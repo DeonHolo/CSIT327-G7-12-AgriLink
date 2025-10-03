@@ -46,7 +46,7 @@ pip install -r requirements.txt
    ```
 
 3. Get your Supabase Session Pooler credentials:
-   - Go to: [Supabase Dashboard](https://supabase.com/dashboard) → Your Project → Connect → Connection Info
+   - Go to: [Supabase Dashboard](https://supabase.com/dashboard) → Your Project → Connect → Connection Info (Or check pinned message in Teams chat)
    - Copy the **Session Pooler** connection string (not direct DB)
    - It should look like: `postgresql://postgres:PASSWORD@aws-0-PROJECTREF.pooler.supabase.com:6543/postgres?sslmode=require`
 
@@ -122,7 +122,7 @@ This project uses Supabase PostgreSQL via **Session Pooler** for better connecti
 - `python-dotenv` - Environment variable loading
 
 ### Connection Setup
-1. Get Session Pooler URL from Supabase Dashboard → Connect → Connection Info
+1. Get Session Pooler URL from Supabase Dashboard → Connect → Connection Info (Or check pinned message in Teams chat)
 2. Format: `postgresql://postgres:PASSWORD@aws-0-PROJECTREF.pooler.supabase.com:5432/postgres?sslmode=require`
 3. Add to `.env` as `DATABASE_URL`
 
