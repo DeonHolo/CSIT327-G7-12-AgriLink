@@ -11,7 +11,7 @@ AgriLink is a web-based platform designed to connect farmers directly with buyer
 
 ## Tech Stack
 
-- **Backend**: Django 5.0.6
+- **Backend**: Django 5.2.6
 - **Database**: Supabase (PostgreSQL)
 - **Authentication**: Django Auth with custom User model
 
@@ -36,9 +36,10 @@ pip install -r requirements.txt
 
 ### 4. Configure Environment Variables
 1. Copy `.env.example` to `.env`
-2. Update with your Supabase credentials:
-   - Get credentials from: Supabase Dashboard → Settings → Database
-   - Update `DB_USER`, `DB_PASSWORD`, `DB_HOST`
+2. Update with your Supabase Session Pooler credentials:
+   - Go to: Supabase Dashboard → Connect → Connection Info
+   - Copy the **Session Pooler** connection string (not direct DB)
+   - Paste as `DATABASE_URL` in your `.env` file
 
 ### 5. Run Migrations
 ```bash
@@ -72,7 +73,7 @@ AgriLink/
 │   └── urls.py           # Auth URL routing
 ├── manage.py             # Django management script
 ├── requirements.txt      # Python dependencies
-└── .env.example         # Environment variables template
+└── .env.example         # Supabase Session Pooler config template
 ```
 
 ## API Endpoints
@@ -93,6 +94,20 @@ AgriLink/
 - `is_verified` - Email verification status
 - `created_at` - Timestamp
 - `updated_at` - Timestamp
+
+## Supabase Configuration
+
+This project uses Supabase PostgreSQL via **Session Pooler** for better connection management:
+
+### Required Packages
+- `psycopg2` - PostgreSQL adapter
+- `dj-database-url` - Database URL parsing
+- `python-dotenv` - Environment variable loading
+
+### Connection Setup
+1. Get Session Pooler URL from Supabase Dashboard → Connect → Connection Info
+2. Format: `postgresql://postgres:PASSWORD@aws-0-PROJECTREF.pooler.supabase.com:5432/postgres?sslmode=require`
+3. Add to `.env` as `DATABASE_URL`
 
 ## Contributing
 
