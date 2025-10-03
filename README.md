@@ -11,7 +11,7 @@ AgriLink is a web-based platform designed to connect farmers directly with buyer
 
 ## Tech Stack
 
-- **Backend**: Django 5.0.6
+- **Backend**: Django 5.2.6
 - **Database**: Supabase (PostgreSQL)
 - **Authentication**: Django Auth with custom User model
 
@@ -35,10 +35,24 @@ pip install -r requirements.txt
 ```
 
 ### 4. Configure Environment Variables
-1. Copy `.env.example` to `.env`
-2. Update with your Supabase credentials:
-   - Get credentials from: Supabase Dashboard → Settings → Database
-   - Update `DB_USER`, `DB_PASSWORD`, `DB_HOST`
+1. Copy `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Generate a Django secret key:
+   ```bash
+   python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+   ```
+
+3. Get your Supabase Session Pooler credentials:
+   - Go to: [Supabase Dashboard](https://supabase.com/dashboard) → Your Project → Connect → Connection Info
+   - Copy the **Session Pooler** connection string (not direct DB)
+   - It should look like: `postgresql://postgres:PASSWORD@aws-0-PROJECTREF.pooler.supabase.com:6543/postgres?sslmode=require`
+
+4. Update your `.env` file with:
+   - `SECRET_KEY`: Paste the generated secret key
+   - `DATABASE_URL`: Paste your Supabase Session Pooler connection string
 
 ### 5. Run Migrations
 ```bash
@@ -58,6 +72,8 @@ python manage.py runserver
 
 Visit: `http://127.0.0.1:8000/`
 
+**Note**: If you get a `SECRET_KEY` error, make sure you've properly configured your `.env` file with a valid secret key.
+
 ## Project Structure
 
 ```
@@ -72,7 +88,9 @@ AgriLink/
 │   └── urls.py           # Auth URL routing
 ├── manage.py             # Django management script
 ├── requirements.txt      # Python dependencies
-└── .env.example         # Environment variables template
+├── .env.example         # Environment variables template
+├── .gitignore           # Git ignore rules
+└── README.md            # This file
 ```
 
 ## API Endpoints
@@ -93,6 +111,20 @@ AgriLink/
 - `is_verified` - Email verification status
 - `created_at` - Timestamp
 - `updated_at` - Timestamp
+
+## Supabase Configuration
+
+This project uses Supabase PostgreSQL via **Session Pooler** for better connection management:
+
+### Required Packages
+- `psycopg2` - PostgreSQL adapter
+- `dj-database-url` - Database URL parsing
+- `python-dotenv` - Environment variable loading
+
+### Connection Setup
+1. Get Session Pooler URL from Supabase Dashboard → Connect → Connection Info
+2. Format: `postgresql://postgres:PASSWORD@aws-0-PROJECTREF.pooler.supabase.com:5432/postgres?sslmode=require`
+3. Add to `.env` as `DATABASE_URL`
 
 ## Contributing
 
