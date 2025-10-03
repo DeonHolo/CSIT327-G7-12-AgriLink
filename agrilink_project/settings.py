@@ -26,7 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-fd*jm7dw6ag9f=q+rcc#4z9&urdw3c5z=tl3akxn_qhf^^5cg$')
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY environment variable is required")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
@@ -87,7 +89,7 @@ DATABASES = {
     "default": dj_database_url.config(
         default="sqlite:///db.sqlite3",
         conn_max_age=600,  # persistent connections
-        ssl_require=True   # enforce SSL
+        ssl_require=False  # SQLite doesn't support SSL
     )
 }
 

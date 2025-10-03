@@ -35,11 +35,24 @@ pip install -r requirements.txt
 ```
 
 ### 4. Configure Environment Variables
-1. Copy `.env.example` to `.env`
-2. Update with your Supabase Session Pooler credentials:
-   - Go to: Supabase Dashboard → Connect → Connection Info
+1. Copy `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Generate a Django secret key:
+   ```bash
+   python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+   ```
+
+3. Get your Supabase Session Pooler credentials:
+   - Go to: [Supabase Dashboard](https://supabase.com/dashboard) → Your Project → Connect → Connection Info
    - Copy the **Session Pooler** connection string (not direct DB)
-   - Paste as `DATABASE_URL` in your `.env` file
+   - It should look like: `postgresql://postgres:PASSWORD@aws-0-PROJECTREF.pooler.supabase.com:6543/postgres?sslmode=require`
+
+4. Update your `.env` file with:
+   - `SECRET_KEY`: Paste the generated secret key
+   - `DATABASE_URL`: Paste your Supabase Session Pooler connection string
 
 ### 5. Run Migrations
 ```bash
@@ -59,6 +72,8 @@ python manage.py runserver
 
 Visit: `http://127.0.0.1:8000/`
 
+**Note**: If you get a `SECRET_KEY` error, make sure you've properly configured your `.env` file with a valid secret key.
+
 ## Project Structure
 
 ```
@@ -73,7 +88,9 @@ AgriLink/
 │   └── urls.py           # Auth URL routing
 ├── manage.py             # Django management script
 ├── requirements.txt      # Python dependencies
-└── .env.example         # Supabase Session Pooler config template
+├── .env.example         # Environment variables template
+├── .gitignore           # Git ignore rules
+└── README.md            # This file
 ```
 
 ## API Endpoints
