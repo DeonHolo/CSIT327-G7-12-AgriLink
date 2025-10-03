@@ -4,4 +4,3 @@ dj-database-url==2.1.0
 python-dotenv==1.0.0
 djangorestframework==3.15.1
 django-cors-headers==4.3.1
-
