@@ -5,9 +5,9 @@ from django.contrib.auth.decorators import login_required
 from .forms import RegistrationForm
 from .models import User
 
-def register_view(request):
+def register_view(request, user_type='buyer'):
     """
-    Handle user registration
+    Handle user registration with role-based registration
     Task 1.1.2: Connect registration form to database
     Task 1.1.3: Implement form validation (frontend & backend)
     Task 1.1.4: Display success/error messages for registration
@@ -18,13 +18,15 @@ def register_view(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            # Save user to database
-            user = form.save()
+            # Save user to database with specified user_type
+            user = form.save(commit=False)
+            user.user_type = user_type
+            user.save()
             
-            # Success message
+            # Success message with role
             messages.success(
                 request, 
-                f'Account created successfully for {user.username}! You can now log in.'
+                f'{user.get_user_type_display()} account created successfully for {user.username}! You can now log in.'
             )
             
             # Redirect to login page
@@ -39,7 +41,8 @@ def register_view(request):
     
     context = {
         'form': form,
-        'title': 'Register - AgriLink'
+        'user_type': user_type,
+        'title': f'Register as {user_type.title()} - AgriLink'
     }
     return render(request, 'authentication/register.html', context)
 
@@ -53,9 +56,14 @@ def login_view(request):
         return redirect('home')
     
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
         remember_me = request.POST.get('remember_me')
+        
+        # Validate input
+        if not username or not password:
+            messages.error(request, 'Both username and password are required.')
+            return render(request, 'authentication/login.html', context)
         
         # Authenticate user
         user = authenticate(request, username=username, password=password)
@@ -91,9 +99,45 @@ def logout_view(request):
 
 def home_view(request):
     """
-    Home page view
+    Home page view - context-aware based on authentication
+    - Guests: Redirected to landing page (marketing content)
+    - Authenticated users: Dashboard with personalized content
     """
+    # Redirect unauthenticated users to the landing page
+    if not request.user.is_authenticated:
+        return redirect('landing')
+    
     context = {
-        'title': 'Home - AgriLink'
+        'title': 'Dashboard - AgriLink'
     }
     return render(request, 'home.html', context)
+
+
+def landing_view(request):
+    """
+    Landing page view
+    """
+    context = {
+        'title': 'Welcome - AgriLink'
+    }
+    return render(request, 'landing.html', context)
+
+
+def password_reset_view(request):
+    """
+    Password reset request view
+    """
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        # TODO: Implement actual password reset email sending
+        # Always show the same message for security (don't reveal if email exists)
+        messages.success(
+            request,
+            'If an account exists with this email, password reset instructions have been sent.'
+        )
+        return redirect('login')
+    
+    context = {
+        'title': 'Reset Password - AgriLink'
+    }
+    return render(request, 'authentication/password_reset.html', context)

@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - AgriLink{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+    
+    .auth-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+        max-width: 1000px;
+        width: 100%;
+    }
+    
+    .auth-image {
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.9), rgba(39, 174, 96, 0.9)),
+                    url('https://images.unsplash.com/photo-1574943320219-553eb213f72d?q=80&w=800') center/cover;
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: white;
+        text-align: center;
+    }
+    
+    .auth-image h2 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+    
+    .auth-image i {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .auth-form {
+        padding: 3rem;
+    }
+    
+    .auth-form h3 {
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+    }
+    
+    .form-control {
+        border-radius: 10px;
+        border: 2px solid #e0e0e0;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #2ecc71;
+        box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+    
+    .btn-login {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+    }
+    
+    .divider {
+        text-align: center;
+        margin: 1.5rem 0;
+        position: relative;
+    }
+    
+    .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #e0e0e0;
+    }
+    
+    .divider span {
+        background: white;
+        padding: 0 1rem;
+        position: relative;
+        color: #7f8c8d;
+    }
+    
+    .password-toggle {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #7f8c8d;
+    }
+    
+    .password-wrapper {
+        position: relative;
+    }
+    
+    @media (max-width: 768px) {
+        .auth-image {
+            padding: 2rem;
+        }
+        
+        .auth-image h2 {
+            font-size: 2rem;
+        }
+        
+        .auth-image i {
+            font-size: 3rem;
+        }
+        
+        .auth-form {
+            padding: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="container d-flex justify-content-center">
+        <div class="auth-card">
+            <div class="row g-0">
+                <!-- Left Side - Image and Info -->
+                <div class="col-lg-5 d-none d-lg-block">
+                    <div class="auth-image h-100">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        <h2>Welcome Back!</h2>
+                        <p class="lead">Sign in to access your AgriLink account and continue connecting with the agricultural community.</p>
+                        <div class="mt-4">
+                            <i class="bi bi-shield-check me-2"></i> Secure Login
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Side - Login Form -->
+                <div class="col-lg-7">
+                    <div class="auth-form">
+                        <h3>Sign In</h3>
+                        <p class="text-muted mb-4">Enter your credentials to access your account</p>
+                        
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- Username Field -->
+                            <div class="mb-3">
+                                <label for="username" class="form-label">
+                                    <i class="bi bi-person"></i> Username
+                                </label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="username" 
+                                    name="username" 
+                                    placeholder="Enter your username"
+                                    required
+                                    autofocus
+                                >
+                            </div>
+                            
+                            <!-- Password Field -->
+                            <div class="mb-3">
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-lock"></i> Password
+                                </label>
+                                <div class="password-wrapper">
+                                    <input 
+                                        type="password" 
+                                        class="form-control" 
+                                        id="password" 
+                                        name="password" 
+                                        placeholder="Enter your password"
+                                        required
+                                    >
+                                    <i class="bi bi-eye password-toggle" id="togglePassword"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Remember Me & Forgot Password -->
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="form-check">
+                                    <input 
+                                        class="form-check-input" 
+                                        type="checkbox" 
+                                        id="remember_me" 
+                                        name="remember_me"
+                                        checked
+                                    >
+                                    <label class="form-check-label" for="remember_me">
+                                        Remember me
+                                    </label>
+                                </div>
+                                <a href="{% url 'password_reset' %}" class="text-decoration-none">
+                                    Forgot password?
+                                </a>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary btn-login w-100">
+                                <i class="bi bi-box-arrow-in-right"></i> Sign In
+                            </button>
+                        </form>
+                        
+                        <!-- Divider -->
+                        <div class="divider">
+                            <span>Don't have an account?</span>
+                        </div>
+                        
+                        <!-- Register Link -->
+                        <a href="{% url 'register' %}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-person-plus"></i> Create Account
+                        </a>
+                        
+                        <!-- Back to Home -->
+                        <div class="text-center mt-3">
+                            <a href="{% url 'home' %}" class="text-decoration-none text-muted">
+                                <i class="bi bi-arrow-left"></i> Back to Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Password toggle functionality
+    const togglePassword = document.getElementById('togglePassword');
+    const password = document.getElementById('password');
+    
+    togglePassword.addEventListener('click', function() {
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        
+        // Toggle icon
+        this.classList.toggle('bi-eye');
+        this.classList.toggle('bi-eye-slash');
+    });
+    
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const username = document.getElementById('username').value.trim();
+        const passwordValue = password.value;
+        
+        if (!username || !passwordValue) {
+            e.preventDefault();
+            alert('Please fill in all fields');
+        }
+    });
+</script>
+{% endblock %}
+
