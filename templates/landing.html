@@ -1,0 +1,337 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Welcome to AgriLink - Connecting Farmers & Buyers{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Remove default padding from main content for full-width sections */
+    .main-content {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.9), rgba(39, 174, 96, 0.9)),
+                    url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2000') center/cover;
+        color: white;
+        padding: 8rem 0 6rem;
+        text-align: center;
+    }
+    
+    .hero-section h1 {
+        font-size: 3.5rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .hero-section p {
+        font-size: 1.3rem;
+        margin-bottom: 2rem;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    /* Purpose Section */
+    .purpose-section {
+        padding: 5rem 0;
+        background-color: #f8f9fa;
+    }
+    
+    .purpose-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+    }
+    
+    .purpose-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .purpose-icon {
+        font-size: 3rem;
+        color: #2ecc71;
+        margin-bottom: 1rem;
+    }
+    
+    /* Services Section */
+    .services-section {
+        padding: 5rem 0;
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        color: white;
+    }
+    
+    .service-card {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .service-card:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: scale(1.05);
+    }
+    
+    .service-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* Features Section */
+    .features-section {
+        padding: 5rem 0;
+        background-color: white;
+    }
+    
+    .feature-item {
+        text-align: center;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .feature-item i {
+        font-size: 2.5rem;
+        color: #2ecc71;
+        margin-bottom: 1rem;
+    }
+    
+    /* CTA Section */
+    .cta-section {
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        color: white;
+        padding: 5rem 0;
+        text-align: center;
+    }
+    
+    .cta-section h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .btn-cta {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        border: none;
+        color: white;
+        padding: 1rem 3rem;
+        font-size: 1.2rem;
+        font-weight: 600;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        margin: 0.5rem;
+    }
+    
+    .btn-cta:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(46, 204, 113, 0.4);
+        color: white;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .hero-section h1 {
+            font-size: 2.5rem;
+        }
+        
+        .hero-section p {
+            font-size: 1.1rem;
+        }
+        
+        .cta-section h2 {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <h1><i class="bi bi-flower2"></i> Welcome to AgriLink</h1>
+        <p class="lead">Connecting Farmers Directly with Buyers</p>
+        <p>Fostering a fair, transparent, and sustainable local food ecosystem</p>
+        <div class="mt-4">
+            <a href="{% url 'register' %}" class="btn btn-light btn-lg me-2">
+                <i class="bi bi-person-plus"></i> Get Started
+            </a>
+            <a href="#about" class="btn btn-light btn-lg ms-2" style="background-color: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.8); color: white; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.9)'; this.style.color='#2ecc71'; this.style.borderColor='white';" onmouseout="this.style.backgroundColor='rgba(255, 255, 255, 0.2)'; this.style.color='white'; this.style.borderColor='rgba(255, 255, 255, 0.8)';">
+                <i class="bi bi-arrow-down-circle"></i> Learn More
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Purpose Section -->
+<section class="purpose-section" id="about">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-4 fw-bold text-dark">Our Purpose</h2>
+            <p class="lead text-muted">Building bridges between local farmers and buyers</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="purpose-card text-center">
+                    <i class="bi bi-people purpose-icon"></i>
+                    <h3>Direct Connection</h3>
+                    <p>Eliminate middlemen and connect farmers directly with buyers for fair pricing and transparent transactions.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="purpose-card text-center">
+                    <i class="bi bi-shield-check purpose-icon"></i>
+                    <h3>Fair Trade</h3>
+                    <p>Ensure farmers receive fair compensation for their hard work while buyers get quality products at reasonable prices.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="purpose-card text-center">
+                    <i class="bi bi-globe purpose-icon"></i>
+                    <h3>Sustainability</h3>
+                    <p>Promote sustainable farming practices and support local food systems for a healthier planet.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-lg-8 mx-auto">
+                <div class="purpose-card">
+                    <h3 class="text-center mb-4"><i class="bi bi-lightbulb text-warning"></i> Why AgriLink?</h3>
+                    <p>AgriLink is more than just a marketplace—it's a movement towards sustainable agriculture and community empowerment. We believe that by connecting farmers directly with buyers, we can create a more equitable food system that benefits everyone.</p>
+                    <p class="mb-0">Our platform leverages modern technology to make it easier than ever for farmers to reach customers and for buyers to access fresh, locally-sourced products. Join us in building a better food future!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="services-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-4 fw-bold">Our Services</h2>
+            <p class="lead">Everything you need to buy and sell agricultural products</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="service-card">
+                    <i class="bi bi-shop service-icon"></i>
+                    <h3>For Farmers</h3>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2"><i class="bi bi-check-circle"></i> List your products easily</li>
+                        <li class="mb-2"><i class="bi bi-check-circle"></i> Set your own prices</li>
+                        <li class="mb-2"><i class="bi bi-check-circle"></i> Manage inventory in real-time</li>
+                        <li class="mb-2"><i class="bi bi-check-circle"></i> Receive direct payments</li>
+                        <li class="mb-2"><i class="bi bi-check-circle"></i> Build your customer base</li>
+                        <li class="mb-2"><i class="bi bi-check-circle"></i> Track sales and analytics</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="service-card">
+                    <i class="bi bi-cart3 service-icon"></i>
+                    <h3>For Buyers</h3>
+                    <ul class="list-unstyled mt-3">
+                        <li class="mb-2"><i class="bi bi-check-circle"></i> Browse fresh local products</li>
+                        <li class="mb-2"><i class="bi bi-check-circle"></i> Connect directly with farmers</li>
+                        <li class="mb-2"><i class="bi bi-check-circle"></i> Verify product quality and origin</li>
+                        <li class="mb-2"><i class="bi bi-check-circle"></i> Secure payment options</li>
+                        <li class="mb-2"><i class="bi bi-check-circle"></i> Schedule pickups or deliveries</li>
+                        <li class="mb-2"><i class="bi bi-check-circle"></i> Review and rate farmers</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="service-card">
+                    <i class="bi bi-graph-up service-icon"></i>
+                    <h3>Market Insights</h3>
+                    <p>Smart filtering and search tools help buyers find exactly what they need by price, location, and category.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="service-card">
+                    <i class="bi bi-chat-dots service-icon"></i>
+                    <h3>Communication Tools</h3>
+                    <p>Built-in messaging system to negotiate, ask questions, and build lasting business relationships.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="service-card">
+                    <i class="bi bi-calculator service-icon"></i>
+                    <h3>Fair Price Calculator</h3>
+                    <p>Transparent pricing based on farmgate prices, production costs, and fair margins for both farmers and buyers.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-4 fw-bold text-dark">Platform Features</h2>
+            <p class="lead text-muted">Designed with both farmers and buyers in mind</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4 col-sm-6">
+                <div class="feature-item">
+                    <i class="bi bi-lightning"></i>
+                    <h5>Fast & Efficient</h5>
+                    <p class="text-muted">Quick loading and smooth user experience</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="feature-item">
+                    <i class="bi bi-search"></i>
+                    <h5>Easy Search</h5>
+                    <p class="text-muted">Find exactly what you need with powerful filters</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="feature-item">
+                    <i class="bi bi-shield-lock"></i>
+                    <h5>Secure Platform</h5>
+                    <p class="text-muted">Your data and transactions are protected with industry-standard security measures</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <h2>Ready to Join AgriLink?</h2>
+        <p class="lead mb-4">Start connecting with farmers and buyers today</p>
+        {% if not user.is_authenticated %}
+            <a href="{% url 'register' %}" class="btn btn-cta">
+                <i class="bi bi-person-plus"></i> Create Account
+            </a>
+            <a href="{% url 'login' %}" class="btn btn-outline-light btn-cta">
+                <i class="bi bi-box-arrow-in-right"></i> Sign In
+            </a>
+        {% else %}
+            <a href="{% url 'home' %}" class="btn btn-cta">
+                <i class="bi bi-speedometer2"></i> Go to Dashboard
+            </a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+

@@ -1,0 +1,374 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register - AgriLink{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+    
+    .auth-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+        max-width: 1000px;
+        width: 100%;
+    }
+    
+    .auth-image {
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.9), rgba(39, 174, 96, 0.9)),
+                    url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=800') center/cover;
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: white;
+        text-align: center;
+    }
+    
+    .auth-image h2 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+    
+    .auth-image i {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .auth-form {
+        padding: 3rem;
+    }
+    
+    .auth-form h3 {
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+    }
+    
+    .form-control {
+        border-radius: 10px;
+        border: 2px solid #e0e0e0;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #2ecc71;
+        box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
+    }
+    
+    .form-control.is-invalid {
+        border-color: #e74c3c;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+    
+    .btn-register {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+    }
+    
+    .divider {
+        text-align: center;
+        margin: 1.5rem 0;
+        position: relative;
+    }
+    
+    .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #e0e0e0;
+    }
+    
+    .divider span {
+        background: white;
+        padding: 0 1rem;
+        position: relative;
+        color: #7f8c8d;
+    }
+    
+    .password-toggle {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #7f8c8d;
+    }
+    
+    .password-wrapper {
+        position: relative;
+    }
+    
+    .password-strength {
+        height: 5px;
+        border-radius: 3px;
+        margin-top: 0.5rem;
+        background: #e0e0e0;
+        overflow: hidden;
+    }
+    
+    .password-strength-bar {
+        height: 100%;
+        width: 0%;
+        transition: all 0.3s ease;
+    }
+    
+    .invalid-feedback {
+        display: block;
+        color: #e74c3c;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    @media (max-width: 768px) {
+        .auth-image {
+            padding: 2rem;
+        }
+        
+        .auth-image h2 {
+            font-size: 2rem;
+        }
+        
+        .auth-image i {
+            font-size: 3rem;
+        }
+        
+        .auth-form {
+            padding: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="container d-flex justify-content-center">
+        <div class="auth-card">
+            <div class="row g-0">
+                <!-- Left Side - Form -->
+                <div class="col-lg-7">
+                    <div class="auth-form">
+                        <h3>Create {{ user_type|title }} Account</h3>
+                        <p class="text-muted mb-4">Join AgriLink as a {{ user_type }} and start connecting today</p>
+                        
+                        <form method="post" novalidate id="registrationForm">
+                            {% csrf_token %}
+                            
+                            <!-- Username Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.username.id_for_label }}" class="form-label">
+                                    <i class="bi bi-person"></i> Username
+                                </label>
+                                {{ form.username }}
+                                {% if form.username.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.username.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Email Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">
+                                    <i class="bi bi-envelope"></i> Email Address
+                                </label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.email.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Password Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.password1.id_for_label }}" class="form-label">
+                                    <i class="bi bi-lock"></i> Password
+                                </label>
+                                <div class="password-wrapper">
+                                    {{ form.password1 }}
+                                    <i class="bi bi-eye password-toggle" id="togglePassword1"></i>
+                                </div>
+                                <div class="password-strength">
+                                    <div class="password-strength-bar" id="strengthBar"></div>
+                                </div>
+                                <small class="text-muted">
+                                    Must be at least 8 characters with letters and numbers
+                                </small>
+                                {% if form.password1.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.password1.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Confirm Password Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.password2.id_for_label }}" class="form-label">
+                                    <i class="bi bi-lock-fill"></i> Confirm Password
+                                </label>
+                                <div class="password-wrapper">
+                                    {{ form.password2 }}
+                                    <i class="bi bi-eye password-toggle" id="togglePassword2"></i>
+                                </div>
+                                {% if form.password2.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.password2.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Terms and Conditions -->
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" id="terms" required>
+                                <label class="form-check-label" for="terms">
+                                    I agree to the <a href="#" class="text-decoration-none">Terms and Conditions</a>
+                                </label>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary btn-register w-100">
+                                <i class="bi bi-person-plus"></i> Create Account
+                            </button>
+                        </form>
+                        
+                        <!-- Divider -->
+                        <div class="divider">
+                            <span>Already have an account?</span>
+                        </div>
+                        
+                        <!-- Login Link -->
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-box-arrow-in-right"></i> Sign In
+                        </a>
+                        
+                        <!-- Back to Home -->
+                        <div class="text-center mt-3">
+                            <a href="{% url 'home' %}" class="text-decoration-none text-muted">
+                                <i class="bi bi-arrow-left"></i> Back to Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Side - Image and Info -->
+                <div class="col-lg-5 d-none d-lg-block">
+                    <div class="auth-image h-100">
+                        <i class="bi bi-person-plus-fill"></i>
+                        <h2>Join AgriLink</h2>
+                        <p class="lead">Connect with farmers and buyers in your local community. Start your journey towards sustainable agriculture.</p>
+                        <div class="mt-4">
+                            <div class="mb-2">
+                                <i class="bi bi-check-circle me-2"></i> Free to join
+                            </div>
+                            <div class="mb-2">
+                                <i class="bi bi-check-circle me-2"></i> Secure platform
+                            </div>
+                            <div class="mb-2">
+                                <i class="bi bi-check-circle me-2"></i> Easy to use
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Password toggle functionality
+    const togglePassword1 = document.getElementById('togglePassword1');
+    const togglePassword2 = document.getElementById('togglePassword2');
+    const password1 = document.getElementById('{{ form.password1.id_for_label }}');
+    const password2 = document.getElementById('{{ form.password2.id_for_label }}');
+    
+    togglePassword1.addEventListener('click', function() {
+        const type = password1.getAttribute('type') === 'password' ? 'text' : 'password';
+        password1.setAttribute('type', type);
+        this.classList.toggle('bi-eye');
+        this.classList.toggle('bi-eye-slash');
+    });
+    
+    togglePassword2.addEventListener('click', function() {
+        const type = password2.getAttribute('type') === 'password' ? 'text' : 'password';
+        password2.setAttribute('type', type);
+        this.classList.toggle('bi-eye');
+        this.classList.toggle('bi-eye-slash');
+    });
+    
+    // Password strength indicator
+    const strengthBar = document.getElementById('strengthBar');
+    
+    password1.addEventListener('input', function() {
+        const password = this.value;
+        let strength = 0;
+        
+        if (password.length >= 8) strength += 25;
+        if (password.match(/[a-z]/)) strength += 25;
+        if (password.match(/[A-Z]/)) strength += 25;
+        if (password.match(/[0-9]/)) strength += 25;
+        
+        strengthBar.style.width = strength + '%';
+        
+        if (strength < 50) {
+            strengthBar.style.backgroundColor = '#e74c3c';
+        } else if (strength < 75) {
+            strengthBar.style.backgroundColor = '#f39c12';
+        } else {
+            strengthBar.style.backgroundColor = '#2ecc71';
+        }
+    });
+    
+    // Form validation
+    const form = document.getElementById('registrationForm');
+    const terms = document.getElementById('terms');
+    
+    form.addEventListener('submit', function(e) {
+        if (!terms.checked) {
+            e.preventDefault();
+            alert('Please accept the terms and conditions');
+        }
+    });
+    
+    // Real-time password match validation
+    password2.addEventListener('input', function() {
+        if (password1.value && password2.value) {
+            if (password1.value !== password2.value) {
+                password2.classList.add('is-invalid');
+            } else {
+                password2.classList.remove('is-invalid');
+            }
+        }
+    });
+</script>
+{% endblock %}
+
