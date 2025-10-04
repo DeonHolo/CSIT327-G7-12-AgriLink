@@ -1,19 +1,23 @@
-# AgriLink
+# AgriLink 
 
 AgriLink is a web-based platform designed to connect farmers directly with buyers, fostering a fair, transparent, and sustainable local food ecosystem.
 
 ## Features
 
-- User Authentication (Registration & Login)
-- Supabase PostgreSQL Database Integration
-- Session Management
-- Form Validation (Frontend & Backend)
+- **User Authentication**: Registration, login, logout with role-based access (Farmer/Buyer)
+- **Dynamic Database**: Automatic switching between SQLite (local) and Supabase PostgreSQL (production)
+- **Responsive Design**: Modern Bootstrap 5 UI with mobile-friendly interface
+- **Security**: CSRF protection, secure password validation, and environment-based configuration
+- **Session Management**: Persistent user sessions with remember me functionality
+- **Form Validation**: Both frontend and backend validation with user feedback
 
 ## Tech Stack
 
-- **Backend**: Django 5.0.6
-- **Database**: Supabase (PostgreSQL)
+- **Backend**: Django 5.2.6
+- **Database**: SQLite (development) / Supabase PostgreSQL (production)
+- **Frontend**: Bootstrap 5, Bootstrap Icons, HTML5/CSS3/JavaScript
 - **Authentication**: Django Auth with custom User model
+- **Configuration**: python-decouple for environment variables
 
 ## Setup Instructions
 
@@ -35,14 +39,28 @@ pip install -r requirements.txt
 ```
 
 ### 4. Configure Environment Variables
-1. Copy `.env.example` to `.env`
-2. Update with your Supabase credentials:
-   - Get credentials from: Supabase Dashboard → Settings → Database
-   - Update `DB_USER`, `DB_PASSWORD`, `DB_HOST`
+1. Copy `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit `.env` with your settings:
+   ```env
+   SECRET_KEY=your-secret-key-here
+   DEBUG=False
+   ALLOWED_HOSTS=localhost,127.0.0.1
+   
+   # For Supabase PostgreSQL: Supabase Dashboard → Your Project → Connect → Connection Info (Or check pinned message in Teams chat for Supabase key) (optional - leave empty to use SQLite, recommended for development testing)
+   DATABASE_URL=postgresql://user:password@host:port/database
+   ```
+
+3. Generate a new SECRET_KEY:
+   ```python
+   python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+   ```
 
 ### 5. Run Migrations
 ```bash
-python manage.py makemigrations
 python manage.py migrate
 ```
 
@@ -58,48 +76,60 @@ python manage.py runserver
 
 Visit: `http://127.0.0.1:8000/`
 
-## Project Structure
+## Database Configuration
 
-```
-AgriLink/
-├── agrilink_project/      # Main project settings
-│   ├── settings.py        # Django settings with Supabase config
-│   └── urls.py           # Main URL routing
-├── authentication/        # Authentication app
-│   ├── models.py         # Custom User model
-│   ├── forms.py          # Registration forms
-│   ├── views.py          # Auth views (register, login, logout)
-│   └── urls.py           # Auth URL routing
-├── manage.py             # Django management script
-├── requirements.txt      # Python dependencies
-└── .env.example         # Environment variables template
-```
+The project automatically handles database switching:
 
-## API Endpoints
+- **Without DATABASE_URL**: Uses SQLite (`db.sqlite3`) for local development
+- **With DATABASE_URL**: Uses PostgreSQL (Supabase) for production
 
+To use Supabase:
+1. Get Session Pooler URL from Supabase Dashboard → Connect → Connection Info (Or check pinned message in Teams chat for Supabase key)
+2. Format: postgresql://postgres:PASSWORD@aws-0-PROJECTREF.pooler.supabase.com:5432/postgres?sslmode=require
+3. Add to .env as DATABASE_URL
+
+## URL Routes
+
+### Public Routes
+- `/` - Home (redirects to landing for guests, dashboard for users)
+- `/landing/` - Marketing/About page
 - `/auth/register/` - User registration
+- `/auth/register/farmer/` - Farmer registration
+- `/auth/register/buyer/` - Buyer registration
 - `/auth/login/` - User login
+- `/auth/password-reset/` - Password reset
+
+### Protected Routes
+- `/` - User dashboard (when authenticated)
 - `/auth/logout/` - User logout
 - `/admin/` - Django admin panel
 
-## Database Schema
+## User Model
 
-### Users Table
+### Custom User Fields
 - `id` - Primary key
 - `username` - Unique username
 - `email` - Unique email
 - `password` - Hashed password
-- `phone_number` - Optional phone
+- `phone_number` - Optional phone number
+- `user_type` - Role: 'farmer', 'buyer', or 'both'
 - `is_verified` - Email verification status
-- `created_at` - Timestamp
-- `updated_at` - Timestamp
+- `created_at` - Account creation timestamp
+- `updated_at` - Last update timestamp
 
-## Contributing
+### Helper Methods
+- `is_farmer()` - Returns True if user is farmer or both
+- `is_buyer()` - Returns True if user is buyer or both
 
-1. Create a new branch for your feature
-2. Make your changes
-3. Submit a pull request
+## Security
+
+- All sensitive data is stored in environment variables
+- CSRF protection enabled
+- Secure password validation
+- Session-based authentication
+- SQL injection protection through Django ORM
 
 ## License
 
 © 2025 AgriLink. All rights reserved.
+
