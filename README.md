@@ -6,7 +6,7 @@ AgriLink is a web-based platform designed to connect farmers directly with buyer
 
 - **User Authentication**: Registration, login, logout with role-based access (Farmer/Buyer)
 - **Dynamic Database**: Automatic switching between SQLite (local) and Supabase PostgreSQL (production)
-- **Responsive Design**: Modern Bootstrap 5 UI with mobile-friendly interface
+- **Responsive Design**: Modern Bootstrap 5 UI
 - **Security**: CSRF protection, secure password validation, and environment-based configuration
 - **Session Management**: Persistent user sessions with remember me functionality
 - **Form Validation**: Both frontend and backend validation with user feedback
