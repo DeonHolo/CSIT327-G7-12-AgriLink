@@ -27,6 +27,10 @@ db.sqlite3-journal
 media/
 staticfiles/
 
+# Database files
+*.sqlite3
+*.db
+
 # Environment
 .env
 .venv
