@@ -176,6 +176,24 @@
             flex-wrap: wrap;
         }
         
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .navbar-center {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .navbar-right {
+            display: flex;
+            align-items: center;
+        }
+        
         .navbar-brand {
             font-size: 1.5rem;
             font-weight: bold;
@@ -196,13 +214,30 @@
         }
         
         .navbar-toggle {
-            display: none;
+            display: block;
             background: transparent;
             border: none;
             color: var(--white);
             font-size: 1.5rem;
             cursor: pointer;
             padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            transform: scale(1.05);
+        }
+        
+        .desktop-sidebar-toggle {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+        }
+        
+        .desktop-sidebar-toggle:hover {
+            border-color: rgba(255, 255, 255, 0.6);
+            background-color: rgba(255, 255, 255, 0.15);
         }
         
         .navbar-menu {
@@ -210,6 +245,7 @@
             list-style: none;
             gap: 0.5rem;
             align-items: center;
+            margin-left: auto;
         }
         
         .nav-link {
@@ -420,10 +456,6 @@
         
         /* ===== RESPONSIVE DESIGN ===== */
         @media (max-width: 768px) {
-            .navbar-toggle {
-                display: block;
-            }
-            
             .navbar-menu {
                 display: none;
                 width: 100%;
@@ -474,22 +506,17 @@
     <nav class="navbar">
         <div class="container-fluid">
             <div class="navbar-container">
-                <!-- Sidebar Toggle Button -->
-                <button class="navbar-toggle" id="sidebarToggle">
-                    <i class="bi bi-list"></i>
-                </button>
+                <!-- Left Side: Burger Menu + Logo -->
+                <div class="navbar-left">
+                    <button class="navbar-toggle desktop-sidebar-toggle" id="sidebarToggle">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <a class="navbar-brand" href="{% url 'home' %}">
+                        <i class="bi bi-flower2"></i> AgriLink
+                    </a>
+                </div>
                 
-                <!-- Brand -->
-                <a class="navbar-brand" href="{% url 'home' %}">
-                    <i class="bi bi-flower2"></i> AgriLink
-                </a>
-                
-                <!-- Mobile Menu Toggle -->
-                <button class="navbar-toggle" id="mobileMenuToggle">
-                    <i class="bi bi-list"></i>
-                </button>
-                
-                <!-- Navbar Links -->
+                <!-- Right Side: Navbar Links -->
                 <ul class="navbar-menu" id="navbarMenu">
                     <li>
                         <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">
@@ -627,16 +654,6 @@
                 sidebarOverlay.classList.remove('active');
             });
         });
-        
-        // Mobile Menu Toggle
-        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-        const navbarMenu = document.getElementById('navbarMenu');
-        
-        if (mobileMenuToggle) {
-            mobileMenuToggle.addEventListener('click', function() {
-                navbarMenu.classList.toggle('active');
-            });
-        }
     </script>
     
     {% block extra_js %}{% endblock %}
