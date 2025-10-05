@@ -6,7 +6,7 @@ AgriLink is a web-based platform designed to connect farmers directly with buyer
 
 - **User Authentication**: Registration, login, logout with role-based access (Farmer/Buyer)
 - **Dynamic Database**: Automatic switching between SQLite (local) and Supabase PostgreSQL (production)
-- **Responsive Design**: Modern Bootstrap 5 UI
+- **Responsive Design**: Custom CSS framework
 - **Security**: CSRF protection, secure password validation, and environment-based configuration
 - **Session Management**: Persistent user sessions with remember me functionality
 - **Form Validation**: Both frontend and backend validation with user feedback
@@ -15,9 +15,12 @@ AgriLink is a web-based platform designed to connect farmers directly with buyer
 
 - **Backend**: Django 5.2.6
 - **Database**: SQLite (development) / Supabase PostgreSQL (production)
-- **Frontend**: Bootstrap 5, Bootstrap Icons, HTML5/CSS3/JavaScript
+- **Frontend**: Custom CSS Framework, Bootstrap Icons, HTML5/CSS3/JavaScript
 - **Authentication**: Django Auth with custom User model
-- **Configuration**: python-decouple for environment variables
+- **Configuration**: python-decouple, python-dotenv for environment variables
+- **API**: Django REST Framework 3.15.1
+- **Database**: psycopg2 for PostgreSQL, dj-database-url for URL parsing
+- **CORS**: django-cors-headers for cross-origin requests
 
 ## Setup Instructions
 
