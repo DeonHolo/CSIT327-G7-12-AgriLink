@@ -50,8 +50,7 @@ pip install -r requirements.txt
 2. Edit `.env` with your settings:
    ```env
    SECRET_KEY=your-secret-key-here
-   DEBUG=False
-   ALLOWED_HOSTS=localhost,127.0.0.1
+   DEBUG=True
    
    # For Supabase PostgreSQL: Supabase Dashboard → Your Project → Connect → Connection Info (Or check pinned message in Teams chat for Supabase key) (optional - leave empty to use SQLite, recommended for development testing)
    DATABASE_URL=postgresql://user:password@host:port/database
