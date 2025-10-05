@@ -7,10 +7,9 @@
 <style>
     .auth-container {
         min-height: calc(100vh - 200px);
+        padding: 2rem 0;
         display: flex;
         align-items: center;
-        justify-content: center;
-        padding: 2rem 0;
     }
     
     .auth-card {
@@ -20,6 +19,10 @@
         overflow: hidden;
         max-width: 1000px;
         width: 100%;
+        margin: 0 auto;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
     }
     
     .auth-image {
@@ -46,39 +49,74 @@
     
     .auth-form {
         padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
     
     .auth-form h3 {
         color: #2c3e50;
         margin-bottom: 0.5rem;
         font-weight: 700;
+        text-align: center;
+        font-size: 2rem;
+    }
+    
+    .auth-form .text-muted {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 1rem;
     }
     
     .form-control {
-        border-radius: 10px;
+        border-radius: 12px;
         border: 2px solid #e0e0e0;
-        padding: 0.75rem 1rem;
+        padding: 1rem 1.25rem;
         transition: all 0.3s ease;
+        font-size: 1rem;
+        width: 100%;
+        box-sizing: border-box;
     }
     
     .form-control:focus {
         border-color: #2ecc71;
         box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
+        outline: none;
     }
     
     .form-label {
         font-weight: 600;
         color: #2c3e50;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+    }
+    
+    .form-label i {
+        font-size: 1.1rem;
+        color: #2ecc71;
+    }
+    
+    .mb-3 {
+        margin-bottom: 1.5rem !important;
     }
     
     .btn-login {
         background: linear-gradient(135deg, #2ecc71, #27ae60);
         border: none;
-        border-radius: 10px;
-        padding: 0.75rem;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
         font-weight: 600;
+        font-size: 1.1rem;
         transition: all 0.3s ease;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin: 1rem 0;
     }
     
     .btn-login:hover {
@@ -86,9 +124,32 @@
         box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
     }
     
+    .btn-outline-primary {
+        border: 2px solid #2ecc71;
+        color: #2ecc71;
+        background: transparent;
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin: 0.5rem 0;
+        text-decoration: none;
+    }
+    
+    .btn-outline-primary:hover {
+        background: #2ecc71;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
     .divider {
         text-align: center;
-        margin: 1.5rem 0;
+        margin: 2rem 0;
         position: relative;
     }
     
@@ -104,9 +165,65 @@
     
     .divider span {
         background: white;
-        padding: 0 1rem;
+        padding: 0 1.5rem;
         position: relative;
         color: #7f8c8d;
+        font-size: 0.9rem;
+    }
+    
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 1rem 0;
+    }
+    
+    .form-check-input {
+        width: 1.2rem;
+        height: 1.2rem;
+        border-radius: 4px;
+        border: 2px solid #e0e0e0;
+    }
+    
+    .form-check-input:checked {
+        background-color: #2ecc71;
+        border-color: #2ecc71;
+    }
+    
+    .form-check-label {
+        font-size: 0.95rem;
+        color: #495057;
+        margin: 0;
+    }
+    
+    .forgot-password-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+    
+    .forgot-link {
+        color: #3498db;
+        font-weight: 500;
+        font-size: 0.95rem;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    
+    .forgot-link:hover {
+        color: #2980b9;
+        text-decoration: underline !important;
+    }
+    
+    .text-decoration-none {
+        color: #3498db;
+        font-weight: 500;
+    }
+    
+    .text-decoration-none:hover {
+        color: #2980b9;
+        text-decoration: underline !important;
     }
     
     .password-toggle {
@@ -144,23 +261,33 @@
 
 {% block content %}
 <div class="auth-container">
-    <div class="container d-flex justify-content-center">
-        <div class="auth-card">
-            <div class="row g-0">
+    <div class="auth-card">
+            <div class="row g-0" style="margin: 0;">
                 <!-- Left Side - Image and Info -->
-                <div class="col-lg-5 d-none d-lg-block">
+                <div class="col-lg-5 d-none d-lg-block" style="padding: 0;">
                     <div class="auth-image h-100">
                         <i class="bi bi-box-arrow-in-right"></i>
                         <h2>Welcome Back!</h2>
                         <p class="lead">Sign in to access your AgriLink account and continue connecting with the agricultural community.</p>
                         <div class="mt-4">
-                            <i class="bi bi-shield-check me-2"></i> Secure Login
+                            <div class="mb-2">
+                                <i class="bi bi-shield-check me-2"></i> Secure Login
+                            </div>
+                            <div class="mb-2">
+                                <i class="bi bi-lightning-charge me-2"></i> Quick Access
+                            </div>
+                            <div class="mb-2">
+                                <i class="bi bi-people me-2"></i> Community Connect
+                            </div>
+                            <div class="mb-2">
+                                <i class="bi bi-graph-up me-2"></i> Track Progress
+                            </div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Right Side - Login Form -->
-                <div class="col-lg-7">
+                <div class="col-lg-7" style="padding: 0 15px;">
                     <div class="auth-form">
                         <h3>Sign In</h3>
                         <p class="text-muted mb-4">Enter your credentials to access your account</p>
@@ -203,7 +330,7 @@
                             </div>
                             
                             <!-- Remember Me & Forgot Password -->
-                            <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="forgot-password-container mb-4">
                                 <div class="form-check">
                                     <input 
                                         class="form-check-input" 
@@ -216,7 +343,7 @@
                                         Remember me
                                     </label>
                                 </div>
-                                <a href="{% url 'password_reset' %}" class="text-decoration-none">
+                                <a href="{% url 'password_reset' %}" class="text-decoration-none forgot-link">
                                     Forgot password?
                                 </a>
                             </div>
@@ -238,7 +365,7 @@
                         </a>
                         
                         <!-- Back to Home -->
-                        <div class="text-center mt-3">
+                        <div class="text-center mt-4">
                             <a href="{% url 'home' %}" class="text-decoration-none text-muted">
                                 <i class="bi bi-arrow-left"></i> Back to Home
                             </a>
@@ -247,7 +374,6 @@
                 </div>
             </div>
         </div>
-    </div>
 </div>
 {% endblock %}
 

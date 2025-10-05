@@ -5,9 +5,9 @@ from django.contrib.auth.decorators import login_required
 from .forms import RegistrationForm
 from .models import User
 
-def register_view(request, user_type='buyer'):
+def register_view(request):
     """
-    Handle user registration with role-based registration
+    Handle user registration with toggle-based role selection
     Task 1.1.2: Connect registration form to database
     Task 1.1.3: Implement form validation (frontend & backend)
     Task 1.1.4: Display success/error messages for registration
@@ -17,6 +17,8 @@ def register_view(request, user_type='buyer'):
     
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
+        user_type = request.POST.get('user_type', 'buyer')  # Default to buyer if not specified
+        
         if form.is_valid():
             # Save user to database with specified user_type
             user = form.save(commit=False)
@@ -41,8 +43,7 @@ def register_view(request, user_type='buyer'):
     
     context = {
         'form': form,
-        'user_type': user_type,
-        'title': f'Register as {user_type.title()} - AgriLink'
+        'title': 'Register - AgriLink'
     }
     return render(request, 'authentication/register.html', context)
 

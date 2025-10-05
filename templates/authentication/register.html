@@ -7,10 +7,9 @@
 <style>
     .auth-container {
         min-height: calc(100vh - 200px);
+        padding: 2rem 0;
         display: flex;
         align-items: center;
-        justify-content: center;
-        padding: 2rem 0;
     }
     
     .auth-card {
@@ -20,6 +19,10 @@
         overflow: hidden;
         max-width: 1000px;
         width: 100%;
+        margin: 0 auto;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
     }
     
     .auth-image {
@@ -46,24 +49,39 @@
     
     .auth-form {
         padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
     
     .auth-form h3 {
         color: #2c3e50;
         margin-bottom: 0.5rem;
         font-weight: 700;
+        text-align: center;
+        font-size: 2rem;
+    }
+    
+    .auth-form .text-muted {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 1rem;
     }
     
     .form-control {
-        border-radius: 10px;
+        border-radius: 12px;
         border: 2px solid #e0e0e0;
-        padding: 0.75rem 1rem;
+        padding: 1rem 1.25rem;
         transition: all 0.3s ease;
+        font-size: 1rem;
+        width: 100%;
+        box-sizing: border-box;
     }
     
     .form-control:focus {
         border-color: #2ecc71;
         box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
+        outline: none;
     }
     
     .form-control.is-invalid {
@@ -73,16 +91,36 @@
     .form-label {
         font-weight: 600;
         color: #2c3e50;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+    }
+    
+    .form-label i {
+        font-size: 1.1rem;
+        color: #2ecc71;
+    }
+    
+    .mb-3 {
+        margin-bottom: 1.5rem !important;
     }
     
     .btn-register {
         background: linear-gradient(135deg, #2ecc71, #27ae60);
         border: none;
-        border-radius: 10px;
-        padding: 0.75rem;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
         font-weight: 600;
+        font-size: 1.1rem;
         transition: all 0.3s ease;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin: 1rem 0;
     }
     
     .btn-register:hover {
@@ -90,9 +128,32 @@
         box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
     }
     
+    .btn-outline-primary {
+        border: 2px solid #2ecc71;
+        color: #2ecc71;
+        background: transparent;
+        border-radius: 12px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin: 0.5rem 0;
+        text-decoration: none;
+    }
+    
+    .btn-outline-primary:hover {
+        background: #2ecc71;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
     .divider {
         text-align: center;
-        margin: 1.5rem 0;
+        margin: 2rem 0;
         position: relative;
     }
     
@@ -108,9 +169,50 @@
     
     .divider span {
         background: white;
-        padding: 0 1rem;
+        padding: 0 1.5rem;
         position: relative;
         color: #7f8c8d;
+        font-size: 0.9rem;
+    }
+    
+    .form-check {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin: 1.5rem 0;
+        text-align: left;
+    }
+    
+    .form-check-input {
+        width: 1.2rem;
+        height: 1.2rem;
+        border-radius: 4px;
+        border: 2px solid #e0e0e0;
+        margin-top: 0.1rem;
+        flex-shrink: 0;
+    }
+    
+    .form-check-input:checked {
+        background-color: #2ecc71;
+        border-color: #2ecc71;
+    }
+    
+    .form-check-label {
+        font-size: 0.95rem;
+        color: #495057;
+        margin: 0;
+        line-height: 1.4;
+    }
+    
+    .form-check-label a {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .form-check-label a:hover {
+        color: #2980b9;
+        text-decoration: underline;
     }
     
     .password-toggle {
@@ -124,6 +226,212 @@
     
     .password-wrapper {
         position: relative;
+    }
+    
+    /* User Type Selection Styles */
+    .user-type-selection {
+        margin-bottom: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+    
+    .selection-title {
+        color: #2c3e50;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    
+    .user-type-cards {
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        gap: 1rem;
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .card-wrapper {
+        position: relative;
+        flex: 1;
+        max-width: 280px;
+    }
+    
+    .card-wrapper input[type="radio"] {
+        display: none;
+    }
+    
+    .user-card {
+        background: #ffffff;
+        border: 2px solid #e0e0e0;
+        border-radius: 15px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        min-height: 200px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        width: 100%;
+    }
+    
+    .user-card:hover {
+        border-color: #2ecc71;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(46, 204, 113, 0.15);
+    }
+    
+    .user-card:has(input:checked) {
+        border-color: #2ecc71;
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.05), rgba(39, 174, 96, 0.05));
+        box-shadow: 0 5px 20px rgba(46, 204, 113, 0.2);
+    }
+    
+    .card-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .card-icon i {
+        font-size: 1.8rem;
+        color: white;
+    }
+    
+    .card-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 100%;
+    }
+    
+    .card-content h5 {
+        color: #2c3e50;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .card-content p {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        line-height: 1.4;
+    }
+    
+    .card-content ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .card-content li {
+        color: #6c757d;
+        font-size: 0.8rem;
+        padding: 0.25rem 0;
+        position: relative;
+        text-align: center;
+        width: auto;
+    }
+    
+    .card-content li:before {
+        content: "✓";
+        color: #2ecc71;
+        font-weight: bold;
+        margin-right: 0.5rem;
+    }
+    
+    .selection-indicator {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    
+    .selection-indicator i {
+        font-size: 0.8rem;
+        color: #6c757d;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+    
+    /* Show selection indicator when input is checked */
+    #buyer-toggle:checked + .buyer-card .selection-indicator {
+        background: #2ecc71;
+    }
+    
+    #buyer-toggle:checked + .buyer-card .selection-indicator i {
+        color: white;
+        opacity: 1;
+    }
+    
+    #farmer-toggle:checked + .farmer-card .selection-indicator {
+        background: #2ecc71;
+    }
+    
+    #farmer-toggle:checked + .farmer-card .selection-indicator i {
+        color: white;
+        opacity: 1;
+    }
+    
+    /* Specific styling for buyer card when selected */
+    #buyer-toggle:checked + .buyer-card {
+        border-color: #2ecc71;
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.05), rgba(39, 174, 96, 0.05));
+        box-shadow: 0 5px 20px rgba(46, 204, 113, 0.2);
+    }
+    
+    /* Specific styling for farmer card when selected */
+    #farmer-toggle:checked + .farmer-card {
+        border-color: #2ecc71;
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.05), rgba(39, 174, 96, 0.05));
+        box-shadow: 0 5px 20px rgba(46, 204, 113, 0.2);
+    }
+    
+    /* Text color changes when selected */
+    #buyer-toggle:checked + .buyer-card .card-content h5,
+    #farmer-toggle:checked + .farmer-card .card-content h5 {
+        color: #2ecc71;
+    }
+    
+    #buyer-toggle:checked + .buyer-card .card-content p,
+    #farmer-toggle:checked + .farmer-card .card-content p {
+        color: #27ae60;
+        font-weight: 500;
+    }
+    
+    #buyer-toggle:checked + .buyer-card .card-content li,
+    #farmer-toggle:checked + .farmer-card .card-content li {
+        color: #2c3e50;
     }
     
     .password-strength {
@@ -147,36 +455,124 @@
         margin-top: 0.25rem;
     }
     
-    @media (max-width: 768px) {
-        .auth-image {
-            padding: 2rem;
+        @media (max-width: 768px) {
+            .auth-image {
+                padding: 2rem;
+            }
+            
+            .auth-image h2 {
+                font-size: 2rem;
+            }
+            
+            .auth-image i {
+                font-size: 3rem;
+            }
+            
+            .auth-form {
+                padding: 2rem;
+            }
+            
+            .user-type-cards {
+                flex-direction: column;
+                gap: 0.75rem;
+                justify-content: center;
+                align-items: center;
+                max-width: 100%;
+            }
+            
+            .card-wrapper {
+                max-width: 100%;
+                width: 100%;
+            }
+            
+            .user-card {
+                min-height: 160px;
+                padding: 1rem;
+            }
+            
+            .card-icon {
+                width: 50px;
+                height: 50px;
+                margin-bottom: 0.75rem;
+            }
+            
+            .card-icon i {
+                font-size: 1.5rem;
+            }
+            
+            .card-content h5 {
+                font-size: 1.1rem;
+            }
+            
+            .card-content p {
+                font-size: 0.85rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .card-content li {
+                font-size: 0.75rem;
+            }
         }
-        
-        .auth-image h2 {
-            font-size: 2rem;
-        }
-        
-        .auth-image i {
-            font-size: 3rem;
-        }
-        
-        .auth-form {
-            padding: 2rem;
-        }
-    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="auth-container">
-    <div class="container d-flex justify-content-center">
-        <div class="auth-card">
-            <div class="row g-0">
+    <div class="auth-card">
+            <div class="row g-0" style="margin: 0;">
                 <!-- Left Side - Form -->
-                <div class="col-lg-7">
+                <div class="col-lg-7" style="padding: 0 15px;">
                     <div class="auth-form">
-                        <h3>Create {{ user_type|title }} Account</h3>
-                        <p class="text-muted mb-4">Join AgriLink as a {{ user_type }} and start connecting today</p>
+                        <h3>Create Account</h3>
+                        <p class="text-muted mb-4">Join AgriLink and start connecting today</p>
+                        
+                        <!-- User Type Selection -->
+                        <div class="user-type-selection mb-4">
+                            <h4 class="selection-title">I want to join as:</h4>
+                            <div class="user-type-cards">
+                                <div class="card-wrapper">
+                                    <input type="radio" id="buyer-toggle" name="user_type" value="buyer" checked>
+                                    <label for="buyer-toggle" class="user-card buyer-card">
+                                        <div class="card-icon">
+                                            <i class="bi bi-cart3"></i>
+                                        </div>
+                                        <div class="card-content">
+                                            <h5>Buyer</h5>
+                                            <p>Purchase fresh produce directly from farmers</p>
+                                            <ul>
+                                                <li>Access to fresh, local produce</li>
+                                                <li>Direct farmer connections</li>
+                                                <li>Competitive pricing</li>
+                                            </ul>
+                                        </div>
+                                        <div class="selection-indicator">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        </div>
+                                    </label>
+                                </div>
+                                
+                                <div class="card-wrapper">
+                                    <input type="radio" id="farmer-toggle" name="user_type" value="farmer">
+                                    <label for="farmer-toggle" class="user-card farmer-card">
+                                        <div class="card-icon">
+                                            <i class="bi bi-tree"></i>
+                                        </div>
+                                        <div class="card-content">
+                                            <h5>Farmer</h5>
+                                            <p>Sell your fresh produce to local buyers</p>
+                                            <ul>
+                                                <li>Direct sales to customers</li>
+                                                <li>Fair pricing for your crops</li>
+                                                <li>Local market expansion</li>
+                                            </ul>
+                                        </div>
+                                        <div class="selection-indicator">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                         
                         <form method="post" novalidate id="registrationForm">
                             {% csrf_token %}
@@ -270,7 +666,7 @@
                         </a>
                         
                         <!-- Back to Home -->
-                        <div class="text-center mt-3">
+                        <div class="text-center mt-4">
                             <a href="{% url 'home' %}" class="text-decoration-none text-muted">
                                 <i class="bi bi-arrow-left"></i> Back to Home
                             </a>
@@ -279,11 +675,11 @@
                 </div>
                 
                 <!-- Right Side - Image and Info -->
-                <div class="col-lg-5 d-none d-lg-block">
-                    <div class="auth-image h-100">
-                        <i class="bi bi-person-plus-fill"></i>
-                        <h2>Join AgriLink</h2>
-                        <p class="lead">Connect with farmers and buyers in your local community. Start your journey towards sustainable agriculture.</p>
+                <div class="col-lg-5 d-none d-lg-block" style="padding: 0;">
+                    <div class="auth-image h-100" id="authImage">
+                        <i class="bi bi-person-plus-fill" id="authIcon"></i>
+                        <h2 id="authTitle">Join as Buyer</h2>
+                        <p class="lead" id="authDescription">Connect with farmers and sell your produce in your local community. Start your journey in agricultural trade.</p>
                         <div class="mt-4">
                             <div class="mb-2">
                                 <i class="bi bi-check-circle me-2"></i> Free to join
@@ -294,12 +690,14 @@
                             <div class="mb-2">
                                 <i class="bi bi-check-circle me-2"></i> Easy to use
                             </div>
+                            <div class="mb-2">
+                                <i class="bi bi-check-circle me-2"></i> Local marketplace
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 </div>
 {% endblock %}
 
@@ -368,6 +766,48 @@
                 password2.classList.remove('is-invalid');
             }
         }
+    });
+    
+    // User type toggle functionality
+    const buyerToggle = document.getElementById('buyer-toggle');
+    const farmerToggle = document.getElementById('farmer-toggle');
+    const authImage = document.getElementById('authImage');
+    const authIcon = document.getElementById('authIcon');
+    const authTitle = document.getElementById('authTitle');
+    const authDescription = document.getElementById('authDescription');
+    
+    function updateAuthContent(userType) {
+        if (userType === 'farmer') {
+            authImage.style.background = "linear-gradient(135deg, rgba(46, 204, 113, 0.9), rgba(39, 174, 96, 0.9)), url('https://images.unsplash.com/photo-1574943320219-553eb213f72d?q=80&w=800') center/cover";
+            authIcon.className = "bi bi-tree-fill";
+            authTitle.textContent = "Join as Farmer";
+            authDescription.textContent = "Connect with buyers and showcase your produce. Start your journey in sustainable farming and direct sales.";
+        } else {
+            authImage.style.background = "linear-gradient(135deg, rgba(46, 204, 113, 0.9), rgba(39, 174, 96, 0.9)), url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=800') center/cover";
+            authIcon.className = "bi bi-cart3-fill";
+            authTitle.textContent = "Join as Buyer";
+            authDescription.textContent = "Connect with farmers and buy fresh produce in your local community. Start your journey in agricultural trade.";
+        }
+    }
+    
+    buyerToggle.addEventListener('change', function() {
+        if (this.checked) updateAuthContent('buyer');
+    });
+    
+    farmerToggle.addEventListener('change', function() {
+        if (this.checked) updateAuthContent('farmer');
+    });
+    
+    // Form submission - add user_type to form data
+    form.addEventListener('submit', function(e) {
+        const selectedUserType = buyerToggle.checked ? 'buyer' : 'farmer';
+        
+        // Create hidden input for user_type
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'user_type';
+        hiddenInput.value = selectedUserType;
+        form.appendChild(hiddenInput);
     });
 </script>
 {% endblock %}
