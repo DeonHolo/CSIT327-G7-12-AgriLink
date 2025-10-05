@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load static %}
 
 {% block title %}Home - AgriLink{% endblock %}
 
@@ -32,6 +31,30 @@
     @keyframes float {
         0%, 100% { transform: translateY(0px); }
         50% { transform: translateY(20px); }
+    }
+    
+    .welcome-badge {
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    .display-4 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .lead {
+        font-size: 1.3rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
     }
     
     .dashboard-card {
@@ -76,6 +99,7 @@
         background-clip: text;
         margin-bottom: 1.5rem;
         transition: transform 0.3s ease;
+        display: block;
     }
     
     .dashboard-card:hover .icon {
@@ -99,10 +123,12 @@
         padding: 3rem;
         border-radius: 15px;
         margin-top: 3rem;
+        text-align: center;
     }
     
     .quick-actions h3 {
         margin-bottom: 2rem;
+        font-size: 2rem;
     }
     
     .quick-action-btn {
@@ -115,6 +141,7 @@
         text-decoration: none;
         display: inline-block;
         margin: 0.5rem;
+        font-weight: 500;
     }
     
     .quick-action-btn:hover {
@@ -122,6 +149,7 @@
         border-color: white;
         color: white;
         transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
     
     .stats-card {
@@ -131,12 +159,17 @@
         border-radius: 15px;
         text-align: center;
         margin-bottom: 1.5rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
     }
     
     .stats-card h2 {
         font-size: 3rem;
         font-weight: bold;
-        margin: 0;
+        margin: 0 0 0.5rem 0;
     }
     
     .stats-card p {
@@ -144,52 +177,53 @@
         opacity: 0.9;
     }
     
-    .welcome-badge {
-        background: rgba(255, 255, 255, 0.25);
-        backdrop-filter: blur(10px);
+    .btn-primary {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
         color: white;
-        padding: 0.75rem 2rem;
-        border-radius: 50px;
-        display: inline-block;
-        margin-bottom: 1.5rem;
-        font-weight: 600;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    }
-    
-    .btn-learn-more {
-        background: rgba(255, 255, 255, 0.2) !important;
-        border: 2px solid white !important;
-        color: white !important;
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease !important;
-        font-weight: 600 !important;
-    }
-    
-    .btn-learn-more:hover {
-        background: white !important;
-        color: #2ecc71 !important;
-        border-color: white !important;
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
-    }
-    
-    .feature-card-icon {
-        width: 80px;
-        height: 80px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 50%;
-        display: flex;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        display: inline-flex;
         align-items: center;
-        justify-content: center;
-        margin: 0 auto 1rem;
-        backdrop-filter: blur(10px);
-        border: 2px solid rgba(255, 255, 255, 0.3);
+        gap: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+    }
+    
+    /* Grid improvements */
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
     }
     
     @media (max-width: 768px) {
         .welcome-section {
-            padding: 2rem 0;
+            padding: 3rem 0;
+        }
+        
+        .display-4 {
+            font-size: 2rem;
+        }
+        
+        .lead {
+            font-size: 1.1rem;
+        }
+        
+        .grid-container {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        .dashboard-card {
+            padding: 1.5rem;
         }
     }
 </style>
@@ -203,204 +237,203 @@
             <i class="bi bi-person-circle"></i> Welcome back!
         </span>
         <h1 class="display-4 fw-bold text-white mb-3">Hello, {{ user.username }}!</h1>
-        <p class="lead text-white mb-4" style="font-size: 1.3rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">Ready to manage your agricultural business?</p>
+        {% if user.is_farmer %}
+        <p class="lead text-white mb-4">Ready to manage your agricultural business?</p>
+        {% else %}
+        <p class="lead text-white mb-4">Ready to discover fresh local products?</p>
+        {% endif %}
     </div>
 </section>
 
 <div class="container">
-        <!-- Dashboard Cards -->
-        <section class="mb-5">
-            <h2 class="mb-4 fw-bold text-dark">
-                <i class="bi bi-speedometer2 text-primary"></i> Dashboard
-            </h2>
+    <!-- Dashboard Cards -->
+    <section class="mb-5">
+        <h2 class="mb-4 fw-bold text-dark">
+            <i class="bi bi-speedometer2 text-primary"></i> Dashboard
+        </h2>
+        
+        <div class="grid-container">
+            {% if user.is_farmer %}
+            <!-- Farmer-specific cards -->
+            <div class="dashboard-card text-center">
+                <i class="bi bi-box-seam icon"></i>
+                <h4>My Products</h4>
+                <p>Manage your product listings and inventory</p>
+                <a href="#" class="btn-primary">
+                    <i class="bi bi-arrow-right"></i> Manage Products
+                </a>
+            </div>
             
-            <div class="row g-4">
-                {% if user.is_farmer %}
-                <!-- Farmer-specific cards -->
-                <div class="col-md-4">
-                    <div class="dashboard-card text-center">
-                        <i class="bi bi-box-seam icon"></i>
-                        <h4>My Products</h4>
-                        <p>Manage your product listings and inventory</p>
-                        <a href="#" class="btn btn-primary">
-                            <i class="bi bi-arrow-right"></i> Manage Products
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="dashboard-card text-center">
-                        <i class="bi bi-cart-check icon"></i>
-                        <h4>Sales Dashboard</h4>
-                        <p>Track your sales and customer orders</p>
-                        <a href="#" class="btn btn-primary">
-                            <i class="bi bi-arrow-right"></i> View Sales
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="dashboard-card text-center">
-                        <i class="bi bi-graph-up icon"></i>
-                        <h4>Earnings</h4>
-                        <p>View your earnings and payout history</p>
-                        <a href="#" class="btn btn-primary">
-                            <i class="bi bi-arrow-right"></i> View Earnings
-                        </a>
-                    </div>
-                </div>
-                {% endif %}
-                
-                {% if user.is_buyer %}
-                <!-- Buyer-specific cards -->
-                <div class="col-md-4">
-                    <div class="dashboard-card text-center">
-                        <i class="bi bi-search icon"></i>
-                        <h4>Browse Products</h4>
-                        <p>Find and purchase fresh local products</p>
-                        <a href="#" class="btn btn-primary">
-                            <i class="bi bi-arrow-right"></i> Browse & Buy
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="dashboard-card text-center">
-                        <i class="bi bi-bag-check icon"></i>
-                        <h4>My Orders</h4>
-                        <p>Track your purchases and delivery status</p>
-                        <a href="#" class="btn btn-primary">
-                            <i class="bi bi-arrow-right"></i> View Orders
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="dashboard-card text-center">
-                        <i class="bi bi-heart icon"></i>
-                        <h4>Favorites</h4>
-                        <p>Save your favorite products and farmers</p>
-                        <a href="#" class="btn btn-primary">
-                            <i class="bi bi-arrow-right"></i> View Favorites
-                        </a>
-                    </div>
-                </div>
-                {% endif %}
-                
-                <!-- Shared cards for all users -->
-                <div class="col-md-4">
-                    <div class="dashboard-card text-center">
-                        <i class="bi bi-chat-dots icon"></i>
-                        <h4>Messages</h4>
-                        <p>Communicate with {% if user.is_farmer %}buyers{% else %}farmers{% endif %}</p>
-                        <a href="#" class="btn btn-primary">
-                            <i class="bi bi-arrow-right"></i> View Messages
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="dashboard-card text-center">
-                        <i class="bi bi-person-circle icon"></i>
-                        <h4>Profile</h4>
-                        <p>Update your account information and settings</p>
-                        <a href="#" class="btn btn-primary">
-                            <i class="bi bi-arrow-right"></i> Edit Profile
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="dashboard-card text-center">
-                        <i class="bi bi-gear icon"></i>
-                        <h4>Settings</h4>
-                        <p>Configure your preferences and notifications</p>
-                        <a href="#" class="btn btn-primary">
-                            <i class="bi bi-arrow-right"></i> Settings
-                        </a>
-                    </div>
+            <div class="dashboard-card text-center">
+                <i class="bi bi-cart-check icon"></i>
+                <h4>Sales Dashboard</h4>
+                <p>Track your sales and customer orders</p>
+                <a href="#" class="btn-primary">
+                    <i class="bi bi-arrow-right"></i> View Sales
+                </a>
+            </div>
+            
+            <div class="dashboard-card text-center">
+                <i class="bi bi-graph-up icon"></i>
+                <h4>Earnings</h4>
+                <p>View your earnings and payout history</p>
+                <a href="#" class="btn-primary">
+                    <i class="bi bi-arrow-right"></i> View Earnings
+                </a>
+            </div>
+            {% endif %}
+            
+            {% if user.is_buyer %}
+            <!-- Buyer-specific cards -->
+            <div class="dashboard-card text-center">
+                <i class="bi bi-search icon"></i>
+                <h4>Browse Products</h4>
+                <p>Find and purchase fresh local products</p>
+                <a href="#" class="btn-primary">
+                    <i class="bi bi-arrow-right"></i> Browse & Buy
+                </a>
+            </div>
+            
+            <div class="dashboard-card text-center">
+                <i class="bi bi-bag-check icon"></i>
+                <h4>My Orders</h4>
+                <p>Track your purchases and delivery status</p>
+                <a href="#" class="btn-primary">
+                    <i class="bi bi-arrow-right"></i> View Orders
+                </a>
+            </div>
+            
+            <div class="dashboard-card text-center">
+                <i class="bi bi-heart icon"></i>
+                <h4>Favorites</h4>
+                <p>Save your favorite products and farmers</p>
+                <a href="#" class="btn-primary">
+                    <i class="bi bi-arrow-right"></i> View Favorites
+                </a>
+            </div>
+            {% endif %}
+            
+            <!-- Shared cards for all users -->
+            <div class="dashboard-card text-center">
+                <i class="bi bi-chat-dots icon"></i>
+                <h4>Messages</h4>
+                <p>Communicate with {% if user.is_farmer %}buyers{% else %}farmers{% endif %}</p>
+                <a href="#" class="btn-primary">
+                    <i class="bi bi-arrow-right"></i> View Messages
+                </a>
+            </div>
+            
+            <div class="dashboard-card text-center">
+                <i class="bi bi-person-circle icon"></i>
+                <h4>Profile</h4>
+                <p>Update your account information and settings</p>
+                <a href="#" class="btn-primary">
+                    <i class="bi bi-arrow-right"></i> Edit Profile
+                </a>
+            </div>
+            
+            <div class="dashboard-card text-center">
+                <i class="bi bi-gear icon"></i>
+                <h4>Settings</h4>
+                <p>Configure your preferences and notifications</p>
+                <a href="#" class="btn-primary">
+                    <i class="bi bi-arrow-right"></i> Settings
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Quick Stats -->
+    <section class="mb-5">
+        <h2 class="mb-4 fw-bold text-dark">
+            <i class="bi bi-bar-chart text-primary"></i> Quick Stats
+        </h2>
+        
+        <div class="row">
+            {% if user.is_farmer %}
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stats-card">
+                    <h2>0</h2>
+                    <p>My Products</p>
                 </div>
             </div>
-        </section>
-        
-        <!-- Quick Stats -->
-        <section class="mb-5">
-            <h2 class="mb-4 fw-bold text-dark">
-                <i class="bi bi-bar-chart text-primary"></i> Quick Stats
-            </h2>
-            
-            <div class="row">
-                {% if user.is_farmer %}
-                <div class="col-md-3">
-                    <div class="stats-card">
-                        <h2>0</h2>
-                        <p>My Products</p>
-                    </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stats-card" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
+                    <h2>0</h2>
+                    <p>Orders Received</p>
                 </div>
-                <div class="col-md-3">
-                    <div class="stats-card" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
-                        <h2>0</h2>
-                        <p>Orders Received</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
-                        <h2>₱0</h2>
-                        <p>Total Earnings</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card" style="background: linear-gradient(135deg, #f39c12, #d68910);">
-                        <h2>0</h2>
-                        <p>My Rating</p>
-                    </div>
-                </div>
-                {% else %}
-                <div class="col-md-3">
-                    <div class="stats-card">
-                        <h2>0</h2>
-                        <p>Orders Placed</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
-                        <h2>0</h2>
-                        <p>Favorites</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
-                        <h2>0</h2>
-                        <p>Active Orders</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card" style="background: linear-gradient(135deg, #f39c12, #d68910);">
-                        <h2>0</h2>
-                        <p>Farmers Followed</p>
-                    </div>
-                </div>
-                {% endif %}
             </div>
-        </section>
-        
-        <!-- Quick Actions -->
-        <section class="quick-actions text-center">
-            <h3><i class="bi bi-lightning"></i> Quick Actions</h3>
-            <a href="#" class="quick-action-btn">
-                <i class="bi bi-plus-circle"></i> Add New Product
-            </a>
-            <a href="#" class="quick-action-btn">
-                <i class="bi bi-search"></i> Browse Products
-            </a>
-            <a href="#" class="quick-action-btn">
-                <i class="bi bi-chat-left-text"></i> Send Message
-            </a>
-            <a href="#" class="quick-action-btn">
-                <i class="bi bi-file-earmark-text"></i> View Reports
-            </a>
-        </section>
-    </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stats-card" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                    <h2>₱0</h2>
+                    <p>Total Earnings</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stats-card" style="background: linear-gradient(135deg, #f39c12, #d68910);">
+                    <h2>0</h2>
+                    <p>My Rating</p>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stats-card">
+                    <h2>0</h2>
+                    <p>Orders Placed</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stats-card" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
+                    <h2>0</h2>
+                    <p>Favorites</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stats-card" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                    <h2>0</h2>
+                    <p>Active Orders</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-3">
+                <div class="stats-card" style="background: linear-gradient(135deg, #f39c12, #d68910);">
+                    <h2>0</h2>
+                    <p>Farmers Followed</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+    
+    <!-- Quick Actions -->
+    <section class="quick-actions">
+        <h3><i class="bi bi-lightning"></i> Quick Actions</h3>
+        {% if user.is_farmer %}
+        <a href="#" class="quick-action-btn">
+            <i class="bi bi-plus-circle"></i> Add New Product
+        </a>
+        <a href="#" class="quick-action-btn">
+            <i class="bi bi-box-seam"></i> Manage Inventory
+        </a>
+        <a href="#" class="quick-action-btn">
+            <i class="bi bi-graph-up"></i> View Sales Reports
+        </a>
+        <a href="#" class="quick-action-btn">
+            <i class="bi bi-chat-left-text"></i> Message Buyers
+        </a>
+        {% else %}
+        <a href="#" class="quick-action-btn">
+            <i class="bi bi-search"></i> Browse Products
+        </a>
+        <a href="#" class="quick-action-btn">
+            <i class="bi bi-bag-check"></i> View Orders
+        </a>
+        <a href="#" class="quick-action-btn">
+            <i class="bi bi-heart"></i> My Favorites
+        </a>
+        <a href="#" class="quick-action-btn">
+            <i class="bi bi-chat-left-text"></i> Message Farmers
+        </a>
+        {% endif %}
+    </section>
 </div>
 {% endblock %}
-
