@@ -50,10 +50,10 @@ pip install -r requirements.txt
 2. Edit `.env` with your settings:
    ```env
    SECRET_KEY=your-secret-key-here
-   DEBUG=False
-   ALLOWED_HOSTS=localhost,127.0.0.1
+   DEBUG=True
    
-   # For Supabase PostgreSQL: Supabase Dashboard → Your Project → Connect → Connection Info (Or check pinned message in Teams chat for Supabase key) (optional - leave empty to use SQLite, recommended for development testing)
+   # For Supabase PostgreSQL: Supabase Dashboard → Your Project → Connect → Connection Info (Or check pinned message in Teams chat for Supabase key)
+   # (Optional - leave empty to use SQLite, recommended for development testing)
    DATABASE_URL=postgresql://user:password@host:port/database
    ```
 
@@ -88,7 +88,7 @@ The project automatically handles database switching:
 
 To use Supabase:
 1. Get Session Pooler URL from Supabase Dashboard → Connect → Connection Info (Or check pinned message in Teams chat for Supabase key)
-2. Format: postgresql://postgres:PASSWORD@aws-0-PROJECTREF.pooler.supabase.com:5432/postgres?sslmode=require
+2. Format: ```postgresql://postgres:PASSWORD@aws-0-PROJECTREF.pooler.supabase.com:5432/postgres?sslmode=require```
 3. Add to .env as DATABASE_URL
 
 ## URL Routes

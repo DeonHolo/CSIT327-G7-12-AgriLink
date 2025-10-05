@@ -67,6 +67,8 @@
         border: 2px solid transparent;
         position: relative;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
     
     .dashboard-card::before {
@@ -115,6 +117,7 @@
     .dashboard-card p {
         color: #7f8c8d;
         margin-bottom: 1.5rem;
+        flex: 1;
     }
     
     .quick-actions {
@@ -189,6 +192,8 @@
         gap: 0.5rem;
         font-weight: 500;
         transition: all 0.3s ease;
+        margin-top: auto;
+        align-self: center;
     }
     
     .btn-primary:hover {
