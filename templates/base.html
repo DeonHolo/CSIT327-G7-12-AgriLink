@@ -5,50 +5,223 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AgriLink{% endblock %}</title>
     
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Bootstrap Icons -->
+    <!-- Bootstrap Icons (keeping these for icons) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     
-    <!-- Custom CSS -->
+    <!-- Custom CSS Framework -->
     <style>
+        /* ===== CSS RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         :root {
             --primary-color: #2ecc71;
             --secondary-color: #27ae60;
             --dark-color: #2c3e50;
             --light-color: #ecf0f1;
+            --white: #ffffff;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-400: #ced4da;
+            --gray-500: #adb5bd;
+            --gray-600: #6c757d;
+            --gray-700: #495057;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+            --success: #2ecc71;
+        }
+        
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
         }
         
         body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--gray-900);
+            background-color: var(--white);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
         
-        /* Navigation Bar Styles */
+        /* ===== LAYOUT SYSTEM ===== */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .container-fluid {
+            width: 100%;
+            padding: 0 20px;
+        }
+        
+        /* Grid System */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -20px;
+            row-gap: 2.5rem;
+        }
+        
+        .col {
+            flex: 1;
+            padding: 0 15px;
+        }
+        
+        .col-1 { flex: 0 0 8.333%; max-width: 8.333%; padding: 0 20px; }
+        .col-2 { flex: 0 0 16.666%; max-width: 16.666%; padding: 0 20px; }
+        .col-3 { flex: 0 0 25%; max-width: 25%; padding: 0 20px; }
+        .col-4 { flex: 0 0 33.333%; max-width: 33.333%; padding: 0 20px; }
+        .col-5 { flex: 0 0 41.666%; max-width: 41.666%; padding: 0 20px; }
+        .col-6 { flex: 0 0 50%; max-width: 50%; padding: 0 20px; }
+        .col-7 { flex: 0 0 58.333%; max-width: 58.333%; padding: 0 20px; }
+        .col-8 { flex: 0 0 66.666%; max-width: 66.666%; padding: 0 20px; }
+        .col-9 { flex: 0 0 75%; max-width: 75%; padding: 0 20px; }
+        .col-10 { flex: 0 0 83.333%; max-width: 83.333%; padding: 0 20px; }
+        .col-11 { flex: 0 0 91.666%; max-width: 91.666%; padding: 0 20px; }
+        .col-12 { flex: 0 0 100%; max-width: 100%; padding: 0 20px; }
+        
+        /* ===== UTILITIES ===== */
+        /* Spacing */
+        .m-0 { margin: 0 !important; }
+        .m-1 { margin: 0.25rem !important; }
+        .m-2 { margin: 0.5rem !important; }
+        .m-3 { margin: 1rem !important; }
+        .m-4 { margin: 1.5rem !important; }
+        .m-5 { margin: 3rem !important; }
+        
+        .mt-1 { margin-top: 0.25rem !important; }
+        .mt-2 { margin-top: 0.5rem !important; }
+        .mt-3 { margin-top: 1rem !important; }
+        .mt-4 { margin-top: 1.5rem !important; }
+        .mt-5 { margin-top: 3rem !important; }
+        
+        .mb-1 { margin-bottom: 0.25rem !important; }
+        .mb-2 { margin-bottom: 0.5rem !important; }
+        .mb-3 { margin-bottom: 1rem !important; }
+        .mb-4 { margin-bottom: 1.5rem !important; }
+        .mb-5 { margin-bottom: 3rem !important; }
+        
+        .mx-auto { margin-left: auto !important; margin-right: auto !important; }
+        
+        .p-0 { padding: 0 !important; }
+        .p-1 { padding: 0.25rem !important; }
+        .p-2 { padding: 0.5rem !important; }
+        .p-3 { padding: 1rem !important; }
+        .p-4 { padding: 1.5rem !important; }
+        .p-5 { padding: 3rem !important; }
+        
+        /* Text Alignment */
+        .text-left { text-align: left !important; }
+        .text-center { text-align: center !important; }
+        .text-right { text-align: right !important; }
+        
+        /* Display */
+        .d-none { display: none !important; }
+        .d-block { display: block !important; }
+        .d-flex { display: flex !important; }
+        .d-grid { display: grid !important; }
+        
+        /* Flex */
+        .flex-column { flex-direction: column !important; }
+        .flex-wrap { flex-wrap: wrap !important; }
+        .justify-center { justify-content: center !important; }
+        .justify-between { justify-content: space-between !important; }
+        .align-center { align-items: center !important; }
+        .gap-1 { gap: 0.5rem !important; }
+        .gap-2 { gap: 1rem !important; }
+        .gap-3 { gap: 1.5rem !important; }
+        .gap-4 { gap: 2rem !important; }
+        
+        /* Colors */
+        .text-primary { color: var(--primary-color) !important; }
+        .text-white { color: var(--white) !important; }
+        .text-muted { color: var(--gray-600) !important; }
+        .text-dark { color: var(--dark-color) !important; }
+        
+        .bg-primary { background-color: var(--primary-color) !important; }
+        .bg-light { background-color: var(--gray-100) !important; }
+        .bg-white { background-color: var(--white) !important; }
+        
+        /* Font Weight */
+        .fw-normal { font-weight: 400 !important; }
+        .fw-bold { font-weight: 700 !important; }
+        .fw-semibold { font-weight: 600 !important; }
+        
+        /* ===== NAVIGATION BAR ===== */
         .navbar {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .navbar-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
         }
         
         .navbar-brand {
             font-size: 1.5rem;
             font-weight: bold;
-            color: white !important;
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .navbar-brand:hover {
+            transform: scale(1.05);
         }
         
         .navbar-brand i {
-            color: white;
+            color: var(--white);
+        }
+        
+        .navbar-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            list-style: none;
+            gap: 0.5rem;
+            align-items: center;
         }
         
         .nav-link {
-            color: white !important;
+            color: var(--white);
+            text-decoration: none;
             font-weight: 500;
-            padding: 0.5rem 1rem !important;
-            margin: 0 0.2rem;
+            padding: 0.5rem 1rem;
             border-radius: 5px;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .nav-link:hover {
@@ -56,14 +229,13 @@
             transform: translateY(-2px);
         }
         
-        /* Active Page Highlighting */
         .nav-link.active {
             background-color: rgba(255, 255, 255, 0.3);
             font-weight: 600;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         
-        /* Sidebar Styles */
+        /* Sidebar */
         .sidebar {
             position: fixed;
             top: 0;
@@ -85,10 +257,10 @@
             padding: 1.5rem;
             background-color: rgba(0,0,0,0.2);
             border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: var(--white);
         }
         
         .sidebar-header h3 {
-            color: white;
             margin: 0;
             font-size: 1.5rem;
         }
@@ -98,10 +270,10 @@
         }
         
         .sidebar-nav .nav-link {
-            color: rgba(255,255,255,0.8) !important;
-            padding: 1rem 1.5rem !important;
-            margin: 0 !important;
-            border-radius: 0 !important;
+            color: rgba(255,255,255,0.8);
+            padding: 1rem 1.5rem;
+            margin: 0;
+            border-radius: 0;
             border-left: 3px solid transparent;
             display: flex;
             align-items: center;
@@ -110,14 +282,14 @@
         
         .sidebar-nav .nav-link:hover {
             background-color: rgba(255,255,255,0.1);
-            color: white !important;
+            color: var(--white);
             border-left-color: var(--primary-color);
             transform: none;
         }
         
         .sidebar-nav .nav-link.active {
             background-color: rgba(46, 204, 113, 0.2);
-            color: white !important;
+            color: var(--white);
             border-left-color: var(--primary-color);
         }
         
@@ -125,7 +297,6 @@
             font-size: 1.2rem;
         }
         
-        /* Overlay */
         .sidebar-overlay {
             position: fixed;
             top: 0;
@@ -141,52 +312,158 @@
             display: block;
         }
         
-        /* Main Content */
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-block;
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            line-height: 1.5;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+        
+        .btn-lg {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+        
+        /* ===== ALERTS/MESSAGES ===== */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-left: 4px solid var(--success);
+        }
+        
+        .alert-error,
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid var(--danger);
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid var(--info);
+        }
+        
+        .btn-close {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+        
+        .btn-close:hover {
+            opacity: 1;
+        }
+        
+        /* ===== MAIN CONTENT ===== */
         .main-content {
             flex: 1;
             padding-top: 2rem;
             padding-bottom: 2rem;
         }
         
-        /* Footer */
+        /* ===== FOOTER ===== */
         footer {
             background-color: var(--dark-color);
-            color: white;
+            color: var(--white);
             padding: 2rem 0;
             margin-top: auto;
+            text-align: center;
         }
         
-        /* Messages */
-        .alert {
-            border-radius: 10px;
-            border: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        footer p {
+            margin: 0.5rem 0;
         }
         
-        /* Responsive adjustments */
-        @media (max-width: 991.98px) {
-            .navbar-nav {
+        .text-white-50 {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 768px) {
+            .navbar-toggle {
+                display: block;
+            }
+            
+            .navbar-menu {
+                display: none;
+                width: 100%;
+                flex-direction: column;
                 background-color: rgba(0,0,0,0.1);
                 border-radius: 10px;
                 padding: 1rem;
                 margin-top: 1rem;
             }
+            
+            .navbar-menu.active {
+                display: flex;
+            }
+            
+            .col-md-3, .col-md-4, .col-md-6, .col-md-8, .col-md-12 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            
+            .row {
+                margin: 0;
+            }
+            
+            .col {
+                padding: 0 10px;
+            }
         }
         
-        /* Burger menu always visible for quick access */
-        
-        /* Button styles */
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border: none;
-            font-weight: 500;
-            padding: 0.6rem 1.5rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        @media (min-width: 769px) {
+            .col-md-3 { flex: 0 0 25%; max-width: 25%; padding: 0 20px; }
+            .col-md-4 { flex: 0 0 33.333%; max-width: 33.333%; padding: 0 20px; }
+            .col-md-6 { flex: 0 0 50%; max-width: 50%; padding: 0 20px; }
+            .col-md-8 { flex: 0 0 66.666%; max-width: 66.666%; padding: 0 20px; }
+            .col-md-12 { flex: 0 0 100%; max-width: 100%; padding: 0 20px; }
         }
         
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        @media (min-width: 992px) {
+            .col-lg-4 { flex: 0 0 33.333%; max-width: 33.333%; padding: 0 20px; }
+            .col-lg-6 { flex: 0 0 50%; max-width: 50%; padding: 0 20px; }
+            .col-lg-8 { flex: 0 0 66.666%; max-width: 66.666%; padding: 0 20px; }
         }
     </style>
     
@@ -194,50 +471,54 @@
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <nav class="navbar">
         <div class="container-fluid">
-            <!-- Sidebar Toggle Button (visible on all screen sizes) -->
-            <button class="btn btn-link text-white sidebar-toggle me-2" type="button" id="sidebarToggle">
-                <i class="bi bi-list" style="font-size: 1.5rem;"></i>
-            </button>
-            
-            <!-- Brand -->
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <i class="bi bi-flower2"></i> AgriLink
-            </a>
-            
-            
-            <!-- Navbar Links -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
+            <div class="navbar-container">
+                <!-- Sidebar Toggle Button -->
+                <button class="navbar-toggle" id="sidebarToggle">
+                    <i class="bi bi-list"></i>
+                </button>
+                
+                <!-- Brand -->
+                <a class="navbar-brand" href="{% url 'home' %}">
+                    <i class="bi bi-flower2"></i> AgriLink
+                </a>
+                
+                <!-- Mobile Menu Toggle -->
+                <button class="navbar-toggle" id="mobileMenuToggle">
+                    <i class="bi bi-list"></i>
+                </button>
+                
+                <!-- Navbar Links -->
+                <ul class="navbar-menu" id="navbarMenu">
+                    <li>
                         <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">
                             <i class="bi bi-house-door"></i> Home
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li>
                         <a class="nav-link {% if 'landing' in request.path %}active{% endif %}" href="{% url 'landing' %}">
                             <i class="bi bi-info-circle"></i> About
                         </a>
                     </li>
                     {% if user.is_authenticated %}
-                        <li class="nav-item">
+                        <li>
                             <a class="nav-link" href="#">
                                 <i class="bi bi-person-circle"></i> {{ user.username }}
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li>
                             <a class="nav-link" href="{% url 'logout' %}">
                                 <i class="bi bi-box-arrow-right"></i> Logout
                             </a>
                         </li>
                     {% else %}
-                        <li class="nav-item">
+                        <li>
                             <a class="nav-link {% if 'login' in request.path %}active{% endif %}" href="{% url 'login' %}">
                                 <i class="bi bi-box-arrow-in-right"></i> Login
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li>
                             <a class="nav-link {% if 'register' in request.path %}active{% endif %}" href="{% url 'register' %}">
                                 <i class="bi bi-person-plus"></i> Register
                             </a>
@@ -248,66 +529,48 @@
         </div>
     </nav>
     
-    <!-- Sidebar Menu (Burger Menu) -->
+    <!-- Sidebar Menu -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h3><i class="bi bi-flower2"></i> AgriLink</h3>
             <small class="text-white-50">Quick Access Menu</small>
         </div>
         <nav class="sidebar-nav">
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">
-                        <i class="bi bi-house-door"></i>
-                        <span>Home</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if 'landing' in request.path %}active{% endif %}" href="{% url 'landing' %}">
-                        <i class="bi bi-info-circle"></i>
-                        <span>About Platform</span>
-                    </a>
-                </li>
-                {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-speedometer2"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-person-circle"></i>
-                            <span>Profile</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-gear"></i>
-                            <span>Settings</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">
-                            <i class="bi bi-box-arrow-right"></i>
-                            <span>Logout</span>
-                        </a>
-                    </li>
-                {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link {% if 'login' in request.path %}active{% endif %}" href="{% url 'login' %}">
-                            <i class="bi bi-box-arrow-in-right"></i>
-                            <span>Login</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if 'register' in request.path %}active{% endif %}" href="{% url 'register' %}">
-                            <i class="bi bi-person-plus"></i>
-                            <span>Register</span>
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
+            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">
+                <i class="bi bi-house-door"></i>
+                <span>Home</span>
+            </a>
+            <a class="nav-link {% if 'landing' in request.path %}active{% endif %}" href="{% url 'landing' %}">
+                <i class="bi bi-info-circle"></i>
+                <span>About Platform</span>
+            </a>
+            {% if user.is_authenticated %}
+                <a class="nav-link" href="#">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a class="nav-link" href="#">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Profile</span>
+                </a>
+                <a class="nav-link" href="#">
+                    <i class="bi bi-gear"></i>
+                    <span>Settings</span>
+                </a>
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </a>
+            {% else %}
+                <a class="nav-link {% if 'login' in request.path %}active{% endif %}" href="{% url 'login' %}">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span>Login</span>
+                </a>
+                <a class="nav-link {% if 'register' in request.path %}active{% endif %}" href="{% url 'register' %}">
+                    <i class="bi bi-person-plus"></i>
+                    <span>Register</span>
+                </a>
+            {% endif %}
         </nav>
     </div>
     
@@ -318,9 +581,9 @@
     {% if messages %}
         <div class="container mt-3">
             {% for message in messages %}
-                <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+                <div class="alert alert-{{ message.tags }}">
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <button type="button" class="btn-close" onclick="this.parentElement.style.display='none'">&times;</button>
                 </div>
             {% endfor %}
         </div>
@@ -333,34 +596,30 @@
     
     <!-- Footer -->
     <footer>
-        <div class="container text-center">
-            <p class="mb-1">&copy; 2025 AgriLink. All rights reserved.</p>
-            <p class="mb-0 text-white-50">Connecting farmers with buyers for a sustainable future.</p>
+        <div class="container">
+            <p>&copy; 2025 AgriLink. All rights reserved.</p>
+            <p class="text-white-50">Connecting farmers with buyers for a sustainable future.</p>
         </div>
     </footer>
     
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Sidebar Toggle Script -->
+    <!-- Custom JavaScript -->
     <script>
+        // Sidebar Toggle
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const sidebarToggle = document.getElementById('sidebarToggle');
         
-        // Toggle sidebar
         sidebarToggle.addEventListener('click', function() {
             sidebar.classList.toggle('active');
             sidebarOverlay.classList.toggle('active');
         });
         
-        // Close sidebar when overlay is clicked
         sidebarOverlay.addEventListener('click', function() {
             sidebar.classList.remove('active');
             sidebarOverlay.classList.remove('active');
         });
         
-        // Close sidebar when a link is clicked
+        // Close sidebar when link is clicked
         const sidebarLinks = sidebar.querySelectorAll('.nav-link');
         sidebarLinks.forEach(link => {
             link.addEventListener('click', function() {
@@ -368,9 +627,18 @@
                 sidebarOverlay.classList.remove('active');
             });
         });
+        
+        // Mobile Menu Toggle
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const navbarMenu = document.getElementById('navbarMenu');
+        
+        if (mobileMenuToggle) {
+            mobileMenuToggle.addEventListener('click', function() {
+                navbarMenu.classList.toggle('active');
+            });
+        }
     </script>
     
     {% block extra_js %}{% endblock %}
 </body>
 </html>
-
