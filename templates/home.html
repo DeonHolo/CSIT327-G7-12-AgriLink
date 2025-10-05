@@ -203,7 +203,11 @@
             <i class="bi bi-person-circle"></i> Welcome back!
         </span>
         <h1 class="display-4 fw-bold text-white mb-3">Hello, {{ user.username }}!</h1>
+        {% if user.is_farmer %}
         <p class="lead text-white mb-4" style="font-size: 1.3rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">Ready to manage your agricultural business?</p>
+        {% else %}
+        <p class="lead text-white mb-4" style="font-size: 1.3rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">Ready to discover fresh local products?</p>
+        {% endif %}
     </div>
 </section>
 
@@ -387,18 +391,33 @@
         <!-- Quick Actions -->
         <section class="quick-actions text-center">
             <h3><i class="bi bi-lightning"></i> Quick Actions</h3>
+            {% if user.is_farmer %}
             <a href="#" class="quick-action-btn">
                 <i class="bi bi-plus-circle"></i> Add New Product
             </a>
             <a href="#" class="quick-action-btn">
+                <i class="bi bi-box-seam"></i> Manage Inventory
+            </a>
+            <a href="#" class="quick-action-btn">
+                <i class="bi bi-graph-up"></i> View Sales Reports
+            </a>
+            <a href="#" class="quick-action-btn">
+                <i class="bi bi-chat-left-text"></i> Message Buyers
+            </a>
+            {% else %}
+            <a href="#" class="quick-action-btn">
                 <i class="bi bi-search"></i> Browse Products
             </a>
             <a href="#" class="quick-action-btn">
-                <i class="bi bi-chat-left-text"></i> Send Message
+                <i class="bi bi-bag-check"></i> View Orders
             </a>
             <a href="#" class="quick-action-btn">
-                <i class="bi bi-file-earmark-text"></i> View Reports
+                <i class="bi bi-heart"></i> My Favorites
             </a>
+            <a href="#" class="quick-action-btn">
+                <i class="bi bi-chat-left-text"></i> Message Farmers
+            </a>
+            {% endif %}
         </section>
     </div>
 </div>

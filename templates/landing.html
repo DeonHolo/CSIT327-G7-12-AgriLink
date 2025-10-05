@@ -135,6 +135,74 @@
         color: white;
     }
     
+    /* Enhanced Get Started Button */
+    .btn-get-started {
+        background: linear-gradient(135deg, #ffffff, #f8f9fa);
+        border: 3px solid rgba(255, 255, 255, 0.9);
+        color: #2ecc71;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-get-started:hover {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 15px 35px rgba(46, 204, 113, 0.4);
+        border-color: #2ecc71;
+        color: white;
+    }
+    
+    .btn-get-started i,
+    .btn-get-started span {
+        transition: color 0.4s ease;
+    }
+    
+    .btn-get-started:hover i,
+    .btn-get-started:hover span {
+        color: white !important;
+    }
+    
+    /* Enhanced Learn More Button */
+    .btn-learn-more {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        border: 3px solid #2ecc71;
+        color: white;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 8px 25px rgba(46, 204, 113, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-learn-more:hover {
+        background: linear-gradient(135deg, #ffffff, #f8f9fa);
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 15px 35px rgba(255, 255, 255, 0.4);
+        border-color: white;
+        color: #2ecc71;
+    }
+    
+    .btn-learn-more i,
+    .btn-learn-more span {
+        transition: color 0.4s ease;
+    }
+    
+    .btn-learn-more:hover i,
+    .btn-learn-more:hover span {
+        color: #2ecc71 !important;
+    }
+    
     /* Responsive Design */
     @media (max-width: 768px) {
         .hero-section h1 {
@@ -160,11 +228,11 @@
         <p class="lead">Connecting Farmers Directly with Buyers</p>
         <p>Fostering a fair, transparent, and sustainable local food ecosystem</p>
         <div class="mt-4">
-            <a href="{% url 'register' %}" class="btn btn-light btn-lg me-2">
-                <i class="bi bi-person-plus"></i> Get Started
+            <a href="{% url 'register' %}" class="btn btn-get-started btn-lg me-2">
+                <i class="bi bi-person-plus"></i> <span>Get Started</span>
             </a>
-            <a href="#about" class="btn btn-light btn-lg ms-2" style="background-color: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.8); color: white; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.9)'; this.style.color='#2ecc71'; this.style.borderColor='white';" onmouseout="this.style.backgroundColor='rgba(255, 255, 255, 0.2)'; this.style.color='white'; this.style.borderColor='rgba(255, 255, 255, 0.8)';">
-                <i class="bi bi-arrow-down-circle"></i> Learn More
+            <a href="#about" class="btn btn-learn-more btn-lg ms-2">
+                <i class="bi bi-arrow-down-circle"></i> <span>Learn More</span>
             </a>
         </div>
     </div>
