@@ -49,14 +49,15 @@ python manage.py runserver
 
 ## Team Members
 
-| Name                              | Role             | CIT-U Email                            |
-| :-------------------------------- | :--------------: | --------------------------------------:|
-| Jay Yan Tiongzon                  | Product Owner    | jayyan.tiongzon@cit.edu                |
-| James Michael Siton               | Business Analyst | jamesmichael.siton@cit.edu             |
-| Franz Raven Sanchez               | Scrum Master     | franzraven.sanchez@cit.edu             |
-| Ron Luigi Taghoy                  | Developer        | ronluigi.taghoy@cit.edu                |
-| Harvey Rod Christian Valmera      | Developer        | harveyrodchristian.valmera@cit.edu     |
-| Jusfer Jay Orge                   | Developer        | jusferjay.orge@cit.edu                 |
+| Name                              | Role               | CIT-U Email                            |
+| :-------------------------------- | :-----------------:| --------------------------------------:|
+| Jay Yan Tiongzon                  | Product Owner      | jayyan.tiongzon@cit.edu                |
+| James Michael Siton               | Business Analyst   | jamesmichael.siton@cit.edu             |
+| Franz Raven Sanchez               | Scrum Master       | franzraven.sanchez@cit.edu             |
+| Ron Luigi Taghoy                  | Lead Developer     | ronluigi.taghoy@cit.edu                |
+| Jusfer Jay Orge                   | Frontend Developer | harveyrodchristian.valmera@cit.edu     |
+| Harvey Rod Christian Valmera      | Backend Developer  | jusferjay.orge@cit.edu                 |
+
 
 ## Deployed Link
 
