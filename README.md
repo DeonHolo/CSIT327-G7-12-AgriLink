@@ -32,10 +32,12 @@ pip install -r requirements.txt
 
 4) Configure environment
 ```env
-SECRET_KEY=<generate with: python -c "from django.core.management.utils import get_random_secret_key as g; print(g())" >
-DEBUG=True (set to False in prod)
+# Generate Secret Key with: python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"
+SECRET_KEY=
+# Set DEBUG to False in production
+DEBUG=True
 # For Supabase PostgreSQL: Supabase Dashboard → Your Project → Connect → Connection Info (Or check pinned message in Teams chat for Supabase key)
-# Optional for PostgreSQL (leave empty to use SQLite locally)
+# Optional for PostgreSQL (leave empty to use SQLite locally for development)
 DATABASE_URL=postgresql://user:password@host:port/database
 ```
 
