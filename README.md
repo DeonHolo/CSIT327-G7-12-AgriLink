@@ -38,7 +38,7 @@ SECRET_KEY=
 DEBUG=True
 # For Supabase PostgreSQL: Supabase Dashboard → Your Project → Connect → Connection String → Session Pooler (Or check pinned message in Teams chat for Supabase key)
 # Optional for PostgreSQL (leave empty to use SQLite locally for development)
-DATABASE_URL=postgresql://user:password@host:port/database
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@aws-0-<project-ref>.pooler.supabase.com:5432/postgres?sslmode=require
 ```
 
 5) Apply migrations and run
