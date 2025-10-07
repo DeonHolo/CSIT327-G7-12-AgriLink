@@ -15,7 +15,7 @@ AgriLink is a web-based platform designed to connect farmers directly with buyer
 
 1) Clone and enter project
 ```bash
-git clone https://github.com/DeonHolo/AgriLink.git
+git clone https://github.com/DeonHolo/CSIT327-G7-12-AgriLink.git
 cd AgriLink
 ```
 
