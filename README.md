@@ -36,7 +36,7 @@ pip install -r requirements.txt
 SECRET_KEY=
 # Set DEBUG to False in production
 DEBUG=True
-# For Supabase PostgreSQL: Supabase Dashboard → Your Project → Connect → Connection Info (Or check pinned message in Teams chat for Supabase key)
+# For Supabase PostgreSQL: Supabase Dashboard → Your Project → Connect → Connection String → Session Pooler (Or check pinned message in Teams chat for Supabase key)
 # Optional for PostgreSQL (leave empty to use SQLite locally for development)
 DATABASE_URL=postgresql://user:password@host:port/database
 ```
