@@ -15,7 +15,7 @@ AgriLink is a web-based platform designed to connect farmers directly with buyer
 
 1) Clone and enter project
 ```bash
-git clone https://github.com/DeonHolo/AgriLink.git
+git clone https://github.com/DeonHolo/CSIT327-G7-12-AgriLink.git
 cd AgriLink
 ```
 
@@ -30,12 +30,14 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4) Configure environment
+4) Configure environment (.env) (more detailed instruction in .env.example)
 ```env
-SECRET_KEY=<generate with: python -c "from django.core.management.utils import get_random_secret_key as g; print(g())" >
-DEBUG=True (set to False in prod)
-# For Supabase PostgreSQL: Supabase Dashboard → Your Project → Connect → Connection Info (Or check pinned message in Teams chat for Supabase key)
-# Optional for PostgreSQL (leave empty to use SQLite locally)
+# Generate Secret Key with: python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"
+SECRET_KEY=
+# Set DEBUG to False in production
+DEBUG=True
+# For Supabase PostgreSQL: Supabase Dashboard → Your Project → Connect → Connection String → Session Pooler (Or check pinned message in Teams chat for Supabase key)
+# Optional for PostgreSQL (leave empty to use SQLite locally for development)
 DATABASE_URL=postgresql://user:password@host:port/database
 ```
 
@@ -47,13 +49,15 @@ python manage.py runserver
 
 ## Team Members
 
-| Name | Role | CIT-U Email |
-| Jay Yan Tiongzon | Product Owner | jayyan.tiongzon@cit.edu |
-| James Michael Siton | Business Analyst | jamesmichael.siton@cit.edu |
-| Franz Raven Sanchez | Scrum Master | franzraven.sanchez@cit.edu |
-| Ron Luigi F. Taghoy | Developer | ronluigi.taghoy@cit.edu |
-| Harvey Rod Christian L. Valmera | Developer | harveyrodchristian.valmera@cit.edu |
-| Jusfer Jay Orge | Developer | jusferjay.orge@cit.edu |
+| Name                              | Role               | CIT-U Email                            |
+| :-------------------------------- | :-----------------:| --------------------------------------:|
+| Jay Yan Tiongzon                  | Product Owner      | jayyan.tiongzon@cit.edu                |
+| James Michael Siton               | Business Analyst   | jamesmichael.siton@cit.edu             |
+| Franz Raven Sanchez               | Scrum Master       | franzraven.sanchez@cit.edu             |
+| Ron Luigi Taghoy                  | Lead Developer     | ronluigi.taghoy@cit.edu                |
+| Jusfer Jay Orge                   | Frontend Developer | harveyrodchristian.valmera@cit.edu     |
+| Harvey Rod Christian Valmera      | Backend Developer  | jusferjay.orge@cit.edu                 |
+
 
 ## Deployed Link
 
