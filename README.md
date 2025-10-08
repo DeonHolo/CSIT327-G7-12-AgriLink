@@ -55,9 +55,8 @@ python manage.py runserver
 | James Michael Siton               | Business Analyst   | jamesmichael.siton@cit.edu             |
 | Franz Raven Sanchez               | Scrum Master       | franzraven.sanchez@cit.edu             |
 | Ron Luigi Taghoy                  | Lead Developer     | ronluigi.taghoy@cit.edu                |
-| Jusfer Jay Orge                   | Frontend Developer | harveyrodchristian.valmera@cit.edu     |
-| Harvey Rod Christian Valmera      | Backend Developer  | jusferjay.orge@cit.edu                 |
-
+| Jusfer Jay Orge                   | Frontend Developer | jusferjay.orge@cit.edu                 |
+| Harvey Rod Christian Valmera      | Backend Developer  | harveyrodchristian.valmera@cit.edu     |
 
 ## Deployed Link
 
