@@ -30,7 +30,7 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4) Create (.env) file and then copy paste the content of (.env.example) there and follow instructions on configuration
+4) Configure environment (.env) - Create (.env) file and copy content from (.env.example) following the configuration instructions
 ```env
 # Generate Secret Key with: python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"
 SECRET_KEY=
