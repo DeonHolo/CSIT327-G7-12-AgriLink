@@ -34,11 +34,11 @@ pip install -r requirements.txt
 ```env
 # Generate Secret Key with: python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"
 SECRET_KEY=
-# Set DEBUG to False in production
+# Set DEBUG to 'False' in production
 DEBUG=True
 # For Supabase PostgreSQL: Supabase Dashboard → Your Project → Connect → Connection String → Session Pooler (Or check pinned message in Teams chat for Supabase key)
 # Optional for PostgreSQL (leave empty to use SQLite locally for development)
-DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@aws-0-<project-ref>.pooler.supabase.com:5432/postgres?sslmode=require
+DATABASE_URL=
 ```
 
 5) Apply migrations and run
