@@ -7,26 +7,37 @@
 <style>
     .auth-container {
         min-height: calc(100vh - 200px);
-        padding: 2rem 0;
+        padding: 2rem 1rem;
         display: flex;
         align-items: center;
+        justify-content: center;
+        background: #ffffff;
     }
     
     .auth-card {
         background: white;
         border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
         overflow: hidden;
-        max-width: 1000px;
+        max-width: 1100px;
         width: 100%;
         margin: 0 auto;
-        position: relative;
-        left: 50%;
-        transform: translateX(-50%);
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
     .auth-image {
-        background: linear-gradient(135deg, rgba(46, 204, 113, 0.9), rgba(39, 174, 96, 0.9)),
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.95), rgba(39, 174, 96, 0.95)),
                     url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=800') center/cover;
         padding: 3rem;
         display: flex;
@@ -34,17 +45,52 @@
         justify-content: center;
         color: white;
         text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .auth-image::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: pulse 15s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.3; }
+        50% { transform: scale(1.1); opacity: 0.5; }
     }
     
     .auth-image h2 {
         font-size: 2.5rem;
         font-weight: bold;
         margin-bottom: 1rem;
+        position: relative;
+        z-index: 1;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
     }
     
     .auth-image i {
         font-size: 5rem;
         margin-bottom: 1rem;
+        position: relative;
+        z-index: 1;
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .auth-image p,
+    .auth-image .mt-4 {
+        position: relative;
+        z-index: 1;
     }
     
     .auth-form {
@@ -60,6 +106,10 @@
         font-weight: 700;
         text-align: center;
         font-size: 2rem;
+    }
+    
+    .auth-form h3:focus {
+        outline: none;
     }
     
     .auth-form .text-muted {
@@ -86,6 +136,11 @@
     
     .form-control.is-invalid {
         border-color: #e74c3c;
+    }
+    
+    .form-control.error {
+        border-color: #e74c3c;
+        animation: shake 0.3s;
     }
     
     .form-label {
@@ -121,11 +176,38 @@
         justify-content: center;
         gap: 0.5rem;
         margin: 1rem 0;
+        color: white;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-register::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+    
+    .btn-register:hover::before {
+        width: 300px;
+        height: 300px;
     }
     
     .btn-register:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+    }
+    
+    .btn-register:active {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
     }
     
     .btn-outline-primary {
@@ -177,10 +259,11 @@
     
     .form-check {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         gap: 0.75rem;
         margin: 1.5rem 0;
         text-align: left;
+        flex-wrap: wrap;
     }
     
     .form-check-input {
@@ -202,6 +285,7 @@
         color: #495057;
         margin: 0;
         line-height: 1.4;
+        flex-shrink: 0;
     }
     
     .form-check-label a {
@@ -267,26 +351,44 @@
     
     .user-card {
         background: #ffffff;
-        border: 2px solid #e0e0e0;
+        border: 3px solid #e0e0e0;
         border-radius: 15px;
         padding: 1.5rem;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         text-align: center;
-        min-height: 200px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        min-height: 220px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         width: 100%;
+    }
+    
+    .user-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 13px;
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(39, 174, 96, 0.1));
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        pointer-events: none;
     }
     
     .user-card:hover {
         border-color: #2ecc71;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 20px rgba(46, 204, 113, 0.15);
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 10px 30px rgba(46, 204, 113, 0.25);
+    }
+    
+    .user-card:hover::after {
+        opacity: 1;
     }
     
     .user-card:has(input:checked) {
@@ -296,20 +398,33 @@
     }
     
     .card-icon {
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
         border-radius: 50%;
         background: linear-gradient(135deg, #2ecc71, #27ae60);
         display: flex;
         align-items: center;
         justify-content: center;
         margin-bottom: 1rem;
-        transition: all 0.3s ease;
+        transition: all 0.4s ease;
+        box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        position: relative;
+        z-index: 2;
     }
     
     .card-icon i {
-        font-size: 1.8rem;
+        font-size: 2rem;
         color: white;
+        transition: transform 0.4s ease;
+    }
+    
+    .user-card:hover .card-icon {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5);
+    }
+    
+    .user-card:hover .card-icon i {
+        transform: scale(1.1);
     }
     
     .card-content {
@@ -367,14 +482,15 @@
         position: absolute;
         top: 1rem;
         right: 1rem;
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
         background: #e0e0e0;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: all 0.3s ease;
+        border: 3px solid #e0e0e0;
     }
     
     .selection-indicator i {
@@ -384,23 +500,25 @@
         transition: all 0.3s ease;
     }
     
-    /* Show selection indicator when input is checked */
+    /* Show selection indicator when input is checked - full green circle */
     #buyer-toggle:checked + .buyer-card .selection-indicator {
         background: #2ecc71;
+        border-color: #2ecc71;
+        box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
     }
     
     #buyer-toggle:checked + .buyer-card .selection-indicator i {
-        color: white;
-        opacity: 1;
+        display: none;
     }
     
     #farmer-toggle:checked + .farmer-card .selection-indicator {
         background: #2ecc71;
+        border-color: #2ecc71;
+        box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
     }
     
     #farmer-toggle:checked + .farmer-card .selection-indicator i {
-        color: white;
-        opacity: 1;
+        display: none;
     }
     
     /* Specific styling for buyer card when selected */
@@ -449,10 +567,56 @@
     }
     
     .invalid-feedback {
-        display: block;
+        display: none;
         color: #e74c3c;
         font-size: 0.875rem;
-        margin-top: 0.25rem;
+        margin-top: 0.5rem;
+        animation: fadeIn 0.3s;
+    }
+    
+    .invalid-feedback.show {
+        display: block;
+    }
+    
+    .error-message {
+        color: #e74c3c;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        display: none;
+        animation: fadeIn 0.3s;
+    }
+    
+    .error-message.show {
+        display: block;
+    }
+
+    /* T&C error on the side */
+    .form-check .invalid-feedback,
+    .form-check .error-message {
+        margin-left: 0;
+        margin-top: 0;
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .form-check-input.is-invalid {
+        border-color: #e74c3c;
+        animation: shake 0.3s;
+    }
+    
+    .form-check-input.is-invalid ~ .invalid-feedback {
+        display: block;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     
         @media (max-width: 768px) {
@@ -523,7 +687,7 @@
                 <!-- Left Side - Form -->
                 <div class="col-lg-7" style="padding: 0 15px;">
                     <div class="auth-form">
-                        <h3>Create Account</h3>
+                        <h3 id="form-title" tabindex="-1">Create Account</h3>
                         <p class="text-muted mb-4">Join AgriLink and start connecting today</p>
                         
                         <!-- User Type Selection -->
@@ -555,7 +719,7 @@
                                     <input type="radio" id="farmer-toggle" name="user_type" value="farmer">
                                     <label for="farmer-toggle" class="user-card farmer-card">
                                         <div class="card-icon">
-                                            <i class="bi bi-tree"></i>
+                                            <i class="bi bi-shop"></i>
                                         </div>
                                         <div class="card-content">
                                             <h5>Farmer</h5>
@@ -583,11 +747,7 @@
                                     <i class="bi bi-person"></i> Username
                                 </label>
                                 {{ form.username }}
-                                {% if form.username.errors %}
-                                    <div class="invalid-feedback">
-                                        {{ form.username.errors.0 }}
-                                    </div>
-                                {% endif %}
+                                <div class="error-message" id="{{ form.username.id_for_label }}-error"></div>
                             </div>
                             
                             <!-- Email Field -->
@@ -596,11 +756,7 @@
                                     <i class="bi bi-envelope"></i> Email Address
                                 </label>
                                 {{ form.email }}
-                                {% if form.email.errors %}
-                                    <div class="invalid-feedback">
-                                        {{ form.email.errors.0 }}
-                                    </div>
-                                {% endif %}
+                                <div class="error-message" id="{{ form.email.id_for_label }}-error"></div>
                             </div>
                             
                             <!-- Password Field -->
@@ -618,11 +774,7 @@
                                 <small class="text-muted">
                                     Must be at least 8 characters with letters and numbers
                                 </small>
-                                {% if form.password1.errors %}
-                                    <div class="invalid-feedback">
-                                        {{ form.password1.errors.0 }}
-                                    </div>
-                                {% endif %}
+                                <div class="error-message" id="{{ form.password1.id_for_label }}-error"></div>
                             </div>
                             
                             <!-- Confirm Password Field -->
@@ -634,11 +786,7 @@
                                     {{ form.password2 }}
                                     <i class="bi bi-eye password-toggle" id="togglePassword2"></i>
                                 </div>
-                                {% if form.password2.errors %}
-                                    <div class="invalid-feedback">
-                                        {{ form.password2.errors.0 }}
-                                    </div>
-                                {% endif %}
+                                <div class="error-message" id="{{ form.password2.id_for_label }}-error"></div>
                             </div>
                             
                             <!-- Terms and Conditions -->
@@ -647,6 +795,7 @@
                                 <label class="form-check-label" for="terms">
                                     I agree to the <a href="#" class="text-decoration-none">Terms and Conditions</a>
                                 </label>
+                                <div class="error-message" id="terms-error"></div>
                             </div>
                             
                             <!-- Submit Button -->
@@ -677,7 +826,7 @@
                 <!-- Right Side - Image and Info -->
                 <div class="col-lg-5 d-none d-lg-block" style="padding: 0;">
                     <div class="auth-image h-100" id="authImage">
-                        <i class="bi bi-person-plus-fill" id="authIcon"></i>
+                        <i class="bi bi-cart3" id="authIcon"></i>
                         <h2 id="authTitle">Join as Buyer</h2>
                         <p class="lead" id="authDescription">Connect with farmers and sell your produce in your local community. Start your journey in agricultural trade.</p>
                         <div class="mt-4">
@@ -746,25 +895,131 @@
         }
     });
     
+    // Form validation functions
+    function showError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        const errorElement = document.getElementById(fieldId + '-error');
+        
+        field.classList.add('error');
+        field.setAttribute('aria-invalid', 'true');
+        errorElement.textContent = message;
+        errorElement.classList.add('show');
+    }
+    
+    function clearError(fieldId) {
+        const field = document.getElementById(fieldId);
+        const errorElement = document.getElementById(fieldId + '-error');
+        
+        field.classList.remove('error');
+        field.removeAttribute('aria-invalid');
+        errorElement.textContent = '';
+        errorElement.classList.remove('show');
+    }
+    
+    function clearAllErrors() {
+        clearError('{{ form.username.id_for_label }}');
+        clearError('{{ form.email.id_for_label }}');
+        clearError('{{ form.password1.id_for_label }}');
+        clearError('{{ form.password2.id_for_label }}');
+        clearError('terms');
+    }
+    
     // Form validation
     const form = document.getElementById('registrationForm');
     const terms = document.getElementById('terms');
+    const usernameField = document.getElementById('{{ form.username.id_for_label }}');
+    const emailField = document.getElementById('{{ form.email.id_for_label }}');
     
     form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Clear previous errors
+        clearAllErrors();
+        
+        const username = usernameField.value.trim();
+        const email = emailField.value.trim();
+        const password1Value = password1.value.trim();
+        const password2Value = password2.value.trim();
+        
+        let hasErrors = false;
+        let firstInvalidField = null;
+        
+        // Validate username
+        if (!username) {
+            showError('{{ form.username.id_for_label }}', 'Username is required');
+            hasErrors = true;
+            if (!firstInvalidField) firstInvalidField = usernameField;
+        }
+        
+        // Validate email
+        if (!email) {
+            showError('{{ form.email.id_for_label }}', 'Email is required');
+            hasErrors = true;
+            if (!firstInvalidField) firstInvalidField = emailField;
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            showError('{{ form.email.id_for_label }}', 'Please enter a valid email address');
+            hasErrors = true;
+            if (!firstInvalidField) firstInvalidField = emailField;
+        }
+        
+        // Validate password
+        if (!password1Value) {
+            showError('{{ form.password1.id_for_label }}', 'Password is required');
+            hasErrors = true;
+            if (!firstInvalidField) firstInvalidField = password1;
+        } else if (password1Value.length < 8) {
+            showError('{{ form.password1.id_for_label }}', 'Password must be at least 8 characters');
+            hasErrors = true;
+            if (!firstInvalidField) firstInvalidField = password1;
+        }
+        
+        // Validate confirm password
+        if (!password2Value) {
+            showError('{{ form.password2.id_for_label }}', 'Please confirm your password');
+            hasErrors = true;
+            if (!firstInvalidField) firstInvalidField = password2;
+        } else if (password1Value && password2Value !== password1Value) {
+            showError('{{ form.password2.id_for_label }}', 'Passwords do not match');
+            hasErrors = true;
+            if (!firstInvalidField) firstInvalidField = password2;
+        }
+        
+        // Check if terms is accepted
         if (!terms.checked) {
-            e.preventDefault();
-            alert('Please accept the terms and conditions');
+            showError('terms', 'Please accept the terms and conditions');
+            hasErrors = true;
+            if (!firstInvalidField) firstInvalidField = terms;
+        }
+        
+        // If there are errors, scroll to password field to show all errors
+        if (hasErrors) {
+            password1.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            // If no errors, submit the form
+            form.submit();
         }
     });
     
-    // Real-time password match validation
+    // Clear errors when user starts typing
+    usernameField.addEventListener('input', function() {
+        clearError('{{ form.username.id_for_label }}');
+    });
+    
+    emailField.addEventListener('input', function() {
+        clearError('{{ form.email.id_for_label }}');
+    });
+    
+    password1.addEventListener('input', function() {
+        clearError('{{ form.password1.id_for_label }}');
+    });
+    
     password2.addEventListener('input', function() {
-        if (password1.value && password2.value) {
-            if (password1.value !== password2.value) {
-                password2.classList.add('is-invalid');
-            } else {
-                password2.classList.remove('is-invalid');
-            }
+        clearError('{{ form.password2.id_for_label }}');
+    });
+    
+    terms.addEventListener('change', function() {
+        if (terms.checked) {
+            clearError('terms');
         }
     });
     
@@ -778,16 +1033,19 @@
     
     function updateAuthContent(userType) {
         if (userType === 'farmer') {
-            authImage.style.background = "linear-gradient(135deg, rgba(46, 204, 113, 0.9), rgba(39, 174, 96, 0.9)), url('https://images.unsplash.com/photo-1574943320219-553eb213f72d?q=80&w=800') center/cover";
-            authIcon.className = "bi bi-tree-fill";
+            authImage.style.background = "linear-gradient(135deg, rgba(46, 204, 113, 0.95), rgba(39, 174, 96, 0.95)), url('https://images.unsplash.com/photo-1574943320219-553eb213f72d?q=80&w=800') center/cover";
+            // Use non-fill variant to ensure glyph exists in current Bootstrap Icons set
+            authIcon.className = "bi bi-shop";
             authTitle.textContent = "Join as Farmer";
             authDescription.textContent = "Connect with buyers and showcase your produce. Start your journey in sustainable farming and direct sales.";
         } else {
-            authImage.style.background = "linear-gradient(135deg, rgba(46, 204, 113, 0.9), rgba(39, 174, 96, 0.9)), url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=800') center/cover";
-            authIcon.className = "bi bi-cart3-fill";
+            authImage.style.background = "linear-gradient(135deg, rgba(46, 204, 113, 0.95), rgba(39, 174, 96, 0.95)), url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=800') center/cover";
+            // Use non-fill variant to ensure glyph exists in current Bootstrap Icons set
+            authIcon.className = "bi bi-cart3";
             authTitle.textContent = "Join as Buyer";
             authDescription.textContent = "Connect with farmers and buy fresh produce in your local community. Start your journey in agricultural trade.";
         }
+
     }
     
     buyerToggle.addEventListener('change', function() {
@@ -797,6 +1055,9 @@
     farmerToggle.addEventListener('change', function() {
         if (this.checked) updateAuthContent('farmer');
     });
+    
+    // Ensure correct initial icon/content on load
+    updateAuthContent(buyerToggle.checked ? 'buyer' : 'farmer');
     
     // Form submission - add user_type to form data
     form.addEventListener('submit', function(e) {
