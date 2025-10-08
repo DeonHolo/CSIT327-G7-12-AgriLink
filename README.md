@@ -30,7 +30,7 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4) Configure environment (.env) (more detailed instruction in .env.example)
+4) Configure environment (.env)
 ```env
 # Generate Secret Key with: python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"
 SECRET_KEY=
