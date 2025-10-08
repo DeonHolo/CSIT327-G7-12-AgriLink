@@ -123,61 +123,191 @@
     .quick-actions {
         background: linear-gradient(135deg, #2ecc71, #27ae60);
         color: white;
-        padding: 3rem;
-        border-radius: 15px;
+        padding: 3.5rem;
+        border-radius: 20px;
         margin-top: 3rem;
         text-align: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 15px 40px rgba(46, 204, 113, 0.3);
+    }
+    
+    .quick-actions::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
     }
     
     .quick-actions h3 {
-        margin-bottom: 2rem;
-        font-size: 2rem;
+        margin-bottom: 2.5rem;
+        font-size: 2.2rem;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+    
+    .quick-actions h3 i {
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
     }
     
     .quick-action-btn {
         background: rgba(255, 255, 255, 0.2);
-        border: 2px solid rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.4);
         color: white;
         padding: 1rem 2rem;
-        border-radius: 10px;
-        transition: all 0.3s ease;
+        border-radius: 15px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         text-decoration: none;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
         margin: 0.5rem;
-        font-weight: 500;
+        font-weight: 600;
+        font-size: 1rem;
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+    }
+    
+    .quick-action-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s ease, height 0.6s ease;
+    }
+    
+    .quick-action-btn:hover::before {
+        width: 300px;
+        height: 300px;
     }
     
     .quick-action-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.35);
         border-color: white;
         color: white;
-        transform: translateY(-3px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    
+    .quick-action-btn i {
+        transition: transform 0.4s ease;
+        font-size: 1.2rem;
+    }
+    
+    .quick-action-btn:hover i {
+        transform: rotate(15deg) scale(1.2);
     }
     
     .stats-card {
         background: linear-gradient(135deg, #3498db, #2980b9);
         color: white;
         padding: 2rem;
-        border-radius: 15px;
+        border-radius: 20px;
         text-align: center;
         margin-bottom: 1.5rem;
-        transition: transform 0.3s ease;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+        border: 3px solid transparent;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+    
+    /* shimmer sweep removed to match other sections */
+    
+    .stats-card::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s ease, height 0.6s ease;
+    }
+    
+    .stats-card:hover::after {
+        width: 300px;
+        height: 300px;
     }
     
     .stats-card:hover {
-        transform: translateY(-5px);
+        transform: translateY(-10px) scale(1.03);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+        border-color: rgba(255,255,255,0.3);
     }
     
     .stats-card h2 {
         font-size: 3rem;
         font-weight: bold;
         margin: 0 0 0.5rem 0;
+        position: relative;
+        z-index: 1;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        animation: countUp 0.8s ease-out;
+    }
+    
+    @keyframes countUp {
+        from {
+            opacity: 0;
+            transform: scale(0.5);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
     }
     
     .stats-card p {
         margin: 0;
-        opacity: 0.9;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+    
+    .stats-card .stat-icon {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 2.5rem;
+        opacity: 0.2;
+        z-index: 0;
+        transition: all 0.4s ease;
+    }
+    
+    .stats-card:hover .stat-icon {
+        opacity: 0.3;
+        transform: rotate(15deg) scale(1.2);
     }
     
     .btn-primary {
@@ -358,24 +488,28 @@
             {% if user.is_farmer %}
             <div class="col-md-3 col-6 mb-3">
                 <div class="stats-card">
+                    <i class="bi bi-box-seam stat-icon"></i>
                     <h2>0</h2>
                     <p>My Products</p>
                 </div>
             </div>
             <div class="col-md-3 col-6 mb-3">
                 <div class="stats-card" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
+                    <i class="bi bi-cart-check stat-icon"></i>
                     <h2>0</h2>
                     <p>Orders Received</p>
                 </div>
             </div>
             <div class="col-md-3 col-6 mb-3">
                 <div class="stats-card" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                    <i class="bi bi-cash-stack stat-icon"></i>
                     <h2>₱0</h2>
                     <p>Total Earnings</p>
                 </div>
             </div>
             <div class="col-md-3 col-6 mb-3">
                 <div class="stats-card" style="background: linear-gradient(135deg, #f39c12, #d68910);">
+                    <i class="bi bi-star-fill stat-icon"></i>
                     <h2>0</h2>
                     <p>My Rating</p>
                 </div>
@@ -383,24 +517,28 @@
             {% else %}
             <div class="col-md-3 col-6 mb-3">
                 <div class="stats-card">
+                    <i class="bi bi-bag-check stat-icon"></i>
                     <h2>0</h2>
                     <p>Orders Placed</p>
                 </div>
             </div>
             <div class="col-md-3 col-6 mb-3">
                 <div class="stats-card" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
+                    <i class="bi bi-heart-fill stat-icon"></i>
                     <h2>0</h2>
                     <p>Favorites</p>
                 </div>
             </div>
             <div class="col-md-3 col-6 mb-3">
                 <div class="stats-card" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                    <i class="bi bi-clock-history stat-icon"></i>
                     <h2>0</h2>
                     <p>Active Orders</p>
                 </div>
             </div>
             <div class="col-md-3 col-6 mb-3">
                 <div class="stats-card" style="background: linear-gradient(135deg, #f39c12, #d68910);">
+                    <i class="bi bi-people-fill stat-icon"></i>
                     <h2>0</h2>
                     <p>Farmers Followed</p>
                 </div>

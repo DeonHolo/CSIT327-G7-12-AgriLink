@@ -7,26 +7,37 @@
 <style>
     .auth-container {
         min-height: calc(100vh - 200px);
-        padding: 2rem 0;
+        padding: 2rem 1rem;
         display: flex;
         align-items: center;
+        justify-content: center;
+        background: #ffffff;
     }
     
     .auth-card {
         background: white;
         border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
         overflow: hidden;
         max-width: 1000px;
         width: 100%;
         margin: 0 auto;
-        position: relative;
-        left: 50%;
-        transform: translateX(-50%);
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
     .auth-image {
-        background: linear-gradient(135deg, rgba(46, 204, 113, 0.9), rgba(39, 174, 96, 0.9)),
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.95), rgba(39, 174, 96, 0.95)),
                     url('https://images.unsplash.com/photo-1574943320219-553eb213f72d?q=80&w=800') center/cover;
         padding: 3rem;
         display: flex;
@@ -34,17 +45,52 @@
         justify-content: center;
         color: white;
         text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .auth-image::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: pulse 15s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.3; }
+        50% { transform: scale(1.1); opacity: 0.5; }
     }
     
     .auth-image h2 {
         font-size: 2.5rem;
         font-weight: bold;
         margin-bottom: 1rem;
+        position: relative;
+        z-index: 1;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
     }
     
     .auth-image i {
         font-size: 5rem;
         margin-bottom: 1rem;
+        position: relative;
+        z-index: 1;
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .auth-image p,
+    .auth-image .mt-4 {
+        position: relative;
+        z-index: 1;
     }
     
     .auth-form {
@@ -117,11 +163,38 @@
         justify-content: center;
         gap: 0.5rem;
         margin: 1rem 0;
+        color: white;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-login::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+    
+    .btn-login:hover::before {
+        width: 300px;
+        height: 300px;
     }
     
     .btn-login:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+    }
+    
+    .btn-login:active {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
     }
     
     .btn-outline-primary {
@@ -239,6 +312,35 @@
         position: relative;
     }
     
+    /* Form validation error styles */
+    .form-control.error {
+        border-color: #e74c3c;
+        animation: shake 0.3s;
+    }
+    
+    .error-message {
+        color: #e74c3c;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        display: none;
+        animation: fadeIn 0.3s;
+    }
+    
+    .error-message.show {
+        display: block;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
     @media (max-width: 768px) {
         .auth-image {
             padding: 2rem;
@@ -309,6 +411,7 @@
                                     required
                                     autofocus
                                 >
+                                <div class="error-message" id="username-error"></div>
                             </div>
                             
                             <!-- Password Field -->
@@ -327,6 +430,7 @@
                                     >
                                     <i class="bi bi-eye password-toggle" id="togglePassword"></i>
                                 </div>
+                                <div class="error-message" id="password-error"></div>
                             </div>
                             
                             <!-- Remember Me & Forgot Password -->
@@ -392,16 +496,78 @@
         this.classList.toggle('bi-eye-slash');
     });
     
+    // Form validation functions
+    function showError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        const errorElement = document.getElementById(fieldId + '-error');
+        
+        field.classList.add('error');
+        field.setAttribute('aria-invalid', 'true');
+        errorElement.textContent = message;
+        errorElement.classList.add('show');
+    }
+    
+    function clearError(fieldId) {
+        const field = document.getElementById(fieldId);
+        const errorElement = document.getElementById(fieldId + '-error');
+        
+        field.classList.remove('error');
+        field.removeAttribute('aria-invalid');
+        errorElement.textContent = '';
+        errorElement.classList.remove('show');
+    }
+    
+    function clearAllErrors() {
+        clearError('username');
+        clearError('password');
+    }
+    
     // Form validation
     const form = document.querySelector('form');
+    const usernameField = document.getElementById('username');
+    
     form.addEventListener('submit', function(e) {
-        const username = document.getElementById('username').value.trim();
-        const passwordValue = password.value;
+        e.preventDefault();
         
-        if (!username || !passwordValue) {
-            e.preventDefault();
-            alert('Please fill in all fields');
+        // Clear previous errors
+        clearAllErrors();
+        
+        const username = usernameField.value.trim();
+        const passwordValue = password.value.trim();
+        
+        let hasErrors = false;
+        let firstInvalidField = null;
+        
+        // Validate username
+        if (!username) {
+            showError('username', 'Username is required');
+            hasErrors = true;
+            if (!firstInvalidField) firstInvalidField = usernameField;
         }
+        
+        // Validate password
+        if (!passwordValue) {
+            showError('password', 'Password is required');
+            hasErrors = true;
+            if (!firstInvalidField) firstInvalidField = password;
+        }
+        
+        // If there are errors, focus the first invalid field
+        if (hasErrors && firstInvalidField) {
+            firstInvalidField.focus();
+        } else {
+            // If no errors, submit the form
+            form.submit();
+        }
+    });
+    
+    // Clear errors when user starts typing
+    usernameField.addEventListener('input', function() {
+        clearError('username');
+    });
+    
+    password.addEventListener('input', function() {
+        clearError('password');
     });
 </script>
 {% endblock %}
