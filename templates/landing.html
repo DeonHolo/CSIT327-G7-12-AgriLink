@@ -94,22 +94,52 @@
     
     .purpose-card {
         background: white;
-        border-radius: 15px;
+        border-radius: 20px;
         padding: 2.5rem;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         height: 100%;
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .purpose-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+    
+    .purpose-card:hover::before {
+        transform: scaleX(1);
     }
     
     .purpose-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        transform: translateY(-8px);
+        box-shadow: 0 15px 40px rgba(46, 204, 113, 0.2);
+        border-color: #2ecc71;
     }
     
     .purpose-icon {
-        font-size: 3rem;
-        color: #2ecc71;
-        margin-bottom: 1rem;
+        font-size: 3.5rem;
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1.5rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .purpose-card:hover .purpose-icon {
+        transform: scale(1.1) rotate(5deg);
     }
     
     /* Services Section */
@@ -122,21 +152,57 @@
     .service-card {
         background: rgba(255, 255, 255, 0.15);
         backdrop-filter: blur(10px);
-        border-radius: 15px;
+        border-radius: 20px;
         padding: 2.5rem;
         margin-bottom: 2.5rem;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        transition: all 0.3s ease;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .service-card::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+    
+    .service-card:hover::before {
+        width: 500px;
+        height: 500px;
     }
     
     .service-card:hover {
         background: rgba(255, 255, 255, 0.25);
-        transform: scale(1.05);
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 255, 255, 0.4);
     }
     
     .service-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
+        font-size: 3.5rem;
+        margin-bottom: 1.5rem;
+        transition: transform 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .service-card:hover .service-icon {
+        transform: scale(1.15) rotate(-5deg);
+    }
+    
+    .service-card h3,
+    .service-card p,
+    .service-card ul {
+        position: relative;
+        z-index: 1;
     }
     
     .service-card ul {
@@ -160,14 +226,52 @@
     
     .feature-item {
         text-align: center;
-        padding: 2rem;
+        padding: 2.5rem;
         margin-bottom: 3rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .feature-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+    
+    .feature-item:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .feature-item:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 40px rgba(46, 204, 113, 0.2);
+        border-color: #2ecc71;
     }
     
     .feature-item i {
-        font-size: 2.5rem;
-        color: #2ecc71;
-        margin-bottom: 1rem;
+        font-size: 3rem;
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1.5rem;
+        transition: transform 0.3s ease;
+        display: inline-block;
+    }
+    
+    .feature-item:hover i {
+        transform: scale(1.2) rotate(5deg);
     }
     
     /* CTA Section */
