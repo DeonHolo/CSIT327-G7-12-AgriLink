@@ -30,12 +30,14 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4) Configure environment (.env)
+4) Configure environment (.env) - Create (.env) file and copy content from (.env.example) following the configuration instructions
 ```env
 # Generate Secret Key with: python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"
 SECRET_KEY=
 # Set DEBUG to 'False' in production
 DEBUG=True
+# Comma-separated list of allowed hosts (e.g., localhost,127.0.0.1,AgriLink.com)
+ALLOWED_HOSTS=localhost,127.0.0.1
 # For Supabase PostgreSQL (DATABASE_URL=): Supabase Dashboard → Your Project → Connect → Connection String → Session Pooler
 # For Supabase PostgreSQL (DATABASE_URL=): Or check pinned message in Teams chat for Supabase key
 # Optional for PostgreSQL (leave empty to use SQLite locally for development)
