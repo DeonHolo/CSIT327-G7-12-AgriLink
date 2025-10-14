@@ -30,15 +30,18 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4) Configure environment (.env) (more detailed instruction in .env.example)
+4) Create (.env) file and copy content from (.env.example) following the configuration instructions
 ```env
 # Generate Secret Key with: python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"
 SECRET_KEY=
-# Set DEBUG to False in production
+# Set DEBUG to 'False' in production
 DEBUG=True
-# For Supabase PostgreSQL: Supabase Dashboard → Your Project → Connect → Connection String → Session Pooler (Or check pinned message in Teams chat for Supabase key)
+# Comma-separated list of allowed hosts (e.g., localhost,127.0.0.1,AgriLink.com)
+ALLOWED_HOSTS=localhost,127.0.0.1
+# For Supabase PostgreSQL (DATABASE_URL=): Supabase Dashboard → Your Project → Connect → Connection String → Session Pooler
+# For Supabase PostgreSQL (DATABASE_URL=): Or check pinned message in Teams chat for Supabase key
 # Optional for PostgreSQL (leave empty to use SQLite locally for development)
-DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@aws-0-<project-ref>.pooler.supabase.com:5432/postgres?sslmode=require
+DATABASE_URL=
 ```
 
 5) Apply migrations and run
@@ -55,9 +58,8 @@ python manage.py runserver
 | James Michael Siton               | Business Analyst   | jamesmichael.siton@cit.edu             |
 | Franz Raven Sanchez               | Scrum Master       | franzraven.sanchez@cit.edu             |
 | Ron Luigi Taghoy                  | Lead Developer     | ronluigi.taghoy@cit.edu                |
-| Jusfer Jay Orge                   | Frontend Developer | harveyrodchristian.valmera@cit.edu     |
-| Harvey Rod Christian Valmera      | Backend Developer  | jusferjay.orge@cit.edu                 |
-
+| Jusfer Jay Orge                   | Frontend Developer | jusferjay.orge@cit.edu                 |
+| Harvey Rod Christian Valmera      | Backend Developer  | harveyrodchristian.valmera@cit.edu     |
 
 ## Deployed Link
 
