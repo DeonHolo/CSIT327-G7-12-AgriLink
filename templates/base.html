@@ -277,6 +277,28 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            position: relative;
+        }
+        
+        .notification-badge {
+            background: #f44336;
+            color: white;
+            border-radius: 10px;
+            padding: 0.125rem 0.4rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 0.25rem;
+            animation: pulse-badge 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-badge {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
         
         .nav-link:hover {
@@ -550,6 +572,21 @@
                             <i class="bi bi-house-door"></i> Home
                         </a>
                     </li>
+                    {% if user.is_authenticated %}
+                        <li>
+                            <a class="nav-link {% if 'products' in request.path %}active{% endif %}" href="{% url 'product_list' %}">
+                                <i class="bi bi-grid-3x3-gap"></i> Products
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link {% if 'chat' in request.path %}active{% endif %}" href="{% url 'conversation_list' %}">
+                                <i class="bi bi-chat-dots"></i> Messages
+                                {% if unread_messages_count > 0 %}
+                                <span class="notification-badge">{{ unread_messages_count }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                    {% endif %}
                     <li>
                         <a class="nav-link {% if 'landing' in request.path %}active{% endif %}" href="{% url 'landing' %}">
                             <i class="bi bi-info-circle"></i> About
@@ -599,10 +636,23 @@
                 <span>About Platform</span>
             </a>
             {% if user.is_authenticated %}
-                <a class="nav-link" href="#">
-                    <i class="bi bi-speedometer2"></i>
-                    <span>Dashboard</span>
+                <a class="nav-link {% if 'products' in request.path %}active{% endif %}" href="{% url 'product_list' %}">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                    <span>Products</span>
                 </a>
+                <a class="nav-link {% if 'chat' in request.path %}active{% endif %}" href="{% url 'conversation_list' %}">
+                    <i class="bi bi-chat-dots"></i>
+                    <span>Messages</span>
+                    {% if unread_messages_count > 0 %}
+                    <span class="notification-badge">{{ unread_messages_count }}</span>
+                    {% endif %}
+                </a>
+                {% if user.is_farmer %}
+                <a class="nav-link {% if 'my-products' in request.path %}active{% endif %}" href="{% url 'my_products' %}">
+                    <i class="bi bi-box-seam"></i>
+                    <span>My Products</span>
+                </a>
+                {% endif %}
                 <a class="nav-link" href="#">
                     <i class="bi bi-person-circle"></i>
                     <span>Profile</span>
