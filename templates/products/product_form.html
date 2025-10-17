@@ -1,0 +1,317 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .form-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .form-card h1 {
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-card .subtitle {
+        color: #666;
+        margin-bottom: 2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+    
+    .form-group label .required {
+        color: #f44336;
+    }
+    
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group input[type="file"],
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-family: inherit;
+        resize: none;
+    }
+    
+    .custom-unit-wrapper {
+        margin-top: 0.75rem;
+        display: none;
+    }
+    
+    .custom-unit-wrapper.show {
+        display: block;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #4CAF50;
+    }
+    
+    .form-group small {
+        display: block;
+        margin-top: 0.25rem;
+        color: #666;
+        font-size: 0.875rem;
+    }
+    
+    .form-group .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .form-group .checkbox-wrapper input[type="checkbox"] {
+        width: auto;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .btn-submit, .btn-cancel {
+        flex: 1;
+        padding: 1rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+    }
+    
+    .btn-submit {
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        color: white;
+    }
+    
+    .btn-cancel {
+        background: white;
+        color: #666;
+        border: 2px solid #e0e0e0;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="form-container">
+    <div class="form-card">
+        <h1><i class="bi bi-{% if action == 'Add' %}plus-circle{% else %}pencil{% endif %}"></i> {{ action }} Product</h1>
+        <p class="subtitle">{% if action == 'Add' %}List a new product for sale{% else %}Update product information{% endif %}</p>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Product Name -->
+            <div class="form-group">
+                <label for="{{ form.name.id_for_label }}">
+                    Product Name <span class="required">*</span>
+                </label>
+                {{ form.name }}
+                {% if form.name.help_text %}
+                <small>{{ form.name.help_text }}</small>
+                {% endif %}
+                {% if form.name.errors %}
+                <small style="color: #f44336;">{{ form.name.errors.0 }}</small>
+                {% endif %}
+            </div>
+            
+            <!-- Category -->
+            <div class="form-group">
+                <label for="{{ form.category.id_for_label }}">
+                    Category <span class="required">*</span>
+                </label>
+                {{ form.category }}
+                {% if form.category.help_text %}
+                <small>{{ form.category.help_text }}</small>
+                {% endif %}
+                {% if form.category.errors %}
+                <small style="color: #f44336;">{{ form.category.errors.0 }}</small>
+                {% endif %}
+            </div>
+            
+            <!-- Description -->
+            <div class="form-group">
+                <label for="{{ form.description.id_for_label }}">
+                    Description <span class="required">*</span>
+                </label>
+                {{ form.description }}
+                {% if form.description.help_text %}
+                <small>{{ form.description.help_text }}</small>
+                {% endif %}
+                {% if form.description.errors %}
+                <small style="color: #f44336;">{{ form.description.errors.0 }}</small>
+                {% endif %}
+            </div>
+            
+            <!-- Product Image -->
+            <div class="form-group">
+                <label for="{{ form.image.id_for_label }}">
+                    Product Image
+                </label>
+                {{ form.image }}
+                <small>Upload a clear image of your product (optional)</small>
+                {% if form.image.errors %}
+                <small style="color: #f44336;">{{ form.image.errors.0 }}</small>
+                {% endif %}
+                {% if product and product.image %}
+                <small style="color: #4CAF50;">Current: {{ product.image.name }}</small>
+                {% endif %}
+            </div>
+            
+            <!-- Price and Unit -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.price.id_for_label }}">
+                        Price (₱) <span class="required">*</span>
+                    </label>
+                    {{ form.price }}
+                    {% if form.price.help_text %}
+                    <small>{{ form.price.help_text }}</small>
+                    {% endif %}
+                    {% if form.price.errors %}
+                    <small style="color: #f44336;">{{ form.price.errors.0 }}</small>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.unit_choice.id_for_label }}">
+                        Unit <span class="required">*</span>
+                    </label>
+                    {{ form.unit_choice }}
+                    <small>Unit of measurement (e.g., kg, pieces, bundles)</small>
+                    {% if form.unit_choice.errors %}
+                    <small style="color: #f44336;">{{ form.unit_choice.errors.0 }}</small>
+                    {% endif %}
+                    
+                    <div class="custom-unit-wrapper" id="custom-unit-wrapper">
+                        <label for="{{ form.unit_custom.id_for_label }}">
+                            Custom Unit <span class="required">*</span>
+                        </label>
+                        {{ form.unit_custom }}
+                        {% if form.unit_custom.errors %}
+                        <small style="color: #f44336;">{{ form.unit_custom.errors.0 }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stock Quantity and Location -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.stock_quantity.id_for_label }}">
+                        Stock Quantity <span class="required">*</span>
+                    </label>
+                    {{ form.stock_quantity }}
+                    {% if form.stock_quantity.help_text %}
+                    <small>{{ form.stock_quantity.help_text }}</small>
+                    {% endif %}
+                    {% if form.stock_quantity.errors %}
+                    <small style="color: #f44336;">{{ form.stock_quantity.errors.0 }}</small>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.location.id_for_label }}">
+                        Location
+                    </label>
+                    {{ form.location }}
+                    {% if form.location.help_text %}
+                    <small>{{ form.location.help_text }}</small>
+                    {% endif %}
+                    {% if form.location.errors %}
+                    <small style="color: #f44336;">{{ form.location.errors.0 }}</small>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Is Active -->
+            <div class="form-group">
+                <div class="checkbox-wrapper">
+                    {{ form.is_active }}
+                    <label for="{{ form.is_active.id_for_label }}">
+                        {{ form.is_active.label }}
+                    </label>
+                </div>
+                {% if form.is_active.help_text %}
+                <small>{{ form.is_active.help_text }}</small>
+                {% endif %}
+            </div>
+            
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                    <i class="bi bi-check-circle"></i> {{ action }} Product
+                </button>
+                <a href="{% if product %}{% url 'product_detail' product.pk %}{% else %}{% url 'my_products' %}{% endif %}" class="btn-cancel">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const unitChoice = document.getElementById('unit-choice');
+        const customUnitWrapper = document.getElementById('custom-unit-wrapper');
+        const customUnitInput = document.getElementById('unit-custom');
+        
+        function toggleCustomUnit() {
+            if (unitChoice.value === 'other') {
+                customUnitWrapper.classList.add('show');
+                customUnitInput.required = true;
+            } else {
+                customUnitWrapper.classList.remove('show');
+                customUnitInput.required = false;
+                customUnitInput.value = '';
+            }
+        }
+        
+        // Initial state
+        toggleCustomUnit();
+        
+        // Listen for changes
+        unitChoice.addEventListener('change', toggleCustomUnit);
+    });
+</script>
+{% endblock %}
+

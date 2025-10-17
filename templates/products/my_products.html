@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .my-products-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #4CAF50;
+    }
+    
+    .stat-card .stat-label {
+        font-size: 0.875rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+    
+    .filter-bar {
+        background: white;
+        padding: 1rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+    
+    .btn-add {
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .products-table {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    thead {
+        background: #f5f5f5;
+    }
+    
+    th, td {
+        padding: 1rem;
+        text-align: left;
+    }
+    
+    th {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    tbody tr:hover {
+        background: #f9f9f9;
+    }
+    
+    .product-name-cell {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+    
+    .status-badge.active {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+    
+    .status-badge.inactive {
+        background: #ffebee;
+        color: #c62828;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+    
+    .btn-view {
+        background: #2196F3;
+        color: white;
+    }
+    
+    .btn-edit {
+        background: #FF9800;
+        color: white;
+    }
+    
+    .btn-delete {
+        background: #f44336;
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #ccc;
+        margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .header-section {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .products-table {
+            overflow-x: auto;
+        }
+    }
+</style>
+
+<div class="my-products-container">
+    <div class="header-section">
+        <h1><i class="bi bi-box-seam"></i> My Products</h1>
+        <a href="{% url 'product_create' %}" class="btn-add">
+            <i class="bi bi-plus-circle"></i> Add New Product
+        </a>
+    </div>
+    
+    <!-- Statistics -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_products }}</div>
+            <div class="stat-label"><i class="bi bi-box"></i> Total Products</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ active_products }}</div>
+            <div class="stat-label"><i class="bi bi-check-circle"></i> Active Listings</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ inactive_products }}</div>
+            <div class="stat-label"><i class="bi bi-x-circle"></i> Inactive Listings</div>
+        </div>
+    </div>
+    
+    <!-- Filters and Sorting -->
+    <div class="filter-bar">
+        <form method="get" style="display: flex; gap: 1rem; flex: 1; align-items: center;">
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <label>Status:</label>
+                <select name="status" onchange="this.form.submit()" style="padding: 0.5rem; border: 2px solid #e0e0e0; border-radius: 6px;">
+                    <option value="">All</option>
+                    <option value="active" {% if status_filter == "active" %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if status_filter == "inactive" %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <label>Sort by:</label>
+                <select name="sort" onchange="this.form.submit()" style="padding: 0.5rem; border: 2px solid #e0e0e0; border-radius: 6px;">
+                    <option value="-created_at" {% if sort_by == "-created_at" %}selected{% endif %}>Newest First</option>
+                    <option value="created_at" {% if sort_by == "created_at" %}selected{% endif %}>Oldest First</option>
+                    <option value="price" {% if sort_by == "price" %}selected{% endif %}>Price: Low to High</option>
+                    <option value="-price" {% if sort_by == "-price" %}selected{% endif %}>Price: High to Low</option>
+                    <option value="name" {% if sort_by == "name" %}selected{% endif %}>Name: A to Z</option>
+                    <option value="-total_sales" {% if sort_by == "-total_sales" %}selected{% endif %}>Best Selling</option>
+                </select>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Products Table -->
+    {% if page_obj.object_list %}
+    <div class="products-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th>Listed</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in page_obj %}
+                <tr>
+                    <td class="product-name-cell">{{ product.name }}</td>
+                    <td>{{ product.category.name }}</td>
+                    <td>₱{{ product.price }}/{{ product.unit }}</td>
+                    <td>{{ product.stock_quantity }} {{ product.unit }}</td>
+                    <td>
+                        {% if product.is_active %}
+                        <span class="status-badge active">Active</span>
+                        {% else %}
+                        <span class="status-badge inactive">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ product.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'product_detail' product.pk %}" class="btn-action btn-view">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                            <a href="{% url 'product_edit' product.pk %}" class="btn-action btn-edit">
+                                <i class="bi bi-pencil"></i> Edit
+                            </a>
+                            <a href="{% url 'product_delete' product.pk %}" class="btn-action btn-delete">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination" style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem;">
+        {% if page_obj.has_previous %}
+        <a href="?page=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" style="padding: 0.5rem 1rem; border: 2px solid #e0e0e0; border-radius: 6px; text-decoration: none; color: #333;">
+            <i class="bi bi-chevron-double-left"></i>
+        </a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" style="padding: 0.5rem 1rem; border: 2px solid #e0e0e0; border-radius: 6px; text-decoration: none; color: #333;">
+            <i class="bi bi-chevron-left"></i>
+        </a>
+        {% endif %}
+        
+        <span style="padding: 0.5rem 1rem; background: #4CAF50; color: white; border-radius: 6px;">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+        
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" style="padding: 0.5rem 1rem; border: 2px solid #e0e0e0; border-radius: 6px; text-decoration: none; color: #333;">
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        <a href="?page={{ page_obj.paginator.num_pages }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" style="padding: 0.5rem 1rem; border: 2px solid #e0e0e0; border-radius: 6px; text-decoration: none; color: #333;">
+            <i class="bi bi-chevron-double-right"></i>
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <h2>No products yet</h2>
+        <p>Start selling by adding your first product</p>
+        <a href="{% url 'product_create' %}" class="btn-add" style="margin-top: 1rem;">
+            <i class="bi bi-plus-circle"></i> Add Your First Product
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

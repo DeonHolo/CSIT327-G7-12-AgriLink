@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .delete-container {
+        max-width: 600px;
+        margin: 4rem auto;
+        padding: 2rem 1rem;
+    }
+    
+    .delete-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .delete-icon {
+        font-size: 4rem;
+        color: #f44336;
+        margin-bottom: 1rem;
+    }
+    
+    .delete-card h1 {
+        color: #333;
+        margin-bottom: 1rem;
+    }
+    
+    .product-info {
+        background: #f5f5f5;
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin: 2rem 0;
+        text-align: left;
+    }
+    
+    .product-info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .product-info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .product-info-label {
+        font-weight: 600;
+        color: #666;
+    }
+    
+    .product-info-value {
+        color: #333;
+    }
+    
+    .warning-text {
+        color: #f44336;
+        font-weight: 600;
+        margin: 1rem 0;
+    }
+    
+    .button-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .btn-delete-confirm, .btn-cancel {
+        flex: 1;
+        padding: 1rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+    }
+    
+    .btn-delete-confirm {
+        background: #f44336;
+        color: white;
+    }
+    
+    .btn-cancel {
+        background: white;
+        color: #333;
+        border: 2px solid #e0e0e0;
+    }
+</style>
+
+<div class="delete-container">
+    <div class="delete-card">
+        <div class="delete-icon">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        
+        <h1>Confirm Deletion</h1>
+        <p>Are you sure you want to delete this product?</p>
+        
+        <div class="product-info">
+            <div class="product-info-item">
+                <span class="product-info-label">Product Name:</span>
+                <span class="product-info-value">{{ product.name }}</span>
+            </div>
+            <div class="product-info-item">
+                <span class="product-info-label">Category:</span>
+                <span class="product-info-value">{{ product.category.name }}</span>
+            </div>
+            <div class="product-info-item">
+                <span class="product-info-label">Price:</span>
+                <span class="product-info-value">₱{{ product.price }}/{{ product.unit }}</span>
+            </div>
+            <div class="product-info-item">
+                <span class="product-info-label">Stock:</span>
+                <span class="product-info-value">{{ product.stock_quantity }} {{ product.unit }}</span>
+            </div>
+        </div>
+        
+        <p class="warning-text">
+            <i class="bi bi-info-circle"></i> This action will remove the product from your listings.
+        </p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="button-group">
+                <button type="submit" class="btn-delete-confirm">
+                    <i class="bi bi-trash"></i> Yes, Delete Product
+                </button>
+                <a href="{% url 'product_detail' product.pk %}" class="btn-cancel">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

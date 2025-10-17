@@ -339,6 +339,233 @@
         margin-bottom: 3rem;
     }
     
+    /* Enhanced Product Cards */
+    .product-showcase-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+    
+    .product-showcase-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+    }
+    
+    .product-image-wrapper {
+        position: relative;
+        width: 100%;
+        height: 220px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .product-image-wrapper::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+        animation: shimmer 3s linear infinite;
+    }
+    
+    @keyframes shimmer {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .product-image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .product-image-wrapper i {
+        font-size: 5rem;
+        color: white;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .product-showcase-card:hover .product-image-wrapper i {
+        transform: scale(1.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .product-badge-container {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 2;
+    }
+    
+    .product-badge {
+        padding: 0.4rem 0.9rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    
+    .product-badge i {
+        font-size: 0.75rem;
+        line-height: 1;
+    }
+    
+    .product-badge.featured {
+        background: linear-gradient(135deg, #FF9800, #F57C00);
+        color: white;
+    }
+    
+    .product-badge.top-seller {
+        background: linear-gradient(135deg, #FFD700, #FFA500);
+        color: #333;
+    }
+    
+    .product-card-body {
+        padding: 1.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .product-category {
+        color: #4CAF50;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-title {
+        color: #333;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0 0 0.75rem 0;
+        line-height: 1.3;
+    }
+    
+    .product-description {
+        color: #666;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+    
+    .product-stock-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .product-stock-badge.in-stock {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+    
+    .product-stock-badge.low-stock {
+        background: #fff3e0;
+        color: #ef6c00;
+    }
+    
+    .product-price-section {
+        margin-top: auto;
+        padding-top: 1rem;
+        border-top: 2px solid #f0f0f0;
+    }
+    
+    .product-price {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .price-amount {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #4CAF50;
+    }
+    
+    .price-unit {
+        font-size: 0.9rem;
+        color: #666;
+    }
+    
+    .product-farmer {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #666;
+        font-size: 0.875rem;
+    }
+    
+    .product-farmer i {
+        color: #4CAF50;
+    }
+    
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid #f0f0f0;
+    }
+    
+    .section-header h2 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 800;
+        color: #333;
+    }
+    
+    .section-header i {
+        font-size: 2.5rem;
+    }
+    
+    .view-all-btn {
+        padding: 1rem 2.5rem;
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        color: white;
+        border-radius: 12px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    }
+    
+    .view-all-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 25px rgba(76, 175, 80, 0.4);
+    }
+    
     @media (max-width: 768px) {
         .welcome-section {
             padding: 3rem 0;
@@ -359,6 +586,10 @@
         
         .dashboard-card {
             padding: 1.5rem;
+        }
+        
+        .product-image-wrapper {
+            height: 180px;
         }
     }
 </style>
@@ -394,7 +625,7 @@
                 <i class="bi bi-box-seam icon"></i>
                 <h4>My Products</h4>
                 <p>Manage your product listings and inventory</p>
-                <a href="#" class="btn-primary">
+                <a href="{% url 'my_products' %}" class="btn-primary">
                     <i class="bi bi-arrow-right"></i> Manage Products
                 </a>
             </div>
@@ -424,7 +655,7 @@
                 <i class="bi bi-search icon"></i>
                 <h4>Browse Products</h4>
                 <p>Find and purchase fresh local products</p>
-                <a href="#" class="btn-primary">
+                <a href="{% url 'product_list' %}" class="btn-primary">
                     <i class="bi bi-arrow-right"></i> Browse & Buy
                 </a>
             </div>
@@ -453,7 +684,7 @@
                 <i class="bi bi-chat-dots icon"></i>
                 <h4>Messages</h4>
                 <p>Communicate with {% if user.is_farmer %}buyers{% else %}farmers{% endif %}</p>
-                <a href="#" class="btn-primary">
+                <a href="{% url 'conversation_list' %}" class="btn-primary">
                     <i class="bi bi-arrow-right"></i> View Messages
                 </a>
             </div>
@@ -489,7 +720,7 @@
             <div class="col-md-3 col-6 mb-3">
                 <div class="stats-card">
                     <i class="bi bi-box-seam stat-icon"></i>
-                    <h2>0</h2>
+                    <h2>{{ my_products_count }}</h2>
                     <p>My Products</p>
                 </div>
             </div>
@@ -551,20 +782,20 @@
     <section class="quick-actions">
         <h3><i class="bi bi-lightning"></i> Quick Actions</h3>
         {% if user.is_farmer %}
-        <a href="#" class="quick-action-btn">
+        <a href="{% url 'product_create' %}" class="quick-action-btn">
             <i class="bi bi-plus-circle"></i> Add New Product
         </a>
-        <a href="#" class="quick-action-btn">
+        <a href="{% url 'my_products' %}" class="quick-action-btn">
             <i class="bi bi-box-seam"></i> Manage Inventory
         </a>
         <a href="#" class="quick-action-btn">
             <i class="bi bi-graph-up"></i> View Sales Reports
         </a>
-        <a href="#" class="quick-action-btn">
+        <a href="{% url 'conversation_list' %}" class="quick-action-btn">
             <i class="bi bi-chat-left-text"></i> Message Buyers
         </a>
         {% else %}
-        <a href="#" class="quick-action-btn">
+        <a href="{% url 'product_list' %}" class="quick-action-btn">
             <i class="bi bi-search"></i> Browse Products
         </a>
         <a href="#" class="quick-action-btn">
@@ -573,10 +804,131 @@
         <a href="#" class="quick-action-btn">
             <i class="bi bi-heart"></i> My Favorites
         </a>
-        <a href="#" class="quick-action-btn">
+        <a href="{% url 'conversation_list' %}" class="quick-action-btn">
             <i class="bi bi-chat-left-text"></i> Message Farmers
         </a>
         {% endif %}
     </section>
+    
+    <!-- Featured Products Section (FR-11) -->
+    {% if featured_products %}
+    <section class="mb-5 mt-5">
+        <div class="section-header">
+            <i class="bi bi-star-fill text-warning"></i>
+            <h2>Featured Products</h2>
+        </div>
+        <div class="row">
+            {% for product in featured_products %}
+            <div class="col-md-4 col-sm-6 mb-4">
+                <a href="{% url 'product_detail' product.pk %}" style="text-decoration: none; color: inherit;">
+                    <div class="product-showcase-card">
+                        <div class="product-image-wrapper">
+                            {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                            <i class="bi bi-image"></i>
+                            {% endif %}
+                            <div class="product-badge-container">
+                                <span class="product-badge featured">
+                                    <i class="bi bi-star-fill"></i> Featured
+                                </span>
+                            </div>
+                        </div>
+                        <div class="product-card-body">
+                            <div class="product-category">{{ product.category.name }}</div>
+                            <h3 class="product-title">{{ product.name }}</h3>
+                            {% if product.description %}
+                            <p class="product-description">{{ product.description|truncatewords:12 }}</p>
+                            {% endif %}
+                            {% if product.stock_quantity > 10 %}
+                            <span class="product-stock-badge in-stock">
+                                <i class="bi bi-check-circle"></i> In Stock
+                            </span>
+                            {% elif product.stock_quantity > 0 %}
+                            <span class="product-stock-badge low-stock">
+                                <i class="bi bi-exclamation-circle"></i> Low Stock
+                            </span>
+                            {% endif %}
+                            <div class="product-price-section">
+                                <div class="product-price">
+                                    <span class="price-amount">₱{{ product.price }}</span>
+                                    <span class="price-unit">/ {{ product.unit }}</span>
+                                </div>
+                                <div class="product-farmer">
+                                    <i class="bi bi-person-circle"></i>
+                                    <span>{{ product.farmer.username }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="{% url 'product_list' %}" class="view-all-btn">
+                View All Products <i class="bi bi-arrow-right-circle"></i>
+            </a>
+        </div>
+    </section>
+    {% endif %}
+    
+    <!-- Top Products Section (FR-11) -->
+    {% if top_products %}
+    <section class="mb-5">
+        <div class="section-header">
+            <i class="bi bi-trophy-fill text-success"></i>
+            <h2>Top Products</h2>
+        </div>
+        <div class="row">
+            {% for product in top_products %}
+            <div class="col-md-4 col-sm-6 mb-4">
+                <a href="{% url 'product_detail' product.pk %}" style="text-decoration: none; color: inherit;">
+                    <div class="product-showcase-card">
+                        <div class="product-image-wrapper" style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);">
+                            {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                            <i class="bi bi-image"></i>
+                            {% endif %}
+                            <div class="product-badge-container">
+                                <span class="product-badge top-seller">
+                                    <i class="bi bi-trophy-fill"></i> Top Seller
+                                </span>
+                            </div>
+                        </div>
+                        <div class="product-card-body">
+                            <div class="product-category">{{ product.category.name }}</div>
+                            <h3 class="product-title">{{ product.name }}</h3>
+                            {% if product.description %}
+                            <p class="product-description">{{ product.description|truncatewords:12 }}</p>
+                            {% endif %}
+                            {% if product.stock_quantity > 10 %}
+                            <span class="product-stock-badge in-stock">
+                                <i class="bi bi-check-circle"></i> In Stock
+                            </span>
+                            {% elif product.stock_quantity > 0 %}
+                            <span class="product-stock-badge low-stock">
+                                <i class="bi bi-exclamation-circle"></i> Low Stock
+                            </span>
+                            {% endif %}
+                            <div class="product-price-section">
+                                <div class="product-price">
+                                    <span class="price-amount">₱{{ product.price }}</span>
+                                    <span class="price-unit">/ {{ product.unit }}</span>
+                                </div>
+                                <div class="product-farmer">
+                                    <i class="bi bi-person-circle"></i>
+                                    <span>{{ product.farmer.username }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
 </div>
 {% endblock %}
