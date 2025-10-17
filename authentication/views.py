@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from django.db.models import Prefetch
 from .forms import RegistrationForm
 from .models import User
 
@@ -108,8 +109,27 @@ def home_view(request):
     if not request.user.is_authenticated:
         return redirect('landing')
     
+    # Import Product model here to avoid circular import
+    from products.models import Product
+
+    # Prefetch farmer to avoid extra queries when rendering product cards
+    base_products = Product.objects.filter(is_active=True).select_related('farmer', 'category')
+
+    # Get featured and top products for dashboard (FR-11)
+    featured_products = base_products.filter(is_featured=True)[:6]
+    featured_ids = featured_products.values_list('id', flat=True)
+    top_products = base_products.exclude(id__in=featured_ids).order_by('-total_sales')[:6]
+    
+    # Get user's product count if farmer
+    my_products_count = 0
+    if request.user.is_farmer():
+        my_products_count = request.user.products.filter(is_active=True).count()
+    
     context = {
-        'title': 'Dashboard - AgriLink'
+        'title': 'Dashboard - AgriLink',
+        'featured_products': featured_products,
+        'top_products': top_products,
+        'my_products_count': my_products_count
     }
     return render(request, 'home.html', context)
 

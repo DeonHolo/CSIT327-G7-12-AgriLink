@@ -1,0 +1,394 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .product-detail-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .product-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        margin-bottom: 3rem;
+    }
+    
+    .product-image-section {
+        background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+        border-radius: 16px;
+        height: 500px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8rem;
+        color: white;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .product-image-section img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    
+    .product-details-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .product-header h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-category-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: #e8f5e9;
+        color: #2e7d32;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+    
+    .product-price-section {
+        padding: 1.5rem;
+        background: #f5f5f5;
+        border-radius: 12px;
+    }
+    
+    .product-price {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #4CAF50;
+    }
+    
+    .product-unit {
+        font-size: 1.25rem;
+        color: #666;
+    }
+    
+    .product-stock {
+        margin-top: 1rem;
+        font-size: 1rem;
+    }
+    
+    .stock-status {
+        font-weight: 600;
+    }
+    
+    .stock-status.available {
+        color: #2e7d32;
+    }
+    
+    .stock-status.low {
+        color: #ef6c00;
+    }
+    
+    .stock-status.unavailable {
+        color: #c62828;
+    }
+    
+    .product-description {
+        padding: 1.5rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .product-description h3 {
+        margin-bottom: 1rem;
+    }
+    
+    .product-meta-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .meta-item i {
+        font-size: 1.5rem;
+        color: #4CAF50;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .btn-primary, .btn-secondary {
+        flex: 1;
+        padding: 1rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        transition: transform 0.2s;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        color: white;
+    }
+    
+    .btn-secondary {
+        background: white;
+        color: #4CAF50;
+        border: 2px solid #4CAF50;
+    }
+    
+    .btn-primary:hover, .btn-secondary:hover {
+        transform: translateY(-2px);
+    }
+    
+    .farmer-section {
+        padding: 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .farmer-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .farmer-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+    }
+    
+    .farmer-info h3 {
+        margin: 0;
+    }
+    
+    .farmer-info p {
+        margin: 0.25rem 0 0 0;
+        color: #666;
+    }
+    
+    .other-products {
+        margin-top: 3rem;
+    }
+    
+    .other-products h2 {
+        margin-bottom: 1.5rem;
+    }
+    
+    .other-products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .edit-delete-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .btn-edit, .btn-delete {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-block;
+    }
+    
+    .btn-edit {
+        background: #2196F3;
+        color: white;
+    }
+    
+    .btn-delete {
+        background: #f44336;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .product-layout {
+            grid-template-columns: 1fr;
+        }
+        
+        .product-meta-info {
+            grid-template-columns: 1fr;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="product-detail-container">
+    <!-- Breadcrumb -->
+    <div style="margin-bottom: 2rem;">
+        <a href="{% url 'product_list' %}" style="color: #4CAF50; text-decoration: none;">
+            <i class="bi bi-arrow-left"></i> Back to Products
+        </a>
+    </div>
+    
+    <div class="product-layout">
+        <!-- Product Image -->
+        <div class="product-image-section">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+            <i class="bi bi-image"></i>
+            {% endif %}
+        </div>
+        
+        <!-- Product Details -->
+        <div class="product-details-section">
+            <div class="product-header">
+                <span class="product-category-badge">{{ product.category.name }}</span>
+                <h1>{{ product.name }}</h1>
+            </div>
+            
+            <div class="product-price-section">
+                <div class="product-price">
+                    ₱{{ product.price }}
+                    <span class="product-unit">/ {{ product.unit }}</span>
+                </div>
+                <div class="product-stock">
+                    {% if product.stock_quantity > 10 %}
+                    <span class="stock-status available">
+                        <i class="bi bi-check-circle-fill"></i> In Stock ({{ product.stock_quantity }} {{ product.unit }} available)
+                    </span>
+                    {% elif product.stock_quantity > 0 %}
+                    <span class="stock-status low">
+                        <i class="bi bi-exclamation-circle-fill"></i> Low Stock (Only {{ product.stock_quantity }} {{ product.unit }} left)
+                    </span>
+                    {% else %}
+                    <span class="stock-status unavailable">
+                        <i class="bi bi-x-circle-fill"></i> Out of Stock
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="product-meta-info">
+                {% if product.location %}
+                <div class="meta-item">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <div>
+                        <div style="font-size: 0.875rem; color: #666;">Location</div>
+                        <div style="font-weight: 600;">{{ product.location }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="meta-item">
+                    <i class="bi bi-calendar3"></i>
+                    <div>
+                        <div style="font-size: 0.875rem; color: #666;">Listed</div>
+                        <div style="font-weight: 600;">{{ product.created_at|date:"M d, Y" }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                {% if user.is_authenticated and user != product.farmer %}
+                <a href="{% url 'start_conversation' product.pk %}" class="btn-primary">
+                    <i class="bi bi-chat-dots"></i> Contact Seller
+                </a>
+                <button type="button" class="btn-secondary">
+                    <i class="bi bi-cart-check-fill"></i> Buy Now
+                </button>
+                {% elif user == product.farmer %}
+                <div class="edit-delete-buttons" style="width: 100%;">
+                    <a href="{% url 'product_edit' product.pk %}" class="btn-edit">
+                        <i class="bi bi-pencil"></i> Edit Product
+                    </a>
+                    <a href="{% url 'product_delete' product.pk %}" class="btn-delete">
+                        <i class="bi bi-trash"></i> Delete Product
+                    </a>
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn-primary">
+                    <i class="bi bi-box-arrow-in-right"></i> Login to Contact Seller
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Description Section -->
+    <div class="product-description">
+        <h3><i class="bi bi-file-text"></i> Product Description</h3>
+        <p>{{ product.description }}</p>
+    </div>
+    
+    <!-- Farmer/Seller Section -->
+    <div class="farmer-section">
+        <div class="farmer-header">
+            <div class="farmer-avatar">
+                <i class="bi bi-person"></i>
+            </div>
+            <div class="farmer-info">
+                <h3>{{ product.farmer.get_full_name|default:product.farmer.username }}</h3>
+                <p><i class="bi bi-shield-check"></i> {{ product.farmer.get_user_type_display }}</p>
+                <p style="color: #4CAF50;"><i class="bi bi-box-seam"></i> {{ farmer_active_products_count }} active listing{{ farmer_active_products_count|pluralize }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Other Products from Same Farmer -->
+    {% if other_products %}
+    <div class="other-products">
+        <h2>More from {{ product.farmer.username }}</h2>
+        <div class="other-products-grid">
+            {% for other_product in other_products %}
+            <a href="{% url 'product_detail' other_product.pk %}" style="text-decoration: none;">
+                <div class="product-card" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="width: 100%; height: 150px; background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%); display: flex; align-items: center; justify-content: center; font-size: 3rem; color: white; position: relative; overflow: hidden;">
+                        {% if other_product.image %}
+                        <img src="{{ other_product.image.url }}" alt="{{ other_product.name }}" style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
+                        {% else %}
+                        <i class="bi bi-image"></i>
+                        {% endif %}
+                    </div>
+                    <div style="padding: 1rem;">
+                        <div style="font-size: 1rem; font-weight: 600; color: #333;">{{ other_product.name }}</div>
+                        <div style="font-size: 1.25rem; font-weight: 700; color: #4CAF50; margin-top: 0.5rem;">
+                            ₱{{ other_product.price }}<span style="font-size: 0.875rem; font-weight: 400;">/ {{ other_product.unit }}</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

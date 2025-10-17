@@ -25,6 +25,8 @@ urlpatterns = [
     path('', auth_views.home_view, name='home'),
     path('landing/', auth_views.landing_view, name='landing'),
     path('auth/', include('authentication.urls')),
+    path('products/', include('products.urls')),
+    path('chat/', include('chat.urls')),
 ]
 
 # Serve media files in development
