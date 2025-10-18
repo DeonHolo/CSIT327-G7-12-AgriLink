@@ -1,0 +1,548 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .chat-detail-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        height: calc(100vh - 100px);
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .chat-header {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px 16px 0 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .chat-user-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .user-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+    
+    .chat-user-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .chat-user-role {
+        font-size: 0.875rem;
+        color: #666;
+    }
+    
+    .back-link {
+        color: #4CAF50;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    
+    .back-link:hover {
+        text-decoration: underline;
+    }
+    
+    .product-wrapper {
+        background: white;
+        padding: 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .product-info-card {
+        background: #e3f2fd;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border-radius: 0;
+        width: 100%;
+        margin: 0;
+        padding: 1.25rem;
+    }
+    
+    .product-info-card > i {
+        font-size: 2rem;
+        color: #1976d2;
+        flex-shrink: 0;
+    }
+    
+    .product-info-card a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-left: auto;
+        color: #1976d2;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    
+    .product-info-card a:hover {
+        text-decoration: underline;
+    }
+    
+    .messages-container {
+        flex: 1;
+        background: #f5f5f5;
+        padding: 2rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .message {
+        display: flex;
+        gap: 0.75rem;
+        max-width: 70%;
+    }
+    
+    .message.sent {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+    }
+    
+    .message.received {
+        align-self: flex-start;
+    }
+    
+    .message-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        flex-shrink: 0;
+    }
+    
+    .message.sent .message-avatar {
+        background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    }
+    
+    .message-content {
+        display: flex;
+        flex-direction: column;
+        max-width: 100%;
+    }
+    
+    .message.sent .message-content {
+        align-items: flex-end;
+    }
+    
+    .message.received .message-content {
+        align-items: flex-start;
+    }
+    
+    .message-bubble {
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        word-wrap: break-word;
+        display: inline-block;
+        width: fit-content;
+    }
+    
+    .message.received .message-bubble {
+        background: white;
+        color: #333;
+    }
+    
+    .message.sent .message-bubble {
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        color: white;
+    }
+    
+    .message-timestamp {
+        font-size: 0.75rem;
+        color: #666;
+        margin-top: 0.25rem;
+        padding: 0 0.5rem;
+    }
+    
+    .message.sent .message-timestamp {
+        text-align: right;
+    }
+    
+    .message-type-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .message-type-badge.order {
+        background: #fff3e0;
+        color: #ef6c00;
+    }
+    
+    .message-type-badge.price {
+        background: #e1f5fe;
+        color: #0277bd;
+    }
+    
+    .message-input-area {
+        background: white;
+        padding: 1rem;
+        border-radius: 0 0 16px 16px;
+        box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .message-form {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+    }
+    
+    .message-input {
+        flex: 1;
+        padding: 10px 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-family: inherit;
+        resize: none;
+        min-height: 2.5rem;
+        max-height: 120px;
+        line-height: 1.4;
+        overflow-y: auto;
+        transition: height 0.1s ease;
+    }
+    
+    .message-input:focus {
+        outline: none;
+        border-color: #4CAF50;
+    }
+    
+    .send-btn {
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        height: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .send-btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .pagination-info {
+        text-align: center;
+        padding: 1rem;
+        color: #666;
+        font-size: 0.875rem;
+    }
+</style>
+
+<div class="chat-detail-container">
+    <!-- Chat Header -->
+    <div class="chat-header">
+        <div class="chat-user-info">
+            <a href="{% url 'conversation_list' %}" class="back-link">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+            <div class="user-avatar">
+                <i class="bi bi-person"></i>
+            </div>
+            <div>
+                <div class="chat-user-name">{{ other_user.username }}</div>
+                <div class="chat-user-role">{{ other_user.get_user_type_display }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Product Info (if conversation is about a product) -->
+    {% if product %}
+    <div class="product-wrapper">
+        <div class="product-info-card">
+            <i class="bi bi-box-seam"></i>
+            <div>
+                <div style="font-weight: 600; color: #1976d2;">{{ product.name }}</div>
+                <div style="font-size: 0.875rem; color: #666;">₱{{ product.price }}/{{ product.unit }}</div>
+            </div>
+            <a href="{% url 'product_detail' product.pk %}">
+                View Product <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Messages Container -->
+    <div class="messages-container" id="messagesContainer">
+        {% if page_obj.object_list %}
+            {% if page_obj.has_previous %}
+            <div class="pagination-info">
+                <a href="?page={{ page_obj.previous_page_number }}" style="color: #4CAF50; text-decoration: none;">
+                    <i class="bi bi-arrow-up"></i> Load older messages
+                </a>
+            </div>
+            {% endif %}
+            
+            {% for message in page_obj %}
+            <div class="message {% if message.sender == user %}sent{% else %}received{% endif %}">
+                <div class="message-avatar">
+                    <i class="bi bi-person"></i>
+                </div>
+                <div class="message-content">
+                    {% if message.message_type != 'text' %}
+                    <span class="message-type-badge {% if message.message_type == 'order_request' %}order{% else %}price{% endif %}">
+                        <i class="bi bi-tag"></i> {{ message.get_message_type_display }}
+                    </span>
+                    {% endif %}
+                    <div class="message-bubble">
+                        {{ message.content }}
+                    </div>
+                    <div class="message-timestamp">
+                        {{ message.timestamp|date:"M d, Y g:i A" }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+            <div class="pagination-info">
+                <a href="?page={{ page_obj.next_page_number }}" style="color: #4CAF50; text-decoration: none;">
+                    <i class="bi bi-arrow-down"></i> Load newer messages
+                </a>
+            </div>
+            {% endif %}
+        {% else %}
+        <div style="text-align: center; color: #666;">
+            <i class="bi bi-chat-dots" style="font-size: 3rem;"></i>
+            <p>No messages yet. Start the conversation!</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Message Input Area -->
+    <div class="message-input-area">
+        <form method="post" action="{% url 'message_send' conversation.pk %}" class="message-form" id="messageForm">
+            {% csrf_token %}
+            <input type="hidden" name="message_type" id="messageType" value="text">
+            <textarea
+                name="content"
+                id="messageInput"
+                class="message-input"
+                rows="1"
+                placeholder="Aa"
+                required
+            ></textarea>
+            <button type="submit" class="send-btn">
+                <i class="bi bi-send"></i> Send
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Track last message timestamp for polling
+    let lastMessageTimestamp = '{{ last_message_timestamp|default:"" }}';
+    const currentUserId = {{ user.id }};
+    const conversationId = {{ conversation.pk }};
+    
+    // Auto-scroll to bottom on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('messagesContainer');
+        container.scrollTop = container.scrollHeight;
+
+        // Auto-resize textarea functionality (Facebook Messenger style)
+        const textarea = document.getElementById('messageInput');
+        function autoResizeTextarea() {
+            // Set height to 'auto' first to shrink when text is deleted
+            textarea.style.height = 'auto';
+
+            // Then set height to scrollHeight to fit content
+            const scrollHeight = textarea.scrollHeight;
+            textarea.style.height = scrollHeight + 'px';
+
+            // Ensure height doesn't exceed max-height
+            const maxHeight = 120; // 120px as specified
+            if (scrollHeight > maxHeight) {
+                textarea.style.height = maxHeight + 'px';
+                textarea.style.overflowY = 'auto';
+            } else {
+                textarea.style.overflowY = 'hidden';
+            }
+        }
+
+        // Listen for input events to resize
+        textarea.addEventListener('input', autoResizeTextarea);
+
+        // Initial resize to set proper height
+        autoResizeTextarea();
+
+        // Start polling for new messages
+        startPolling();
+        
+        // Add Enter key listener for message input
+        const messageInput = document.getElementById('messageInput');
+        messageInput.addEventListener('keydown', function(e) {
+            // Submit form when Enter is pressed (without Shift)
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('messageForm').dispatchEvent(new Event('submit', {cancelable: true}));
+            }
+            // Shift+Enter creates a new line (default behavior)
+        });
+    });
+    
+    // Auto-scroll to bottom
+    function scrollToBottom() {
+        const container = document.getElementById('messagesContainer');
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    // Append new message to DOM
+    function appendMessage(messageData) {
+        // Mark message as displayed to prevent duplicates
+        displayedMessageIds.add(messageData.id);
+        
+        const container = document.getElementById('messagesContainer');
+        const isSent = messageData.sender_id === currentUserId;
+        
+        // Create message HTML
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+        
+        let messageBadge = '';
+        if (messageData.message_type !== 'text') {
+            const badgeClass = messageData.message_type === 'order_request' ? 'order' : 'price';
+            messageBadge = `
+                <span class="message-type-badge ${badgeClass}">
+                    <i class="bi bi-tag"></i> ${messageData.message_type_display}
+                </span>
+            `;
+        }
+        
+        messageDiv.innerHTML = `
+            <div class="message-avatar">
+                <i class="bi bi-person"></i>
+            </div>
+            <div class="message-content">
+                ${messageBadge}
+                <div class="message-bubble">
+                    ${escapeHtml(messageData.content)}
+                </div>
+                <div class="message-timestamp">
+                    ${messageData.timestamp_display}
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(messageDiv);
+        scrollToBottom();
+        
+        // Update last message timestamp
+        lastMessageTimestamp = messageData.timestamp;
+    }
+    
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // Track messages that have been displayed to prevent duplicates
+    let displayedMessageIds = new Set();
+    
+    // Poll for new messages
+    function startPolling() {
+        setInterval(function() {
+            if (!lastMessageTimestamp) return;
+            
+            fetch(`/chat/${conversationId}/messages/new/${encodeURIComponent(lastMessageTimestamp)}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.messages && data.messages.length > 0) {
+                        data.messages.forEach(msg => {
+                            // Only append if we haven't displayed this message yet
+                            if (!displayedMessageIds.has(msg.id)) {
+                                appendMessage(msg);
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Polling error:', error);
+                });
+        }, 3000); // Poll every 3 seconds
+    }
+    
+    // Handle form submission via AJAX
+    document.getElementById('messageForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const content = formData.get('content');
+        
+        if (!content.trim()) {
+            return;
+        }
+        
+        // Disable send button to prevent double-sending
+        const sendBtn = this.querySelector('.send-btn');
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Sending...';
+        
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Clear input
+                document.getElementById('messageInput').value = '';
+                document.getElementById('messageType').value = 'text';
+                
+                // Append message to DOM immediately
+                appendMessage(data.message);
+                
+                // Re-enable send button
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<i class="bi bi-send"></i> Send';
+            } else {
+                alert('Error sending message: ' + (data.error || 'Unknown error'));
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<i class="bi bi-send"></i> Send';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to send message. Please try again.');
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<i class="bi bi-send"></i> Send';
+        });
+    });
+</script>
+{% endblock %}
+
