@@ -1,0 +1,28 @@
+services:
+  # PostgreSQL Database
+  - type: postgresql
+    name: agrilink-db
+    plan: free  # Options: free, starter, standard
+    
+  # Django Web Service
+  - type: web
+    name: agrilink
+    runtime: python
+    region: singapore  # Choose closest region
+    plan: free
+    buildCommand: ./build.sh
+    startCommand: gunicorn agrilink_project.wsgi
+    envVars:
+      - key: SECRET_KEY
+        sync: false  # Set manually in Render dashboard
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        value: agrilink.onrender.com  # Update with your actual service URL
+      - key: DATABASE_URL
+        fromDatabase:
+          name: agrilink-db
+          property: connectionString
+    databases:
+      - name: agrilink-db
+
