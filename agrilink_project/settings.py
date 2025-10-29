@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'corsheaders',
     # Local apps
     'authentication',
+    'products',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -71,6 +73,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'chat.context_processors.unread_messages_count',
             ],
         },
     },
@@ -87,8 +90,9 @@ if DATABASE_URL:
     DATABASES = {
         "default": dj_database_url.config(
             default=DATABASE_URL,
-            conn_max_age=600,
-            ssl_require=True
+            conn_max_age=0,  # close DB connection after each request to avoid pool exhaustion
+            ssl_require=True,
+            conn_health_checks=False,
         )
     }
 else:
