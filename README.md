@@ -30,14 +30,14 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4) Create (.env) file and copy content from (.env.example) following the configuration instructions
+4) Create (.env) file with the following configuration:
 ```env
 # Generate Secret Key with: python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"
 SECRET_KEY=
 # Set DEBUG to 'False' in production
 DEBUG=True
-# Comma-separated list of allowed hosts (e.g., localhost,127.0.0.1,AgriLink.com)
-ALLOWED_HOSTS=localhost,127.0.0.1
+# Comma-separated list of allowed hosts (e.g., localhost,127.0.0.1,agrilink-q79q.onrender.com)
+ALLOWED_HOSTS=localhost,127.0.0.1,agrilink-q79q.onrender.com
 # For Supabase PostgreSQL (DATABASE_URL=): Supabase Dashboard → Your Project → Connect → Connection String → Session Pooler
 # For Supabase PostgreSQL (DATABASE_URL=): Or check pinned message in Teams chat for Supabase key
 # Optional for PostgreSQL (leave empty to use SQLite locally for development)
@@ -50,78 +50,67 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-## Deployment to Render
-
-### Prerequisites
-- GitHub account with the AgriLink repository
-- Render account (sign up at https://render.com)
-
-### Steps
-
-1. **Prepare your repository**
-   - Ensure all changes are committed and pushed to GitHub
-   - The repository should contain: `Procfile`, `requirements.txt`, `build.sh`
-
-2. **Create PostgreSQL Database on Render**
-   - Log in to Render Dashboard
-   - Click "New +" → "PostgreSQL"
-   - Choose database name, region, and plan
-   - Click "Create Database"
-   - Wait for the database to be provisioned
-   - Copy the "Internal Database URL" (will be used as DATABASE_URL)
-
-3. **Create Web Service**
-   - In Render Dashboard, click "New +" → "Web Service"
-   - Connect your GitHub repository (authorize if needed)
-   - Select the `CSIT327-G7-12-AgriLink` repository
-   - Configure the service:
-     - **Name**: agrilink (or your preferred name)
-     - **Environment**: Python 3
-     - **Build Command**: `./build.sh`
-     - **Start Command**: `gunicorn agrilink_project.wsgi`
-     - **Instance Type**: Free tier or higher
-
-4. **Configure Environment Variables**
-   Click "Advanced" and add the following environment variables:
-   
-   ```env
-   SECRET_KEY=your-generated-secret-key
-   DEBUG=False
-   ALLOWED_HOSTS=agrilink.onrender.com
-   DATABASE_URL=<Internal Database URL from step 2>
-   ```
-   
-   To generate a SECRET_KEY, run:
-   ```bash
-   python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"
-   ```
-
-5. **Deploy**
-   - Click "Create Web Service"
-   - Render will automatically build and deploy your application
-   - Wait for the deployment to complete (typically 3-5 minutes)
-   - Your app will be available at: `https://agrilink.onrender.com` (replace with your service name)
-
-6. **Update Deployed Link**
-   - Copy the deployed URL and update the "Deployed Link" section below
-
 ### Post-Deployment
 
-- The first deployment will take longer as it installs dependencies
-- You may need to create a superuser account by running:
+#### Creating Admin User
+To create a superuser account for accessing the Django admin panel, use Render's Shell feature:
+
+1. Go to your Render Dashboard
+2. Select your web service
+3. Click on "Shell" in the sidebar
+4. Run the following command:
+   ```bash
+   python manage.py createsuperuser
+   ```
+5. Follow the prompts to enter username, email, and password
+
+#### Monitoring and Logs
+- **View Logs**: Check the Render Dashboard → Your Service → Logs for real-time application logs
+- **Build Logs**: Review build logs for any deployment issues
+- **Health Checks**: Render automatically monitors your service health
+
+#### Static and Media Files
+- **Static Files**: Served automatically via WhiteNoise middleware (CSS, JS, images)
+- **Media Files**: User-uploaded files are stored in Render's ephemeral filesystem
+  - ⚠️ **Important**: Files in the media directory are reset on each deployment
+  - For production, consider using cloud storage (AWS S3, Cloudinary, etc.)
+
+#### Database Management
+- **Migrations**: Automatically run during deployment via `build.sh`
+- **Manual Migrations**: If needed, use Render Shell:
   ```bash
-  python manage.py createsuperuser
+  python manage.py migrate
   ```
-- Monitor logs in the Render Dashboard for any issues
-- Static files are automatically served via WhiteNoise
-- Media files uploaded by users will be stored in Render's ephemeral filesystem (reset on each deploy)
+- **Database Backups**: Configure automatic backups in Render Dashboard for paid plans
+- **Supabase**: Database is hosted on Supabase (PostgreSQL)
 
-### Troubleshooting
+#### Deployment Workflow
+1. Make changes to the code
+2. Commit and push to GitHub
+3. Render automatically detects changes and deploys
+4. Monitor logs for deployment status
+5. Test the live site after successful deployment
 
-- Check the build logs if deployment fails
-- Verify all environment variables are set correctly
-- Ensure DATABASE_URL format is correct (postgresql://...)
-- Check ALLOWED_HOSTS includes your Render URL
+#### Troubleshooting
+
+**Build Fails**
+- Check build logs for error messages
+- Verify all dependencies in `requirements.txt`
+- Ensure `build.sh` has executable permissions
+
+**Application Fails to Start**
+- Verify environment variables are set correctly
+- Check that `DATABASE_URL` format is correct
+- Ensure `ALLOWED_HOSTS` includes your Render URL
+
+**Database Connection Errors**
+- Verify `DATABASE_URL` is correct
+- Check Supabase connection pooling settings
+- Ensure IP whitelist allows Render's IPs (if applicable)
+
+**Static Files Not Loading**
+- WhiteNoise should handle static files automatically
+- Run `python manage.py collectstatic` manually if needed
 
 ## Team Members
 
@@ -136,4 +125,4 @@ python manage.py runserver
 
 ## Deployed Link
 
-Not available yet
+🌐 **Live Application**: [agrilink-q79q.onrender.com](https://agrilink-q79q.onrender.com)
