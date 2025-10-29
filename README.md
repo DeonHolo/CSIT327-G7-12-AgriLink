@@ -50,6 +50,79 @@ python manage.py migrate
 python manage.py runserver
 ```
 
+## Deployment to Render
+
+### Prerequisites
+- GitHub account with the AgriLink repository
+- Render account (sign up at https://render.com)
+
+### Steps
+
+1. **Prepare your repository**
+   - Ensure all changes are committed and pushed to GitHub
+   - The repository should contain: `Procfile`, `requirements.txt`, `build.sh`
+
+2. **Create PostgreSQL Database on Render**
+   - Log in to Render Dashboard
+   - Click "New +" → "PostgreSQL"
+   - Choose database name, region, and plan
+   - Click "Create Database"
+   - Wait for the database to be provisioned
+   - Copy the "Internal Database URL" (will be used as DATABASE_URL)
+
+3. **Create Web Service**
+   - In Render Dashboard, click "New +" → "Web Service"
+   - Connect your GitHub repository (authorize if needed)
+   - Select the `CSIT327-G7-12-AgriLink` repository
+   - Configure the service:
+     - **Name**: agrilink (or your preferred name)
+     - **Environment**: Python 3
+     - **Build Command**: `./build.sh`
+     - **Start Command**: `gunicorn agrilink_project.wsgi`
+     - **Instance Type**: Free tier or higher
+
+4. **Configure Environment Variables**
+   Click "Advanced" and add the following environment variables:
+   
+   ```env
+   SECRET_KEY=your-generated-secret-key
+   DEBUG=False
+   ALLOWED_HOSTS=agrilink.onrender.com
+   DATABASE_URL=<Internal Database URL from step 2>
+   ```
+   
+   To generate a SECRET_KEY, run:
+   ```bash
+   python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"
+   ```
+
+5. **Deploy**
+   - Click "Create Web Service"
+   - Render will automatically build and deploy your application
+   - Wait for the deployment to complete (typically 3-5 minutes)
+   - Your app will be available at: `https://agrilink.onrender.com` (replace with your service name)
+
+6. **Update Deployed Link**
+   - Copy the deployed URL and update the "Deployed Link" section below
+
+### Post-Deployment
+
+- The first deployment will take longer as it installs dependencies
+- You may need to create a superuser account by running:
+  ```bash
+  python manage.py createsuperuser
+  ```
+- Monitor logs in the Render Dashboard for any issues
+- Static files are automatically served via WhiteNoise
+- Media files uploaded by users will be stored in Render's ephemeral filesystem (reset on each deploy)
+
+### Troubleshooting
+
+- Check the build logs if deployment fails
+- Verify all environment variables are set correctly
+- Ensure DATABASE_URL format is correct (postgresql://...)
+- Check ALLOWED_HOSTS includes your Render URL
+
 ## Team Members
 
 | Name                              | Role               | CIT-U Email                            |

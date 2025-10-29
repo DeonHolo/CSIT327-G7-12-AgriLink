@@ -6,3 +6,5 @@ python-decouple==3.8
 djangorestframework==3.15.1
 django-cors-headers==4.3.1
 Pillow>=11.0.0
+gunicorn==23.0.0
+whitenoise==6.9.0
