@@ -86,7 +86,7 @@ To create a superuser account for accessing the Django admin panel, use Render's
 
 #### Deployment Workflow
 1. Make changes to the code
-2. Commit and push to GitHub (deploy/render-setup branch)
+2. Commit and push to GitHub
 3. Render automatically detects changes and deploys
 4. Monitor logs for deployment status
 5. Test the live site after successful deployment
