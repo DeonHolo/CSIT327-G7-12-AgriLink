@@ -53,8 +53,4 @@ venv.bak/
 Thumbs.db
 
 # Project Documentation
-FRS.md
-SprintGoal2.md
-SPRINT2_COMPLETION.md
-TESTING_GUIDE.md
-CHAT_OPTIMIZATION_SUMMARY.md
+documentation/
