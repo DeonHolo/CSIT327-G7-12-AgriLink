@@ -13,5 +13,10 @@ urlpatterns = [
     
     # Farmer's product management
     path('my-products/', views.my_products, name='my_products'),
+    
+    # Fair Price Calculator (Feature 6.2)
+    path('calculator/', views.fair_price_view, name='fair_price_calculator'),
+    path('calculator/delete/<int:calc_id>/', views.delete_saved_calculation, name='delete_saved_calculation'),
+    path('api/calculate-fair-price/', views.calculate_fair_price_view, name='calculate_fair_price'),
 ]
 

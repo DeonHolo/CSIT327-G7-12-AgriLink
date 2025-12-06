@@ -1,6 +1,7 @@
 from django import forms
-from .models import Product, Category
+from django.db.models import Case, IntegerField, Value, When
 from decimal import Decimal
+from .models import Category, Product
 
 
 class ProductForm(forms.ModelForm):
@@ -11,16 +12,7 @@ class ProductForm(forms.ModelForm):
     UNIT_CHOICES = [
         ('', '---------'),
         ('kg', 'Kilogram (kg)'),
-        ('g', 'Gram (g)'),
-        ('lbs', 'Pounds (lbs)'),
-        ('pieces', 'Pieces'),
-        ('bundles', 'Bundles'),
-        ('sacks', 'Sacks'),
-        ('crates', 'Crates'),
-        ('boxes', 'Boxes'),
-        ('dozens', 'Dozens'),
-        ('liters', 'Liters (L)'),
-        ('other', 'Other (specify below)')
+        ('pc', 'Piece (pc)'),
     ]
     
     unit_choice = forms.ChoiceField(
@@ -31,16 +23,6 @@ class ProductForm(forms.ModelForm):
             'id': 'unit-choice'
         }),
         label='Unit'
-    )
-    
-    unit_custom = forms.CharField(
-        required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Enter custom unit',
-            'id': 'unit-custom'
-        }),
-        label='Custom Unit'
     )
     
     class Meta:
@@ -72,7 +54,8 @@ class ProductForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': '0.00',
                 'step': '0.01',
-                'min': '0.01'
+                'min': '0.01',
+                'list': 'price-suggestions'
             }),
             'stock_quantity': forms.NumberInput(attrs={
                 'class': 'form-control',
@@ -110,17 +93,22 @@ class ProductForm(forms.ModelForm):
         # Mark required fields
         for field_name in ['name', 'category', 'description', 'price', 'stock_quantity']:
             self.fields[field_name].required = True
+
+        # Keep "Others" at the bottom of the category list
+        self.fields['category'].queryset = Category.objects.annotate(
+            sort_priority=Case(
+                When(name='Others', then=Value(1)),
+                default=Value(0),
+                output_field=IntegerField()
+            )
+        ).order_by('sort_priority', 'name')
         
         # Populate unit fields if editing existing product
         if self.instance and self.instance.pk:
             current_unit = self.instance.unit
-            # Check if current unit is in predefined choices
             unit_values = [choice[0] for choice in self.UNIT_CHOICES if choice[0]]
             if current_unit in unit_values:
                 self.fields['unit_choice'].initial = current_unit
-            else:
-                self.fields['unit_choice'].initial = 'other'
-                self.fields['unit_custom'].initial = current_unit
     
     def clean_price(self):
         """Validate that price is positive"""
@@ -147,19 +135,11 @@ class ProductForm(forms.ModelForm):
         """Validate unit selection"""
         cleaned_data = super().clean()
         unit_choice = cleaned_data.get('unit_choice')
-        unit_custom = cleaned_data.get('unit_custom')
-        
         # Validate that a unit is provided
         if not unit_choice:
             raise forms.ValidationError('Please select a unit of measurement.')
         
-        # If "other" is selected, custom unit is required
-        if unit_choice == 'other':
-            if not unit_custom or not unit_custom.strip():
-                raise forms.ValidationError('Please specify a custom unit when "Other" is selected.')
-            cleaned_data['unit'] = unit_custom.strip()
-        else:
-            cleaned_data['unit'] = unit_choice
+        cleaned_data['unit'] = unit_choice
         
         return cleaned_data
     

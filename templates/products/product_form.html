@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block content %}
 <style>
@@ -53,15 +54,6 @@
         resize: none;
     }
     
-    .custom-unit-wrapper {
-        margin-top: 0.75rem;
-        display: none;
-    }
-    
-    .custom-unit-wrapper.show {
-        display: block;
-    }
-    
     .form-group input:focus,
     .form-group select:focus,
     .form-group textarea:focus {
@@ -90,6 +82,179 @@
         display: flex;
         gap: 1rem;
         margin-top: 2rem;
+    }
+
+    .saved-calcs-trigger {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        margin-left: 0.5rem;
+        padding: 0.35rem 0.6rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        background: #ffffff;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #333;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .saved-calcs-trigger:hover {
+        border-color: #4CAF50;
+        box-shadow: 0 2px 8px rgba(76, 175, 80, 0.08);
+    }
+
+    .saved-calcs-trigger:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+        box-shadow: none;
+    }
+
+    .price-history-modal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 2000;
+        padding: 1rem;
+    }
+
+    .price-history-modal.show {
+        display: flex;
+    }
+
+    .price-history-modal .modal-card {
+        background: #fff;
+        border-radius: 12px;
+        max-width: 700px;
+        width: 100%;
+        padding: 1.25rem;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+
+    .price-history-modal header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .price-history-modal h4 {
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .price-history-modal .history-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .price-history-modal .history-table th,
+    .price-history-modal .history-table td {
+        padding: 0.65rem;
+        border-bottom: 1px solid #eaeaea;
+        text-align: left;
+        font-size: 0.95rem;
+    }
+
+    .price-history-modal .history-table th {
+        font-weight: 700;
+        color: #555;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        font-size: 0.85rem;
+    }
+
+    .price-history-modal .select-btn {
+        padding: 0.45rem 0.75rem;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+        background: #fff;
+        cursor: pointer;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        font-weight: 600;
+        color: #333;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    .price-history-modal .select-btn:hover {
+        border-color: #4CAF50;
+        box-shadow: 0 2px 8px rgba(76, 175, 80, 0.1);
+    }
+
+    .price-history-modal .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        color: #777;
+    }
+
+    /* Modal for autofill confirmation */
+    .price-modal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 5000;
+        padding: 1rem;
+    }
+
+    .price-modal.show {
+        display: flex;
+    }
+
+    .price-modal .modal-card {
+        background: #fff;
+        border-radius: 12px;
+        max-width: 420px;
+        width: 100%;
+        padding: 1.25rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .price-modal h4 {
+        margin: 0 0 0.75rem 0;
+        font-size: 1.1rem;
+    }
+
+    .price-modal p {
+        margin: 0 0 1rem 0;
+        color: #555;
+    }
+
+    .price-modal .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+    }
+
+    .price-modal button {
+        border: none;
+        border-radius: 8px;
+        padding: 0.65rem 1rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .price-modal .btn-secondary {
+        background: #f5f5f5;
+        color: #555;
+        border: 1px solid #e0e0e0;
+    }
+
+    .price-modal .btn-primary {
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        color: #fff;
     }
     
     .btn-submit, .btn-cancel {
@@ -201,9 +366,27 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="{{ form.price.id_for_label }}">
-                        Price (₱) <span class="required">*</span>
+                        Price per <span id="price-unit-label">kg</span> (₱) <span class="required">*</span>
+                        {% if price_suggestions %}
+                        <button
+                            type="button"
+                            class="saved-calcs-trigger"
+                            id="open-price-history"
+                            aria-label="View saved calculations"
+                        >
+                            <i class="bi bi-clock-history" aria-hidden="true"></i>
+                            <span class="saved-calcs-label">Saved Calculations</span>
+                        </button>
+                        {% endif %}
                     </label>
                     {{ form.price }}
+                {% if price_suggestions %}
+                <datalist id="price-suggestions">
+                    {% for calc in price_suggestions %}
+                    <option value="{{ calc.fair_price }}" label="{{ calc.crop_name }}{% if calc.category %} ({{ calc.category }}){% endif %}"></option>
+                    {% endfor %}
+                </datalist>
+                {% endif %}
                     {% if form.price.help_text %}
                     <small>{{ form.price.help_text }}</small>
                     {% endif %}
@@ -217,21 +400,20 @@
                         Unit <span class="required">*</span>
                     </label>
                     {{ form.unit_choice }}
-                    <small>Unit of measurement (e.g., kg, pieces, bundles)</small>
+                    <small>Choose kg or piece</small>
                     {% if form.unit_choice.errors %}
                     <small style="color: #f44336;">{{ form.unit_choice.errors.0 }}</small>
                     {% endif %}
-                    
-                    <div class="custom-unit-wrapper" id="custom-unit-wrapper">
-                        <label for="{{ form.unit_custom.id_for_label }}">
-                            Custom Unit <span class="required">*</span>
-                        </label>
-                        {{ form.unit_custom }}
-                        {% if form.unit_custom.errors %}
-                        <small style="color: #f44336;">{{ form.unit_custom.errors.0 }}</small>
-                        {% endif %}
-                    </div>
                 </div>
+            </div>
+            
+            <div class="form-group" style="margin-top: -0.5rem;">
+                <small class="text-muted">
+                    Not sure about your pricing?
+                    <a href="{% url 'fair_price_calculator' %}" target="_blank" rel="noopener" style="font-weight: 600; color: #2e7d32;">
+                        Use the Fair Price Calculator
+                    </a>
+                </small>
             </div>
             
             <!-- Stock Quantity and Location -->
@@ -289,28 +471,177 @@
     </div>
 </div>
 
+<!-- Price autofill confirmation modal -->
+<div class="price-modal" id="price-autofill-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-card">
+        <h4><i class="bi bi-lightning-charge-fill" style="color:#4CAF50;"></i> Use saved calculation?</h4>
+        <p id="price-autofill-summary">Do you want to autofill price, category, and product name from this saved calculation?</p>
+        <div class="modal-actions">
+            <button type="button" class="btn-secondary" id="price-autofill-cancel">Cancel</button>
+            <button type="button" class="btn-primary" id="price-autofill-confirm">Autofill</button>
+        </div>
+    </div>
+</div>
+
+<!-- Saved calculations history modal -->
+<div class="price-history-modal" id="price-history-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-card">
+        <header>
+            <h4><i class="bi bi-clock-history" style="color:#4CAF50;"></i> Saved Calculations</h4>
+            <button type="button" class="close-btn" id="close-price-history" aria-label="Close history modal">&times;</button>
+        </header>
+        {% if price_suggestions %}
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Fair Price</th>
+                    <th>Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for calc in price_suggestions %}
+                <tr>
+                    <td>{{ calc.crop_name }}</td>
+                    <td>{{ calc.category|default:'—' }}</td>
+                    <td>₱{{ calc.fair_price|floatformat:2|intcomma }}</td>
+                    <td>{{ calc.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <button
+                            type="button"
+                            class="select-btn price-suggestion-btn"
+                            data-price="{{ calc.fair_price }}"
+                            data-category="{{ calc.category }}"
+                            data-name="{{ calc.crop_name }}"
+                        >
+                            <i class="bi bi-check2-circle" aria-hidden="true"></i>
+                            <span>Select</span>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="margin:0;">No saved calculations available.</p>
+        {% endif %}
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const unitChoice = document.getElementById('unit-choice');
-        const customUnitWrapper = document.getElementById('custom-unit-wrapper');
-        const customUnitInput = document.getElementById('unit-custom');
-        
-        function toggleCustomUnit() {
-            if (unitChoice.value === 'other') {
-                customUnitWrapper.classList.add('show');
-                customUnitInput.required = true;
-            } else {
-                customUnitWrapper.classList.remove('show');
-                customUnitInput.required = false;
-                customUnitInput.value = '';
-            }
+        const priceUnitLabel = document.getElementById('price-unit-label');
+        const priceInput = document.getElementById('id_price');
+        const categorySelect = document.getElementById('id_category');
+        const nameInput = document.getElementById('id_name');
+        const suggestionButtons = document.querySelectorAll('.price-suggestion-btn');
+        const priceModal = document.getElementById('price-autofill-modal');
+        const priceModalConfirm = document.getElementById('price-autofill-confirm');
+        const priceModalCancel = document.getElementById('price-autofill-cancel');
+        const priceModalSummary = document.getElementById('price-autofill-summary');
+        const priceHistoryModal = document.getElementById('price-history-modal');
+        const openPriceHistory = document.getElementById('open-price-history');
+        const closePriceHistory = document.getElementById('close-price-history');
+        let pendingSuggestion = null;
+
+        function syncPriceUnit() {
+            if (!unitChoice || !priceUnitLabel) return;
+            const val = unitChoice.value;
+            priceUnitLabel.textContent = val === 'pc' ? 'piece' : 'kg';
         }
-        
-        // Initial state
-        toggleCustomUnit();
-        
-        // Listen for changes
-        unitChoice.addEventListener('change', toggleCustomUnit);
+
+        syncPriceUnit();
+        unitChoice?.addEventListener('change', syncPriceUnit);
+
+        function applyCategoryByName(categoryName) {
+            if (!categoryName || !categorySelect) return false;
+            const target = categoryName.trim().toLowerCase();
+            for (const option of categorySelect.options) {
+                if (option.text.trim().toLowerCase() === target) {
+                    categorySelect.value = option.value;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function openPriceModal(data) {
+            pendingSuggestion = data;
+            if (priceModalSummary && data) {
+                const cat = data.category || '—';
+                priceModalSummary.textContent = `Autofill price, category (“${cat}”), and product name (“${data.name || 'Unnamed'}”) from this saved calculation?`;
+            }
+            priceModal?.classList.add('show');
+            priceModal?.setAttribute('aria-hidden', 'false');
+            priceModalConfirm?.focus();
+        }
+
+        function closePriceModal() {
+            priceModal?.classList.remove('show');
+            priceModal?.setAttribute('aria-hidden', 'true');
+            pendingSuggestion = null;
+        }
+
+        function applySuggestion(data) {
+            if (!data) return;
+            const { price, category, name } = data;
+            if (priceInput && price) {
+                priceInput.value = price;
+            }
+            if (nameInput && name) {
+                nameInput.value = name;
+            }
+            applyCategoryByName(category);
+        }
+
+        suggestionButtons.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                // Ensure the history modal is not covering the confirmation modal
+                closeHistory();
+                setTimeout(() => {
+                    openPriceModal({
+                        price: btn.dataset.price,
+                        category: btn.dataset.category,
+                        name: btn.dataset.name
+                    });
+                }, 0);
+            });
+        });
+
+        function openHistory() {
+            priceHistoryModal?.classList.add('show');
+            priceHistoryModal?.setAttribute('aria-hidden', 'false');
+            priceHistoryModal?.style.setProperty('display', 'flex');
+        }
+
+        function closeHistory() {
+            priceHistoryModal?.classList.remove('show');
+            priceHistoryModal?.setAttribute('aria-hidden', 'true');
+            priceHistoryModal?.style.setProperty('display', 'none');
+        }
+
+        openPriceHistory?.addEventListener('click', openHistory);
+        closePriceHistory?.addEventListener('click', closeHistory);
+        priceHistoryModal?.addEventListener('click', (e) => {
+            if (e.target === priceHistoryModal) {
+                closeHistory();
+            }
+        });
+
+        priceModalConfirm?.addEventListener('click', () => {
+            applySuggestion(pendingSuggestion);
+            closePriceModal();
+        });
+
+        priceModalCancel?.addEventListener('click', closePriceModal);
+        priceModal?.addEventListener('click', (e) => {
+            if (e.target === priceModal) {
+                closePriceModal();
+            }
+        });
     });
 </script>
 {% endblock %}

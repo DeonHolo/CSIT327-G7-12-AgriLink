@@ -53,7 +53,7 @@
     }
     
     .btn-add {
-        padding: 0.75rem 1.5rem;
+        padding: 0.55rem 1rem;
         background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
         color: white;
         border: none;
@@ -62,8 +62,11 @@
         font-weight: 600;
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.4rem;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 10px rgba(76, 175, 80, 0.25);
     }
+
     
     .products-table {
         background: white;
@@ -154,10 +157,35 @@
         padding: 4rem 2rem;
     }
     
-    .empty-state i {
+    .empty-state i.bi-inbox {
         font-size: 4rem;
         color: #ccc;
         margin-bottom: 1rem;
+        display: block;
+    }
+    
+    .btn-empty-state {
+        display: inline-block;
+        padding: 0.65rem 1.25rem;
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-top: 1rem;
+        box-shadow: 0 3px 8px rgba(76, 175, 80, 0.3);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .btn-empty-state:hover {
+        background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 12px rgba(76, 175, 80, 0.4);
+    }
+    
+    .btn-empty-state i {
+        margin-right: 0.4rem;
     }
     
     @media (max-width: 768px) {
@@ -217,7 +245,7 @@
                     <option value="price" {% if sort_by == "price" %}selected{% endif %}>Price: Low to High</option>
                     <option value="-price" {% if sort_by == "-price" %}selected{% endif %}>Price: High to Low</option>
                     <option value="name" {% if sort_by == "name" %}selected{% endif %}>Name: A to Z</option>
-                    <option value="-total_sales" {% if sort_by == "-total_sales" %}selected{% endif %}>Best Selling</option>
+                    <option value="popularity" {% if sort_by == "popularity" %}selected{% endif %}>Popularity</option>
                 </select>
             </div>
         </form>
@@ -305,7 +333,7 @@
         <i class="bi bi-inbox"></i>
         <h2>No products yet</h2>
         <p>Start selling by adding your first product</p>
-        <a href="{% url 'product_create' %}" class="btn-add" style="margin-top: 1rem;">
+        <a href="{% url 'product_create' %}" class="btn-empty-state">
             <i class="bi bi-plus-circle"></i> Add Your First Product
         </a>
     </div>

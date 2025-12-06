@@ -740,6 +740,7 @@
                         
                         <form method="post" novalidate id="registrationForm">
                             {% csrf_token %}
+                            <input type="hidden" name="user_type" id="user_type_field" value="buyer">
                             
                             <!-- Username Field -->
                             <div class="mb-3">
@@ -1026,6 +1027,7 @@
     // User type toggle functionality
     const buyerToggle = document.getElementById('buyer-toggle');
     const farmerToggle = document.getElementById('farmer-toggle');
+    const userTypeField = document.getElementById('user_type_field');
     const authImage = document.getElementById('authImage');
     const authIcon = document.getElementById('authIcon');
     const authTitle = document.getElementById('authTitle');
@@ -1038,12 +1040,14 @@
             authIcon.className = "bi bi-shop";
             authTitle.textContent = "Join as Farmer";
             authDescription.textContent = "Connect with buyers and showcase your produce. Start your journey in sustainable farming and direct sales.";
+            userTypeField.value = 'farmer';
         } else {
             authImage.style.background = "linear-gradient(135deg, rgba(46, 204, 113, 0.95), rgba(39, 174, 96, 0.95)), url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=800') center/cover";
             // Use non-fill variant to ensure glyph exists in current Bootstrap Icons set
             authIcon.className = "bi bi-cart3";
             authTitle.textContent = "Join as Buyer";
             authDescription.textContent = "Connect with farmers and buy fresh produce in your local community. Start your journey in agricultural trade.";
+            userTypeField.value = 'buyer';
         }
 
     }
@@ -1058,18 +1062,6 @@
     
     // Ensure correct initial icon/content on load
     updateAuthContent(buyerToggle.checked ? 'buyer' : 'farmer');
-    
-    // Form submission - add user_type to form data
-    form.addEventListener('submit', function(e) {
-        const selectedUserType = buyerToggle.checked ? 'buyer' : 'farmer';
-        
-        // Create hidden input for user_type
-        const hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'user_type';
-        hiddenInput.value = selectedUserType;
-        form.appendChild(hiddenInput);
-    });
 </script>
 {% endblock %}
 

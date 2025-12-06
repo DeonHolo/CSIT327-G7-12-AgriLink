@@ -24,10 +24,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-fd*jm7dw6ag9f=q+rcc#4z9&urdw3c5z=tl3akxn_qhf^^5cg$')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+# Default to DEBUG=True for local development; override via env in prod.
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',') if config('ALLOWED_HOSTS', default='') else []
+default_allowed_hosts = '127.0.0.1,localhost'
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default=default_allowed_hosts).split(',')
 
 
 # Application definition
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     # Third-party apps
     'rest_framework',
     'corsheaders',
@@ -90,9 +92,9 @@ if DATABASE_URL:
     DATABASES = {
         "default": dj_database_url.config(
             default=DATABASE_URL,
-            conn_max_age=0,  # close DB connection after each request to avoid pool exhaustion
+            conn_max_age=600,  # Reuse connections for 10 minutes (faster page loads)
             ssl_require=True,
-            conn_health_checks=False,
+            conn_health_checks=True,  # Verify connection is alive before reuse
         )
     }
 else:

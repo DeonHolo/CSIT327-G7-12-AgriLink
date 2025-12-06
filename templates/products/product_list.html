@@ -65,6 +65,23 @@
         border: 2px solid #e0e0e0;
         border-radius: 6px;
     }
+
+    .apply-filters-btn {
+        width: 100%;
+        padding: 0.75rem 1.25rem;
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .apply-filters-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 10px rgba(76, 175, 80, 0.25);
+    }
     
     .results-header {
         display: flex;
@@ -340,7 +357,9 @@
                 </div>
                 
                 <div class="filter-group" style="margin-top: auto;">
-                    <button type="submit" style="width: 100%;">Apply Filters</button>
+                    <button type="submit" class="apply-filters-btn">
+                        <i class="bi bi-funnel"></i> Apply Filters
+                    </button>
                 </div>
                 
                 {% if search_query or selected_category or min_price or max_price %}
@@ -373,6 +392,7 @@
                 <option value="price" {% if sort_by == "price" %}selected{% endif %}>Price: Low to High</option>
                 <option value="-price" {% if sort_by == "-price" %}selected{% endif %}>Price: High to Low</option>
                 <option value="name" {% if sort_by == "name" %}selected{% endif %}>Name: A to Z</option>
+                <option value="popularity" {% if sort_by == "popularity" %}selected{% endif %}>Popularity</option>
             </select>
         </form>
     </div>
