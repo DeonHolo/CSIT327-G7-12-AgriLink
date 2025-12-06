@@ -114,3 +114,40 @@ class Product(models.Model):
             return f"Low Stock ({self.stock_quantity} {self.unit} left)"
         else:
             return f"In Stock ({self.stock_quantity} {self.unit} available)"
+
+
+class SavedCalculation(models.Model):
+    """
+    Saved fair price calculations for users (Feature 6.2)
+    Stores calculation history using Market Split Model
+    """
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='calculations'
+    )
+    crop_name = models.CharField(max_length=200)
+    category = models.CharField(
+        max_length=150,
+        blank=True,
+        help_text='Category selected during calculation'
+    )
+    farmgate_price = models.DecimalField(max_digits=10, decimal_places=2)
+    market_price = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        null=True, 
+        blank=True,
+        help_text='Current price in markets/malls (optional)'
+    )
+    fair_price = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'saved_calculations'
+        verbose_name = 'Saved Calculation'
+        verbose_name_plural = 'Saved Calculations'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.crop_name} - ₱{self.fair_price} ({self.user.username})"

@@ -1,0 +1,531 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<style>
+    .calculator-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .page-header {
+        margin-bottom: 2rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.75rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .page-header p {
+        color: #666;
+        margin: 0;
+    }
+    
+    .calculator-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+    
+    .calculator-card, .history-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+    }
+    
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .card-title i {
+        color: #4CAF50;
+    }
+    
+    /* Form Styles */
+    .calc-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+    
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .form-group label {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.95rem;
+    }
+    
+    .form-group label .required {
+        color: #f44336;
+    }
+    
+    .form-group label .optional {
+        color: #666;
+        font-weight: 400;
+        font-size: 0.85rem;
+    }
+    
+    .form-group input,
+    .form-group select {
+        padding: 0.75rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #4CAF50;
+    }
+    
+    .form-group small {
+        color: #666;
+        font-size: 0.85rem;
+    }
+    
+    /* Error Display */
+    .calc-error {
+        display: none;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: #ffebee;
+        border: 1px solid #ffcdd2;
+        border-radius: 8px;
+        color: #c62828;
+        font-size: 0.9rem;
+    }
+    
+    .calc-error i {
+        font-size: 1.1rem;
+    }
+    
+    /* Result Display */
+    .result-section {
+        margin-top: 1rem;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        border-radius: 12px;
+        text-align: center;
+    }
+    
+    .result-label {
+        font-size: 0.95rem;
+        color: #2e7d32;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+    
+    .result-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1b5e20;
+    }
+    
+    .result-value::before {
+        content: '₱';
+        font-size: 1.5rem;
+        margin-right: 0.25rem;
+    }
+    
+    .result-value.has-value {
+        color: #2e7d32;
+    }
+    
+    .result-hint {
+        font-size: 0.85rem;
+        color: #558b2f;
+        margin-top: 0.5rem;
+    }
+    
+    /* Savings Badge */
+    .savings-badge {
+        display: none;
+        margin-top: 0.75rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #2e7d32 0%, #388e3c 100%);
+        color: white;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-align: center;
+    }
+    
+    .savings-badge i {
+        margin-right: 0.35rem;
+    }
+    
+    /* Save Button */
+    .btn-save {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    }
+    
+    .btn-save:disabled {
+        background: #bdbdbd;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    /* History Table */
+    .history-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .history-table th,
+    .history-table td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .history-table th {
+        font-weight: 600;
+        color: #666;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .history-table td {
+        color: #333;
+    }
+    
+    .history-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .history-table .price-cell {
+        font-weight: 600;
+        color: #2e7d32;
+    }
+    
+    .history-table .date-cell {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .history-table .actions-cell {
+        text-align: right;
+    }
+
+    .btn-delete {
+        background: none;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 0.35rem 0.6rem;
+        font-size: 0.85rem;
+        color: #c62828;
+        cursor: pointer;
+        transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+
+    .btn-delete:hover {
+        background: #ffebee;
+        border-color: #ef9a9a;
+        color: #b71c1c;
+    }
+
+    .empty-history {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #666;
+    }
+    
+    .empty-history i {
+        font-size: 3rem;
+        color: #e0e0e0;
+        margin-bottom: 1rem;
+        display: block;
+    }
+    
+    .empty-history p {
+        margin: 0;
+        font-size: 0.95rem;
+    }
+    
+    /* Delete Modal */
+    .calc-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        z-index: 1200;
+    }
+
+    .calc-modal.show {
+        display: flex;
+    }
+
+    .calc-modal .modal-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        max-width: 420px;
+        width: 100%;
+        padding: 1.5rem;
+        position: relative;
+    }
+
+    .modal-card h3 {
+        margin: 0 0 0.75rem 0;
+        font-size: 1.15rem;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .modal-card p {
+        margin: 0 0 1rem 0;
+        color: #555;
+        line-height: 1.5;
+        font-size: 0.95rem;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        background: none;
+        border: none;
+        font-size: 1.1rem;
+        cursor: pointer;
+        color: #777;
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .btn-secondary {
+        padding: 0.6rem 1rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background: #fff;
+        color: #555;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .btn-secondary:hover {
+        background: #f8f8f8;
+    }
+
+    .btn-danger {
+        padding: 0.6rem 1rem;
+        border: none;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #e53935 0%, #d32f2f 100%);
+        color: #fff;
+        cursor: pointer;
+        font-weight: 600;
+        box-shadow: 0 4px 10px rgba(229, 57, 53, 0.2);
+    }
+
+    .btn-danger:hover {
+        background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+    }
+    
+    /* Formula Info */
+    .formula-info {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        background: #f5f5f5;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        color: #666;
+    }
+    
+    .formula-info strong {
+        color: #333;
+    }
+    
+    /* Responsive */
+    @media (max-width: 900px) {
+        .calculator-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="calculator-page">
+    <div class="page-header">
+        <h1><i class="bi bi-calculator"></i> Fair Price Calculator</h1>
+        <p>Find the sweet spot between your farmgate price and retail market price</p>
+    </div>
+    
+    <div class="calculator-layout">
+        <!-- Calculator Form -->
+        <div class="calculator-card">
+            <h2 class="card-title"><i class="bi bi-cash-stack"></i> Calculate Price</h2>
+            
+            <div class="calc-form">
+                <!-- Error Display -->
+                <div id="calc-error" class="calc-error">
+                    <i class="bi bi-exclamation-circle"></i>
+                    <span id="calc-error-text"></span>
+                </div>
+                
+                <!-- Product Name -->
+                <div class="form-group">
+                    <label for="product-name">Product Name <span class="required">*</span></label>
+                    <input type="text" id="product-name" placeholder="e.g., Fresh Tomatoes">
+                    <small>Name of the product you're selling</small>
+                </div>
+
+                <!-- Category -->
+                <div class="form-group">
+                    <label for="category-select">Category <span class="required">*</span></label>
+                    <select id="category-select">
+                        <option value="">---------</option>
+                        {% for category in categories %}
+                        <option value="{{ category.name }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <small>Select the category that matches your product</small>
+                </div>
+                
+                <!-- Farmgate Price -->
+                <div class="form-group">
+                    <label for="farmgate-price">Farmgate Price (₱/unit) <span class="required">*</span></label>
+                    <input type="number" id="farmgate-price" placeholder="e.g., 50.00" step="0.01" min="0.01">
+                    <small>Your base price at the farm per unit (kg/piece)</small>
+                </div>
+                
+                <!-- Market Price (optional) -->
+                <div class="form-group">
+                    <label for="market-price">Market Price (₱/unit) <span class="optional">(optional)</span></label>
+                    <input type="number" id="market-price" placeholder="e.g., 120.00" step="0.01" min="0">
+                    <small>Current price in markets/malls — leave blank for 35% markup</small>
+                </div>
+                
+                <!-- Result Display -->
+                <div class="result-section">
+                    <div class="result-label">Recommended Selling Price (per unit)</div>
+                    <div id="fair-price-result" class="result-value">0.00</div>
+                    <div class="result-hint">Split between farmgate and market prices</div>
+                    <div id="savings-badge" class="savings-badge">
+                        <i class="bi bi-piggy-bank"></i> Buyer saves <span id="savings-percent">0</span>% compared to retail!
+                    </div>
+                </div>
+                
+                <!-- Save Button -->
+                <button type="button" id="save-btn" class="btn-save">
+                    <i class="bi bi-save"></i> Save Calculation
+                </button>
+                
+                <!-- Formula Info -->
+                <div class="formula-info">
+                    <strong>Formula:</strong> Fair Price = (Farmgate Price + Market Price) ÷ 2<br>
+                    <small>If no market price: Farmgate Price × 1.35 (35% markup)</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Calculation History -->
+        <div class="history-card">
+            <h2 class="card-title"><i class="bi bi-clock-history"></i> Recent Calculations</h2>
+            
+            {% if history %}
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Fair Price</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for calc in history %}
+                    <tr>
+                        <td class="date-cell">{{ calc.created_at|date:"M d, Y" }}</td>
+                        <td>{{ calc.crop_name }}</td>
+                        <td>{{ calc.category|default:'—' }}</td>
+                        <td class="price-cell">₱{{ calc.fair_price|floatformat:2|intcomma }}</td>
+                        <td class="actions-cell">
+                            <button
+                                type="button"
+                                class="btn-delete calc-delete-btn"
+                                data-delete-url="{% url 'delete_saved_calculation' calc.id %}"
+                                aria-label="Delete calculation for {{ calc.crop_name }}"
+                            >
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-history">
+                <i class="bi bi-inbox"></i>
+                <p>No calculations saved yet.<br>Start calculating and save your results!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Delete confirmation modal -->
+<div class="calc-modal" id="calc-delete-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-card">
+        <button type="button" class="modal-close" id="close-delete-btn" aria-label="Close">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <h3><i class="bi bi-trash"></i> Delete calculation</h3>
+        <p>Are you sure you want to delete this saved calculation? This action cannot be undone.</p>
+        <div class="modal-actions">
+            <button type="button" class="btn-secondary" id="cancel-delete-btn">Cancel</button>
+            <button type="button" class="btn-danger" id="confirm-delete-btn">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/calculator.js' %}"></script>
+{% endblock %}

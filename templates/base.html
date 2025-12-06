@@ -579,6 +579,11 @@
                             </a>
                         </li>
                         <li>
+                            <a class="nav-link {% if 'calculator' in request.path %}active{% endif %}" href="{% url 'fair_price_calculator' %}">
+                                <i class="bi bi-calculator"></i> Calculator
+                            </a>
+                        </li>
+                        <li>
                             <a class="nav-link {% if 'chat' in request.path %}active{% endif %}" href="{% url 'conversation_list' %}">
                                 <i class="bi bi-chat-dots"></i> Messages
                                 {% if unread_messages_count > 0 %}
@@ -639,6 +644,10 @@
                 <a class="nav-link {% if 'products' in request.path %}active{% endif %}" href="{% url 'product_list' %}">
                     <i class="bi bi-grid-3x3-gap"></i>
                     <span>Products</span>
+                </a>
+                <a class="nav-link {% if 'calculator' in request.path %}active{% endif %}" href="{% url 'fair_price_calculator' %}">
+                    <i class="bi bi-calculator"></i>
+                    <span>Calculator</span>
                 </a>
                 <a class="nav-link {% if 'chat' in request.path %}active{% endif %}" href="{% url 'conversation_list' %}">
                     <i class="bi bi-chat-dots"></i>

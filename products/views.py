@@ -2,9 +2,32 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q
-from .models import Product, Category
+from django.db.models import Q, Case, When, Value, IntegerField
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from decimal import Decimal, InvalidOperation
+from .models import Product, Category, SavedCalculation
 from .forms import ProductForm
+from .utils import calculate_fair_price, calculate_buyer_savings
+
+
+def _get_price_suggestions(user, limit=5):
+    """
+    Safely fetch recent saved calculations for price suggestions,
+    skipping any rows with invalid decimal values.
+    """
+    qs = SavedCalculation.objects.filter(user=user).only(
+        'id', 'crop_name', 'category', 'fair_price', 'created_at'
+    ).order_by('-created_at')[:limit]
+
+    suggestions = []
+    for calc in qs:
+        try:
+            _ = calc.fair_price + Decimal('0')
+            suggestions.append(calc)
+        except (InvalidOperation, TypeError):
+            continue
+    return suggestions
 
 
 def product_list(request):
@@ -45,8 +68,10 @@ def product_list(request):
     
     # Sorting
     sort_by = request.GET.get('sort', '-created_at')
-    valid_sorts = ['-created_at', 'created_at', 'price', '-price', 'name']
-    if sort_by in valid_sorts:
+    valid_sorts = ['-created_at', 'created_at', 'price', '-price', 'name', 'popularity']
+    if sort_by == 'popularity':
+        products = products.order_by('-total_sales')
+    elif sort_by in valid_sorts:
         products = products.order_by(sort_by)
     
     # Use paginator's count method for better performance
@@ -132,10 +157,14 @@ def product_create(request):
     else:
         form = ProductForm()
     
+    # Saved calculations to help with price suggestions (defensive fetch)
+    price_suggestions = _get_price_suggestions(request.user)
+    
     context = {
         'title': 'Add New Product - AgriLink',
         'form': form,
-        'action': 'Add'
+        'action': 'Add',
+        'price_suggestions': price_suggestions
     }
     return render(request, 'products/product_form.html', context)
 
@@ -167,11 +196,14 @@ def product_edit(request, pk):
     else:
         form = ProductForm(instance=product)
     
+    price_suggestions = _get_price_suggestions(request.user)
+    
     context = {
         'title': f'Edit {product.name} - AgriLink',
         'form': form,
         'product': product,
-        'action': 'Edit'
+        'action': 'Edit',
+        'price_suggestions': price_suggestions
     }
     return render(request, 'products/product_form.html', context)
 
@@ -215,8 +247,10 @@ def my_products(request):
     
     # Get farmer's products with sorting
     sort_by = request.GET.get('sort', '-created_at')
-    valid_sorts = ['-created_at', 'created_at', 'price', '-price', 'name', '-total_sales']
-    if sort_by in valid_sorts:
+    valid_sorts = ['-created_at', 'created_at', 'price', '-price', 'name', '-total_sales', 'popularity']
+    if sort_by == 'popularity':
+        products = request.user.products.all().order_by('-total_sales')
+    elif sort_by in valid_sorts:
         products = request.user.products.all().order_by(sort_by)
     else:
         products = request.user.products.all().order_by('-created_at')
@@ -243,3 +277,214 @@ def my_products(request):
         'inactive_products': request.user.products.filter(is_active=False).count()
     }
     return render(request, 'products/my_products.html', context)
+
+
+@require_POST
+@login_required
+def calculate_fair_price_view(request):
+    """
+    API endpoint for Fair Price Calculator (Feature 6.2)
+    
+    Accepts POST with JSON body:
+        - farmgate_price: Base price at farm gate (per unit)
+        - transport_cost: Total transport/logistics cost
+        - quantity: Total quantity in kg
+        - supermarket_price: (optional) For comparison/savings calculation
+    
+    Returns JSON with calculated values or error message.
+    """
+    import json
+    
+    try:
+        data = json.loads(request.body)
+        
+        # Extract and validate inputs
+        farmgate_price = data.get('farmgate_price')
+        transport_cost = data.get('transport_cost', 0)
+        quantity = data.get('quantity')
+        supermarket_price = data.get('supermarket_price')
+        
+        # Validate required fields
+        if farmgate_price is None or quantity is None:
+            return JsonResponse({
+                'success': False,
+                'error': 'Farmgate price and quantity are required.'
+            }, status=400)
+        
+        # Convert to Decimal
+        try:
+            farmgate_price = Decimal(str(farmgate_price))
+            transport_cost = Decimal(str(transport_cost)) if transport_cost else Decimal('0')
+            quantity = Decimal(str(quantity))
+        except (InvalidOperation, ValueError):
+            return JsonResponse({
+                'success': False,
+                'error': 'Invalid numeric values provided.'
+            }, status=400)
+        
+        # Validate positive values
+        if farmgate_price <= 0:
+            return JsonResponse({
+                'success': False,
+                'error': 'Farmgate price must be greater than zero.'
+            }, status=400)
+        
+        if quantity <= 0:
+            return JsonResponse({
+                'success': False,
+                'error': 'Quantity must be greater than zero.'
+            }, status=400)
+        
+        if transport_cost < 0:
+            return JsonResponse({
+                'success': False,
+                'error': 'Transport cost cannot be negative.'
+            }, status=400)
+        
+        # Calculate fair price
+        result = calculate_fair_price(farmgate_price, transport_cost, quantity)
+        
+        # Calculate savings if supermarket price provided
+        savings_percent = None
+        if supermarket_price:
+            try:
+                supermarket_price = Decimal(str(supermarket_price))
+                if supermarket_price > 0:
+                    savings_percent = float(calculate_buyer_savings(
+                        result['fair_price'], 
+                        supermarket_price
+                    ))
+            except (InvalidOperation, ValueError):
+                pass  # Ignore invalid supermarket price
+        
+        return JsonResponse({
+            'success': True,
+            'fair_price': float(result['fair_price']),
+            'unit_logistics': float(result['unit_logistics']),
+            'base_cost': float(result['base_cost']),
+            'profit_margin': float(result['profit_margin']),
+            'farmgate_price': float(result['farmgate_price']),
+            'savings_percent': savings_percent
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid JSON data.'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': 'An error occurred while calculating the price.'
+        }, status=500)
+
+
+@login_required
+def fair_price_view(request):
+    """
+    Fair Price Calculator page (Feature 6.2)
+    Market Split Model: Fair Price = (Farmgate + Market) / 2
+    Fallback: Farmgate * 1.35 if no market price
+    
+    GET: Render calculator page with user's calculation history
+    POST: Save a new calculation to the database
+    """
+    import json
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            
+            # Extract fields
+            # Accept both the existing crop_name key and the new product_name key
+            crop_name = (data.get('product_name') or data.get('crop_name') or '').strip()
+            farmgate_price = data.get('farmgate_price')
+            market_price = data.get('market_price')  # Optional
+            fair_price = data.get('fair_price')
+            category = (data.get('category') or '').strip()
+            
+            # Validate crop name
+            if not crop_name:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Please enter a product name.'
+                }, status=400)
+            
+            # Validate numeric fields
+            try:
+                farmgate_price = Decimal(str(farmgate_price))
+                market_price = Decimal(str(market_price)) if market_price else None
+                fair_price = Decimal(str(fair_price))
+            except (InvalidOperation, ValueError, TypeError):
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Invalid numeric values provided.'
+                }, status=400)
+            
+            # Create the saved calculation
+            calculation = SavedCalculation.objects.create(
+                user=request.user,
+                crop_name=crop_name,
+                category=category,
+                farmgate_price=farmgate_price,
+                market_price=market_price,
+                fair_price=fair_price
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Calculation saved successfully!',
+                'id': calculation.id
+            })
+            
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'success': False,
+                'error': 'Invalid JSON data.'
+            }, status=400)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': 'An error occurred while saving.'
+            }, status=500)
+    
+    # GET request - render calculator page
+    # Limit fields to avoid loading any corrupted numeric values (defensive)
+    history_qs = SavedCalculation.objects.filter(user=request.user).only(
+        'id', 'crop_name', 'category', 'fair_price', 'created_at'
+    )[:5]
+    
+    # Defensive: skip any rows that still fail conversion
+    history = []
+    for calc in history_qs:
+        try:
+            _ = calc.fair_price + Decimal('0')
+            history.append(calc)
+        except (InvalidOperation, TypeError):
+            continue
+
+    categories = Category.objects.annotate(
+        sort_priority=Case(
+            When(name='Others', then=Value(1)),
+            default=Value(0),
+            output_field=IntegerField()
+        )
+    ).order_by('sort_priority', 'name')
+    
+    context = {
+        'title': 'Fair Price Calculator - AgriLink',
+        'history': history,
+        'categories': categories
+    }
+    return render(request, 'products/calculator.html', context)
+
+
+@login_required
+@require_POST
+def delete_saved_calculation(request, calc_id):
+    """
+    Delete a saved fair price calculation for the current user
+    """
+    calculation = get_object_or_404(SavedCalculation, id=calc_id, user=request.user)
+    calculation.delete()
+    return JsonResponse({'success': True})
