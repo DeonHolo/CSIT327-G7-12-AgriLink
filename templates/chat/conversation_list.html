@@ -77,6 +77,14 @@
         color: white;
         margin-right: 1rem;
         flex-shrink: 0;
+        overflow: hidden;
+    }
+    .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        display: block;
     }
     
     .conversation-info {
@@ -254,7 +262,11 @@
         <div class="conversation-item {% if data.unread_count > 0 %}unread{% endif %}" id="conversation-{{ data.conversation.pk }}">
             <a href="{% url 'conversation_detail' data.conversation.pk %}" class="conversation-link">
                 <div class="user-avatar">
+                    {% if data.other_user.profile_picture %}
+                    <img src="{{ data.other_user.profile_picture.url }}" alt="{{ data.other_user.username }}">
+                    {% else %}
                     <i class="bi bi-person"></i>
+                    {% endif %}
                 </div>
                 
                 <div class="conversation-info">

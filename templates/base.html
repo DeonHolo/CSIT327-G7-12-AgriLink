@@ -470,6 +470,102 @@
         .btn-close:hover {
             opacity: 1;
         }
+
+        /* ===== MODAL (shared) ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1100;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+        }
+
+        .btn-modal-cancel {
+            background: #f1f3f5;
+            color: #495057;
+            border: none;
+            padding: 0.65rem 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-modal-save {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 0.65rem 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-modal-save:hover {
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+        }
         
         /* ===== MAIN CONTENT ===== */
         .main-content {
@@ -579,11 +675,6 @@
                             </a>
                         </li>
                         <li>
-                            <a class="nav-link {% if 'calculator' in request.path %}active{% endif %}" href="{% url 'fair_price_calculator' %}">
-                                <i class="bi bi-calculator"></i> Calculator
-                            </a>
-                        </li>
-                        <li>
                             <a class="nav-link {% if 'chat' in request.path %}active{% endif %}" href="{% url 'conversation_list' %}">
                                 <i class="bi bi-chat-dots"></i> Messages
                                 {% if unread_messages_count > 0 %}
@@ -592,22 +683,29 @@
                             </a>
                         </li>
                     {% endif %}
-                    <li>
-                        <a class="nav-link {% if 'landing' in request.path %}active{% endif %}" href="{% url 'landing' %}">
-                            <i class="bi bi-info-circle"></i> About
-                        </a>
-                    </li>
                     {% if user.is_authenticated %}
                         <li>
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="{% url 'profile' %}">
                                 <i class="bi bi-person-circle"></i> {{ user.username }}
                             </a>
                         </li>
-                        <li>
-                            <a class="nav-link" href="{% url 'logout' %}">
-                                <i class="bi bi-box-arrow-right"></i> Logout
-                            </a>
-                        </li>
+                    <li>
+                        <a class="nav-link {% if 'settings' in request.path %}active{% endif %}" href="{% url 'settings' %}">
+                            <i class="bi bi-gear"></i> Settings
+                        </a>
+                    </li>
+                    {% if user.is_staff %}
+                    <li>
+                        <a class="nav-link {% if 'staff' in request.path %}active{% endif %}" href="{% url 'staff_dashboard' %}">
+                            <i class="bi bi-shield-check"></i> Staff Panel
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a class="nav-link logout-trigger" data-logout-href="{% url 'logout' %}" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </li>
                     {% else %}
                         <li>
                             <a class="nav-link {% if 'login' in request.path %}active{% endif %}" href="{% url 'login' %}">
@@ -645,10 +743,12 @@
                     <i class="bi bi-grid-3x3-gap"></i>
                     <span>Products</span>
                 </a>
+                {% if user.is_farmer %}
                 <a class="nav-link {% if 'calculator' in request.path %}active{% endif %}" href="{% url 'fair_price_calculator' %}">
                     <i class="bi bi-calculator"></i>
                     <span>Calculator</span>
                 </a>
+                {% endif %}
                 <a class="nav-link {% if 'chat' in request.path %}active{% endif %}" href="{% url 'conversation_list' %}">
                     <i class="bi bi-chat-dots"></i>
                     <span>Messages</span>
@@ -662,15 +762,21 @@
                     <span>My Products</span>
                 </a>
                 {% endif %}
-                <a class="nav-link" href="#">
+                <a class="nav-link {% if 'profile' in request.path %}active{% endif %}" href="{% url 'profile' %}">
                     <i class="bi bi-person-circle"></i>
                     <span>Profile</span>
                 </a>
-                <a class="nav-link" href="#">
+                <a class="nav-link {% if 'settings' in request.path %}active{% endif %}" href="{% url 'settings' %}">
                     <i class="bi bi-gear"></i>
                     <span>Settings</span>
                 </a>
-                <a class="nav-link" href="{% url 'logout' %}">
+                {% if user.is_staff %}
+                <a class="nav-link {% if 'staff' in request.path %}active{% endif %}" href="{% url 'staff_dashboard' %}">
+                    <i class="bi bi-shield-check"></i>
+                    <span>Staff Panel</span>
+                </a>
+                {% endif %}
+                <a class="nav-link logout-trigger" data-logout-href="{% url 'logout' %}" href="{% url 'logout' %}">
                     <i class="bi bi-box-arrow-right"></i>
                     <span>Logout</span>
                 </a>
@@ -706,6 +812,24 @@
     <main class="main-content">
         {% block content %}{% endblock %}
     </main>
+
+    <!-- Logout confirmation modal -->
+    <div class="modal-overlay" id="logoutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="bi bi-box-arrow-right"></i> Confirm Logout</h3>
+                <button class="modal-close" id="logoutModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to log out?</p>
+                <p style="color: #666; font-size: 0.9rem;">You will need to log in again to continue.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal-cancel" id="logoutCancelBtn">Stay Logged In</button>
+                <button class="btn-modal-save" id="logoutConfirmBtn"><i class="bi bi-box-arrow-right"></i> Log Out</button>
+            </div>
+        </div>
+    </div>
     
     <!-- Footer -->
     <footer>
@@ -739,6 +863,62 @@
                 sidebar.classList.remove('active');
                 sidebarOverlay.classList.remove('active');
             });
+        });
+
+        // Logout confirmation modal
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutConfirmBtn = document.getElementById('logoutConfirmBtn');
+        const logoutCancelBtn = document.getElementById('logoutCancelBtn');
+        const logoutModalClose = document.getElementById('logoutModalClose');
+        let pendingLogout = null;
+
+        function closeLogoutModal() {
+            logoutModal.classList.remove('active');
+            pendingLogout = null;
+        }
+
+        function openLogoutModal(action) {
+            pendingLogout = action;
+            logoutModal.classList.add('active');
+        }
+
+        document.querySelectorAll('.logout-trigger').forEach(el => {
+            el.addEventListener('click', function(e) {
+                e.preventDefault();
+                const href = this.dataset.logoutHref;
+                const formId = this.dataset.logoutForm;
+                openLogoutModal({ href, formId });
+            });
+        });
+
+        logoutConfirmBtn.addEventListener('click', function() {
+            if (!pendingLogout) {
+                closeLogoutModal();
+                return;
+            }
+            if (pendingLogout.href) {
+                window.location.href = pendingLogout.href;
+            } else if (pendingLogout.formId) {
+                const form = document.getElementById(pendingLogout.formId);
+                if (form) form.submit();
+            }
+            closeLogoutModal();
+        });
+
+        [logoutCancelBtn, logoutModalClose].forEach(btn => {
+            if (btn) {
+                btn.addEventListener('click', function() {
+                    closeLogoutModal();
+                });
+            }
+        });
+
+        logoutModal.addEventListener('click', function(e) {
+            if (e.target === logoutModal) closeLogoutModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeLogoutModal();
         });
     </script>
     

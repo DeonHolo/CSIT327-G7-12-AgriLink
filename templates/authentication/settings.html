@@ -1,0 +1,464 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .settings-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .settings-header {
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        border-radius: 20px;
+        padding: 3rem;
+        color: white;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .settings-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 60%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    }
+
+    .settings-header-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .settings-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .settings-header p {
+        opacity: 0.9;
+        font-size: 1.05rem;
+    }
+
+    .settings-section {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+        max-width: 900px;
+        margin: 0 auto 2rem;
+    }
+
+    .settings-section-header {
+        background: #f8f9fa;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .settings-section-header i {
+        font-size: 1.25rem;
+        color: #2ecc71;
+    }
+
+    .settings-section-header h2 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .settings-content {
+        padding: 1.5rem;
+    }
+
+    .settings-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f0f0f0;
+        gap: 2rem;
+    }
+
+    .settings-row:last-child {
+        border-bottom: none;
+    }
+
+    .settings-label {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .settings-label strong {
+        font-size: 1rem;
+        color: #333;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .settings-label span {
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .settings-action {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .btn-link {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        border: none;
+        color: white;
+        text-decoration: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-badge.none {
+        background: #e9ecef;
+        color: #495057;
+    }
+
+    .status-badge.pending {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+
+    .status-badge.approved {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .status-badge.rejected {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .farmer-status-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .farmer-status-info small {
+        color: #666;
+        font-size: 0.85rem;
+    }
+
+    .rejection-notes {
+        background: #fff5f5;
+        border-left: 3px solid #e74c3c;
+        padding: 0.75rem;
+        margin-top: 0.5rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        color: #721c24;
+    }
+
+    .notification-toggle {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .notification-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 0.75rem 0;
+    }
+
+    .notification-item label {
+        display: flex;
+        align-items: flex-start;
+        cursor: pointer;
+        flex: 1;
+        gap: 0.75rem;
+    }
+
+    .notification-item input[type="checkbox"] {
+        width: 22px;
+        height: 22px;
+        cursor: pointer;
+        accent-color: #2ecc71;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .notification-item .settings-label {
+        margin: 0;
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-top: 1rem;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+    }
+
+    @media (max-width: 768px) {
+        .settings-header {
+            padding: 2rem 1.5rem;
+        }
+
+        .settings-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .settings-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .settings-action {
+            width: 100%;
+        }
+
+        .btn-link, .btn-danger {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <div class="settings-header">
+        <div class="settings-header-content">
+            <h1><i class="bi bi-gear-fill"></i> Settings</h1>
+            <p>Manage your account preferences and security</p>
+        </div>
+    </div>
+
+    <!-- Account Section -->
+    <div class="settings-section">
+        <div class="settings-section-header">
+            <i class="bi bi-person-circle"></i>
+            <h2>Account</h2>
+        </div>
+        <div class="settings-content">
+            <div class="settings-row">
+                <div class="settings-label">
+                    <strong>Email Address</strong>
+                    <span>{{ user.email }}</span>
+                </div>
+                <div class="settings-action">
+                    <a href="{% url 'profile' %}" class="btn-link">
+                        <i class="bi bi-pencil"></i> Change
+                    </a>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <div class="settings-label">
+                    <strong>Password</strong>
+                    <span>Change your password to keep your account secure</span>
+                </div>
+                <div class="settings-action">
+                    <a href="{% url 'change_password' %}" class="btn-link">
+                        <i class="bi bi-key"></i> Change
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Section -->
+    <div class="settings-section">
+        <div class="settings-section-header">
+            <i class="bi bi-shield-lock"></i>
+            <h2>Security</h2>
+        </div>
+        <div class="settings-content">
+            <div class="settings-row">
+                <div class="settings-label">
+                    <strong>Active Sessions</strong>
+                    <span>Log out from all devices and sessions</span>
+                </div>
+                <div class="settings-action">
+                    <form id="logoutAllForm" method="POST" action="{% url 'logout_all_sessions' %}">
+                        {% csrf_token %}
+                        <button type="button" class="btn-danger logout-trigger" data-logout-form="logoutAllForm">
+                            <i class="bi bi-box-arrow-right"></i> Log Out All
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Farmer Status Section -->
+    <div class="settings-section">
+        <div class="settings-section-header">
+            <i class="bi bi-shop"></i>
+            <h2>Farmer Status</h2>
+        </div>
+        <div class="settings-content">
+            <div class="settings-row">
+                <div class="settings-label">
+                    <strong>Account Role</strong>
+                    <span>{{ user.get_user_type_display }}</span>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <div class="settings-label">
+                    <strong>Business Permit Verification</strong>
+                    <div class="farmer-status-info">
+                        {% if user.business_permit_status == 'none' %}
+                            <span class="status-badge none">
+                                <i class="bi bi-dash-circle"></i> Not Submitted
+                            </span>
+                            <small>Upload your business permit in your profile to become a farmer</small>
+                        {% elif user.business_permit_status == 'pending' %}
+                            <span class="status-badge pending">
+                                <i class="bi bi-hourglass-split"></i> Pending Review
+                            </span>
+                            {% if user.business_permit_updated_at %}
+                                <small>Submitted on {{ user.business_permit_updated_at|date:"M d, Y" }}</small>
+                            {% endif %}
+                        {% elif user.business_permit_status == 'approved' %}
+                            <span class="status-badge approved">
+                                <i class="bi bi-patch-check-fill"></i> Verified Farmer
+                            </span>
+                            {% if user.business_permit_updated_at %}
+                                <small>Approved on {{ user.business_permit_updated_at|date:"M d, Y" }}</small>
+                            {% endif %}
+                        {% elif user.business_permit_status == 'rejected' %}
+                            <span class="status-badge rejected">
+                                <i class="bi bi-x-circle"></i> Rejected
+                            </span>
+                            {% if user.business_permit_notes %}
+                                <div class="rejection-notes">
+                                    <strong><i class="bi bi-exclamation-triangle"></i> Admin Notes:</strong> {{ user.business_permit_notes }}
+                                </div>
+                            {% endif %}
+                            <small>You can upload a new permit in your profile</small>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="settings-action">
+                    <a href="{% url 'profile' %}#farmer-section" class="btn-link">
+                        {% if user.business_permit_status == 'none' or user.business_permit_status == 'rejected' %}
+                            <i class="bi bi-upload"></i> Upload
+                        {% else %}
+                            <i class="bi bi-eye"></i> View
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Section -->
+    <div class="settings-section">
+        <div class="settings-section-header">
+            <i class="bi bi-bell"></i>
+            <h2>Notifications</h2>
+        </div>
+        <div class="settings-content">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="notification-toggle">
+                    <div class="notification-item">
+                        <label>
+                            {{ form.notify_chat }}
+                            <div class="settings-label">
+                                <strong>Chat Messages</strong>
+                                <span>Get notified when you receive new chat messages</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="notification-item">
+                        <label>
+                            {{ form.notify_permit_decision }}
+                            <div class="settings-label">
+                                <strong>Business Permit Decisions</strong>
+                                <span>Get notified when your business permit is reviewed</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-save">
+                    <i class="bi bi-check-circle"></i> Save Preferences
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

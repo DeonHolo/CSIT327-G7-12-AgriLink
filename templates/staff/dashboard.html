@@ -1,0 +1,301 @@
+{% extends 'staff/base_staff.html' %}
+
+{% block title %}Dashboard - Staff Panel{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Metrics Grid -->
+<div class="metric-grid">
+    <div class="metric-card">
+        <div class="metric-icon primary">
+            <i class="bi bi-people"></i>
+        </div>
+        <div class="metric-content">
+            <h3>{{ metrics.total_users }}</h3>
+            <p>Total Users</p>
+        </div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-icon info">
+            <i class="bi bi-person"></i>
+        </div>
+        <div class="metric-content">
+            <h3>{{ metrics.buyers }}</h3>
+            <p>Buyers</p>
+        </div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-icon primary">
+            <i class="bi bi-shop"></i>
+        </div>
+        <div class="metric-content">
+            <h3>{{ metrics.farmers }}</h3>
+            <p>Farmers</p>
+        </div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-icon purple">
+            <i class="bi bi-shield-check"></i>
+        </div>
+        <div class="metric-content">
+            <h3>{{ metrics.admins }}</h3>
+            <p>Staff/Admins</p>
+        </div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-icon warning">
+            <i class="bi bi-hourglass-split"></i>
+        </div>
+        <div class="metric-content">
+            <h3>{{ metrics.pending_verifications }}</h3>
+            <p>Pending Verifications</p>
+        </div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-icon info">
+            <i class="bi bi-box-seam"></i>
+        </div>
+        <div class="metric-content">
+            <h3>{{ metrics.total_products }}</h3>
+            <p>Total Products</p>
+        </div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-icon primary">
+            <i class="bi bi-check-circle"></i>
+        </div>
+        <div class="metric-content">
+            <h3>{{ metrics.active_products }}</h3>
+            <p>Active Products</p>
+        </div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-icon danger">
+            <i class="bi bi-x-circle"></i>
+        </div>
+        <div class="metric-content">
+            <h3>{{ metrics.unlisted_products }}</h3>
+            <p>Unlisted Products</p>
+        </div>
+    </div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 1.5rem;">
+    <!-- Recent Verifications -->
+    <div style="flex: 1; min-width: 400px;">
+        <div class="staff-card">
+            <div class="staff-card-header">
+                <h2><i class="bi bi-file-earmark-check"></i> Pending Verifications</h2>
+                <a href="{% url 'staff_verification_list' %}" class="btn btn-sm btn-outline">View All</a>
+            </div>
+            <div class="staff-card-body" style="padding: 0;">
+                {% if recent_verifications %}
+                <table class="staff-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Submitted</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in recent_verifications %}
+                        <tr>
+                            <td>
+                                <div class="user-cell">
+                                    <div class="user-avatar">
+                                        {% if u.profile_picture %}
+                                        <img src="{{ u.profile_picture.url }}" alt="{{ u.username }}">
+                                        {% else %}
+                                        {{ u.username|slice:":1"|upper }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="user-info">
+                                        <span class="user-name">{{ u.username }}</span>
+                                        <span class="user-email">{{ u.email }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="small text-muted">{{ u.business_permit_updated_at|date:"M d, Y" }}</span>
+                            </td>
+                            <td>
+                                <a href="{% url 'staff_verification_detail' u.pk %}" class="btn btn-sm btn-primary">Review</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-check-circle"></i>
+                    <h4>No Pending Verifications</h4>
+                    <p>All farmer verification requests have been processed.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Users -->
+    <div style="flex: 1; min-width: 400px;">
+        <div class="staff-card">
+            <div class="staff-card-header">
+                <h2><i class="bi bi-people"></i> Recent Users</h2>
+                <a href="{% url 'staff_users_list' %}" class="btn btn-sm btn-outline">View All</a>
+            </div>
+            <div class="staff-card-body" style="padding: 0;">
+                {% if recent_users %}
+                <table class="staff-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in recent_users %}
+                        <tr>
+                            <td>
+                                <div class="user-cell">
+                                    <div class="user-avatar">
+                                        {% if u.profile_picture %}
+                                        <img src="{{ u.profile_picture.url }}" alt="{{ u.username }}">
+                                        {% else %}
+                                        {{ u.username|slice:":1"|upper }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="user-info">
+                                        <span class="user-name">{{ u.username }}</span>
+                                        <span class="user-email">{{ u.email }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge badge-{% if u.user_type == 'farmer' %}primary{% elif u.user_type == 'both' %}info{% else %}secondary{% endif %}">
+                                    {{ u.get_user_type_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="small text-muted">{{ u.date_joined|date:"M d, Y" }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-people"></i>
+                    <h4>No Users Yet</h4>
+                    <p>Users will appear here once they register.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trends Section -->
+<div style="margin-top: 1.5rem;">
+    <div class="staff-card">
+        <div class="staff-card-header">
+            <h2><i class="bi bi-graph-up"></i> Activity Trends (Last 30 Days)</h2>
+        </div>
+        <div class="staff-card-body">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+                <div>
+                    <h4 class="text-muted small mb-2">New Users</h4>
+                    <div class="d-flex align-items-center gap-2">
+                        <span style="font-size: 2rem; font-weight: 700; color: var(--primary-color);">{{ trends.new_users_30d }}</span>
+                        <span class="small text-muted">in last 30 days</span>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-muted small mb-2">New Products</h4>
+                    <div class="d-flex align-items-center gap-2">
+                        <span style="font-size: 2rem; font-weight: 700; color: var(--info);">{{ trends.new_products_30d }}</span>
+                        <span class="small text-muted">in last 30 days</span>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-muted small mb-2">Verifications Processed</h4>
+                    <div class="d-flex align-items-center gap-2">
+                        <span style="font-size: 2rem; font-weight: 700; color: var(--warning);">{{ trends.verifications_30d }}</span>
+                        <span class="small text-muted">in last 30 days</span>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-muted small mb-2">Top Category</h4>
+                    <div class="d-flex align-items-center gap-2">
+                        {% if trends.top_category %}
+                        <span style="font-size: 1.25rem; font-weight: 600; color: var(--dark-color);">{{ trends.top_category.name }}</span>
+                        <span class="small text-muted">({{ trends.top_category.product_count }} products)</span>
+                        {% else %}
+                        <span class="text-muted">No data</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Audit Log -->
+<div style="margin-top: 1.5rem;">
+    <div class="staff-card">
+        <div class="staff-card-header">
+            <h2><i class="bi bi-clock-history"></i> Recent Activity</h2>
+        </div>
+        <div class="staff-card-body" style="padding: 0;">
+            {% if recent_audits %}
+            <table class="staff-table">
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>Target</th>
+                        <th>Staff</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for audit in recent_audits %}
+                    <tr>
+                        <td>
+                            <span class="badge badge-{% if 'approve' in audit.action %}success{% elif 'reject' in audit.action %}danger{% elif 'unlist' in audit.action %}warning{% else %}info{% endif %}">
+                                {{ audit.get_action_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if audit.target_user %}
+                            <span>{{ audit.target_user.username }}</span>
+                            {% elif audit.target_product %}
+                            <span>{{ audit.target_product.name }}</span>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ audit.actor.username }}</td>
+                        <td><span class="small text-muted">{{ audit.created_at|timesince }} ago</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-clock-history"></i>
+                <h4>No Recent Activity</h4>
+                <p>Staff actions will appear here.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

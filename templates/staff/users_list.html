@@ -1,0 +1,155 @@
+{% extends 'staff/base_staff.html' %}
+
+{% block title %}User Management - Staff Panel{% endblock %}
+{% block page_title %}User Management{% endblock %}
+
+{% block content %}
+<div class="staff-card">
+    <!-- Filter Bar -->
+    <form method="GET" class="filter-bar">
+        <input type="text" name="search" class="form-control search-input" placeholder="Search by name or email..." value="{{ search }}">
+        
+        <select name="role" class="form-select">
+            <option value="">All Roles</option>
+            <option value="buyer" {% if role_filter == 'buyer' %}selected{% endif %}>Buyers</option>
+            <option value="farmer" {% if role_filter == 'farmer' %}selected{% endif %}>Farmers</option>
+            <option value="staff" {% if role_filter == 'staff' %}selected{% endif %}>Staff</option>
+            <option value="superuser" {% if role_filter == 'superuser' %}selected{% endif %}>Superusers</option>
+        </select>
+        
+        <select name="status" class="form-select">
+            <option value="">All Status</option>
+            <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+        </select>
+        
+        <select name="permit_status" class="form-select">
+            <option value="">Permit Status</option>
+            <option value="none" {% if permit_status_filter == 'none' %}selected{% endif %}>Not Submitted</option>
+            <option value="pending" {% if permit_status_filter == 'pending' %}selected{% endif %}>Pending</option>
+            <option value="approved" {% if permit_status_filter == 'approved' %}selected{% endif %}>Approved</option>
+            <option value="rejected" {% if permit_status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+        </select>
+        
+        <input type="date" name="date_from" class="form-control" value="{{ date_from }}" title="From Date">
+        <input type="date" name="date_to" class="form-control" value="{{ date_to }}" title="To Date">
+        
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-search"></i> Filter
+        </button>
+        
+        {% if search or role_filter or status_filter or permit_status_filter or date_from or date_to %}
+        <a href="{% url 'staff_users_list' %}" class="btn btn-secondary">Clear</a>
+        {% endif %}
+    </form>
+    
+    <!-- Table -->
+    <div class="staff-card-body" style="padding: 0;">
+        {% if users %}
+        <table class="staff-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Permit</th>
+                    <th>Products</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-avatar">
+                                {% if u.profile_picture %}
+                                <img src="{{ u.profile_picture.url }}" alt="{{ u.username }}">
+                                {% else %}
+                                {{ u.username|slice:":1"|upper }}
+                                {% endif %}
+                            </div>
+                            <div class="user-info">
+                                <span class="user-name">
+                                    {{ u.username }}
+                                    {% if u.is_superuser %}
+                                    <span class="badge badge-purple" style="font-size: 0.65rem;">Superuser</span>
+                                    {% elif u.is_staff %}
+                                    <span class="badge badge-info" style="font-size: 0.65rem;">Staff</span>
+                                    {% endif %}
+                                </span>
+                                <span class="user-email">{{ u.email }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge badge-{% if u.user_type == 'farmer' %}primary{% elif u.user_type == 'both' %}info{% else %}secondary{% endif %}">
+                            {{ u.get_user_type_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge badge-{% if u.is_active %}success{% else %}danger{% endif %}">
+                            {% if u.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        {% if u.business_permit_status != 'none' %}
+                        <span class="badge badge-{% if u.business_permit_status == 'pending' %}warning{% elif u.business_permit_status == 'approved' %}success{% elif u.business_permit_status == 'rejected' %}danger{% else %}secondary{% endif %}">
+                            {{ u.get_business_permit_status_display }}
+                        </span>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="fw-semibold">{{ u.product_count }}</span>
+                    </td>
+                    <td>
+                        <span class="small text-muted">{{ u.date_joined|date:"M d, Y" }}</span>
+                    </td>
+                    <td>
+                        <a href="{% url 'staff_user_detail' u.pk %}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-eye"></i> View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Pagination -->
+        {% if users.has_other_pages %}
+        <div class="pagination">
+            {% if users.has_previous %}
+            <a href="?page={{ users.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if permit_status_filter %}&permit_status={{ permit_status_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            {% endif %}
+            
+            {% for num in users.paginator.page_range %}
+                {% if users.number == num %}
+                <span class="current">{{ num }}</span>
+                {% elif num > users.number|add:'-3' and num < users.number|add:'3' %}
+                <a href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if permit_status_filter %}&permit_status={{ permit_status_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if users.has_next %}
+            <a href="?page={{ users.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if permit_status_filter %}&permit_status={{ permit_status_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-people"></i>
+            <h4>No Users Found</h4>
+            <p>{% if search or role_filter or status_filter %}No users match your filters.{% else %}No users have registered yet.{% endif %}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

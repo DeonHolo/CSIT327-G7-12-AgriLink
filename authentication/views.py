@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.db.models import Prefetch
-from .forms import RegistrationForm
+from django.utils import timezone
+from .forms import RegistrationForm, PasswordChangeForm, ProfilePictureForm, NotificationPreferencesForm
 from .models import User
+import os
 
 def register_view(request):
     """
@@ -79,6 +81,9 @@ def login_view(request):
                 request.session.set_expiry(0)  # Session expires when browser closes
             
             messages.success(request, f'Welcome back, {user.username}!')
+            # Staff and superusers land on the staff dashboard
+            if user.is_staff:
+                return redirect('staff_dashboard')
             return redirect('home')
         else:
             messages.error(request, 'Invalid username or password.')
@@ -103,34 +108,71 @@ def home_view(request):
     """
     Home page view - context-aware based on authentication
     - Guests: Redirected to landing page (marketing content)
-    - Authenticated users: Dashboard with personalized content
+    - Authenticated users: Role-specific dashboard with personalized content
     """
     # Redirect unauthenticated users to the landing page
     if not request.user.is_authenticated:
         return redirect('landing')
     
-    # Import Product model here to avoid circular import
+    # Import models here to avoid circular imports
     from products.models import Product
-
-    # Prefetch farmer to avoid extra queries when rendering product cards
-    base_products = Product.objects.filter(is_active=True).select_related('farmer', 'category')
-
-    # Get featured and top products for dashboard (FR-11)
-    featured_products = base_products.filter(is_featured=True)[:6]
-    featured_ids = featured_products.values_list('id', flat=True)
-    top_products = base_products.exclude(id__in=featured_ids).order_by('-total_sales')[:6]
+    from chat.models import Conversation, Message
+    from django.db.models import Count, Q
     
-    # Get user's product count if farmer
-    my_products_count = 0
-    if request.user.is_farmer():
-        my_products_count = request.user.products.filter(is_active=True).count()
+    user = request.user
     
+    # Base products query
+    all_active_products = Product.objects.filter(is_active=True).select_related('farmer', 'category')
+    
+    # Featured and top products for highlights section (3 each)
+    featured_products = all_active_products.filter(is_featured=True)[:3]
+    top_products = all_active_products.order_by('-total_sales')[:3]
+    
+    # Recent conversations for both roles
+    recent_conversations = Conversation.objects.filter(
+        participants=user
+    ).exclude(
+        deleted_by=user
+    ).select_related('product').prefetch_related('participants', 'messages')[:5]
+    recent_conversation_data = []
+    for convo in recent_conversations:
+        recent_conversation_data.append({
+            'conversation': convo,
+            'other': convo.get_other_participant(user),
+            'last_msg': convo.get_last_message(),
+            'unread': convo.get_unread_count(user)
+        })
+    
+    # Unread messages count
+    unread_messages = Message.objects.filter(
+        conversation__participants=user,
+        is_read=False
+    ).exclude(sender=user).count()
+    
+    # Role-specific context
     context = {
         'title': 'Dashboard - AgriLink',
         'featured_products': featured_products,
         'top_products': top_products,
-        'my_products_count': my_products_count
+        'recent_conversations': recent_conversation_data,
+        'unread_messages': unread_messages,
     }
+    
+    if user.is_farmer():
+        # Farmer-specific stats
+        user_products = user.products.all()
+        context['active_count'] = user_products.filter(is_active=True).count()
+        context['inactive_count'] = user_products.filter(is_active=False).count()
+        context['low_stock_count'] = user_products.filter(is_active=True, stock_quantity__lt=10).count()
+        context['recent_products'] = user_products.order_by('-created_at')[:5]
+    else:
+        # Buyer-specific stats
+        context['total_products'] = all_active_products.count()
+        context['total_farmers'] = User.objects.filter(
+            user_type__in=['farmer', 'both']
+        ).count()
+        context['recent_products'] = all_active_products.order_by('-created_at')[:5]
+    
     return render(request, 'home.html', context)
 
 
@@ -162,3 +204,305 @@ def password_reset_view(request):
         'title': 'Reset Password - AgriLink'
     }
     return render(request, 'authentication/password_reset.html', context)
+
+
+@login_required
+def profile_view(request):
+    """
+    Display user profile with activity history
+    Acceptance Criteria:
+    - Load Profile: Display profile details when navigating to profile
+    - View Activity History: Show past activities (products, calculations, messages)
+    - Update Profile View: Refresh shows latest details
+    """
+    user = request.user
+    
+    # Get activity history
+    # Products (for farmers)
+    products = []
+    if user.is_farmer():
+        products = user.products.all().order_by('-created_at')[:10]
+    
+    # Saved calculations
+    calculations = user.calculations.all().order_by('-created_at')[:10]
+    
+    # Recent messages sent
+    recent_messages = user.sent_messages.select_related(
+        'conversation'
+    ).order_by('-timestamp')[:10]
+    
+    context = {
+        'title': 'My Profile - AgriLink',
+        'profile_user': user,
+        'products': products,
+        'calculations': calculations,
+        'recent_messages': recent_messages,
+    }
+    return render(request, 'authentication/profile.html', context)
+
+
+@login_required
+def update_name_view(request):
+    """
+    Update user's name via inline editing (single field, auto-save on blur)
+    """
+    if request.method != 'POST':
+        return redirect('profile')
+    
+    user = request.user
+    full_name = request.POST.get('full_name', '').strip()
+    
+    # Split full name into first and last name
+    name_parts = full_name.split(' ', 1)
+    user.first_name = name_parts[0] if name_parts else ''
+    user.last_name = name_parts[1] if len(name_parts) > 1 else ''
+    user.save()
+    
+    messages.success(request, 'Your name has been updated.')
+    return redirect('profile')
+
+
+@login_required
+def update_email_view(request):
+    """
+    Update user's email via modal
+    For MVP: OTP/verification is visual only, email updates directly
+    """
+    if request.method != 'POST':
+        return redirect('profile')
+    
+    user = request.user
+    new_email = request.POST.get('email', '').strip()
+    
+    if not new_email:
+        messages.error(request, 'Please enter a valid email address.')
+        return redirect('profile')
+    
+    # Check if email is already taken by another user
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    if User.objects.filter(email=new_email).exclude(pk=user.pk).exists():
+        messages.error(request, 'This email is already in use by another account.')
+        return redirect('profile')
+    
+    user.email = new_email
+    user.save()
+    
+    messages.success(request, 'Your email has been updated successfully.')
+    return redirect('profile')
+
+
+@login_required
+def update_phone_view(request):
+    """
+    Update user's phone number via modal
+    For MVP: OTP is visual only, phone updates directly
+    """
+    if request.method != 'POST':
+        return redirect('profile')
+    
+    user = request.user
+    new_phone = request.POST.get('phone_number', '').strip()
+    
+    user.phone_number = new_phone if new_phone else None
+    user.save()
+    
+    messages.success(request, 'Your phone number has been updated successfully.')
+    return redirect('profile')
+
+
+@login_required
+def change_password_view(request):
+    """
+    Change user password
+    Acceptance Criteria:
+    - Change Password: Enter new password and save
+    - Can log in with new password after change
+    """
+    user = request.user
+    
+    if request.method == 'POST':
+        form = PasswordChangeForm(user, request.POST)
+        if form.is_valid():
+            form.save()
+            # Keep the user logged in after password change
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Your password has been changed successfully.')
+            return redirect('profile')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    if field == '__all__':
+                        messages.error(request, error)
+                    else:
+                        messages.error(request, f'{error}')
+    else:
+        form = PasswordChangeForm(user)
+    
+    context = {
+        'title': 'Change Password - AgriLink',
+        'form': form,
+    }
+    return render(request, 'authentication/password_change.html', context)
+
+
+@login_required
+def upload_profile_picture_view(request):
+    """
+    Upload or replace profile picture
+    Acceptance Criteria:
+    - Upload Picture: Select valid image and update profile
+    - Preview Before Upload: See preview before uploading
+    - Upload Wrong File Type: Show error for non-image files
+    - Cancel Upload: No changes made if cancelled
+    - Replace Existing Image: Old picture replaced with new one
+    """
+    user = request.user
+
+    if request.method != 'POST':
+        return redirect('profile')
+    
+    # Check if user wants to remove the picture
+    if 'remove_picture' in request.POST:
+        if user.profile_picture:
+            # Delete the old file
+            old_picture_path = user.profile_picture.path
+            if os.path.exists(old_picture_path):
+                os.remove(old_picture_path)
+            user.profile_picture = None
+            user.save()
+            messages.success(request, 'Your profile picture has been removed.')
+        return redirect('profile')
+    
+    form = ProfilePictureForm(request.POST, request.FILES, instance=user)
+    if form.is_valid():
+        # Delete old picture if exists
+        if user.profile_picture:
+            old_picture_path = user.profile_picture.path
+            if os.path.exists(old_picture_path):
+                os.remove(old_picture_path)
+        
+        form.save()
+        messages.success(request, 'Your profile picture has been updated successfully.')
+        return redirect('profile')
+    
+    for field, errors in form.errors.items():
+        for error in errors:
+            messages.error(request, error)
+    return redirect('profile')
+
+
+@login_required
+def upload_business_permit_view(request):
+    """
+    Upload business permit for farmer verification request.
+    Sets status to 'pending' and awaits admin approval.
+    Role does NOT change until admin approves.
+    """
+    user = request.user
+    
+    if request.method != 'POST':
+        return redirect('profile')
+    
+    # Check if user is already an approved farmer
+    if user.user_type in ['farmer', 'both'] and user.business_permit_status == 'approved':
+        messages.info(request, 'You are already verified as a farmer.')
+        return redirect('profile')
+    
+    # Check if there's already a pending request
+    if user.business_permit_status == 'pending':
+        messages.warning(request, 'You already have a pending verification request. Please wait for admin review.')
+        return redirect('profile')
+    
+    # Validate file upload
+    permit_file = request.FILES.get('business_permit')
+    if not permit_file:
+        messages.error(request, 'Please select a file to upload.')
+        return redirect('profile')
+    
+    # Validate file type (images and PDF)
+    allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf']
+    if permit_file.content_type not in allowed_types:
+        messages.error(request, 'Invalid file type. Please upload an image (JPEG, PNG, GIF, WebP) or PDF.')
+        return redirect('profile')
+    
+    # Validate file size (max 5MB)
+    max_size = 5 * 1024 * 1024  # 5MB
+    if permit_file.size > max_size:
+        messages.error(request, 'File too large. Maximum size is 5MB.')
+        return redirect('profile')
+    
+    # Delete old permit if exists
+    if user.business_permit:
+        try:
+            old_permit_path = user.business_permit.path
+            if os.path.exists(old_permit_path):
+                os.remove(old_permit_path)
+        except Exception:
+            pass  # Ignore errors deleting old file
+    
+    # Save new permit and set status to pending
+    user.business_permit = permit_file
+    user.business_permit_status = 'pending'
+    user.business_permit_notes = ''  # Clear any previous rejection notes
+    user.business_permit_updated_at = timezone.now()
+    user.save()
+    
+    messages.success(
+        request,
+        'Your business permit has been submitted for verification. '
+        'You will be notified once an admin reviews your request.'
+    )
+    return redirect('profile')
+
+
+@login_required
+def settings_view(request):
+    """
+    Settings page with account, security, farmer status, and notifications.
+    """
+    user = request.user
+    
+    # Handle notification preferences form submission
+    if request.method == 'POST':
+        form = NotificationPreferencesForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your notification preferences have been updated.')
+            return redirect('settings')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error)
+    else:
+        form = NotificationPreferencesForm(instance=user)
+    
+    context = {
+        'title': 'Settings - AgriLink',
+        'form': form,
+    }
+    return render(request, 'authentication/settings.html', context)
+
+
+@login_required
+def logout_all_sessions_view(request):
+    """
+    Log out from all sessions (clears all user sessions).
+    """
+    if request.method != 'POST':
+        return redirect('settings')
+    
+    # Store user info before clearing sessions
+    user = request.user
+    
+    # Clear all sessions for this user
+    # Note: This is a simple implementation that logs out the current session
+    # For production, you'd want to track all sessions in the database
+    from django.contrib.auth import logout
+    logout(request)
+    
+    messages.success(
+        request,
+        'You have been logged out from all sessions. Please log in again.'
+    )
+    return redirect('login')

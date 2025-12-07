@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block content %}
 <style>
@@ -46,6 +47,29 @@
     .product-header h1 {
         font-size: 2rem;
         margin-bottom: 0.5rem;
+    }
+    
+    .availability-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.9rem;
+        font-weight: 700;
+    }
+    
+    .availability-badge.in-stock {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border: 1px solid #c8e6c9;
+    }
+    
+    .availability-badge.out-stock,
+    .availability-badge.inactive {
+        background: #ffebee;
+        color: #c62828;
+        border: 1px solid #ffcdd2;
     }
     
     .product-category-badge {
@@ -101,6 +125,7 @@
         background: white;
         border-radius: 12px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
     }
     
     .product-description h3 {
@@ -185,6 +210,15 @@
         justify-content: center;
         font-size: 2rem;
         color: white;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .farmer-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
     }
     
     .farmer-info h3 {
@@ -272,15 +306,28 @@
             <div class="product-header">
                 <span class="product-category-badge">{{ product.category.name }}</span>
                 <h1>{{ product.name }}</h1>
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <span class="availability-badge {% if product.is_active %}in-stock{% else %}inactive{% endif %}">
+                        {% if product.is_active %}
+                        <i class="bi bi-check-circle-fill"></i> Available for Sale
+                        {% else %}
+                        <i class="bi bi-slash-circle-fill"></i> Not Available for Sale
+                        {% endif %}
+                    </span>
+                </div>
             </div>
             
             <div class="product-price-section">
                 <div class="product-price">
-                    ₱{{ product.price }}
+                    ₱{{ product.price|floatformat:"-2"|intcomma }}
                     <span class="product-unit">/ {{ product.unit }}</span>
                 </div>
                 <div class="product-stock">
-                    {% if product.stock_quantity > 10 %}
+                    {% if not product.is_active %}
+                        <span class="stock-status unavailable">
+                            <i class="bi bi-slash-circle-fill"></i> Listing disabled (not available for sale)
+                        </span>
+                    {% elif product.stock_quantity > 10 %}
                     <span class="stock-status available">
                         <i class="bi bi-check-circle-fill"></i> In Stock ({{ product.stock_quantity }} {{ product.unit }} available)
                     </span>
@@ -317,25 +364,18 @@
             </div>
             
             <div class="action-buttons">
-                {% if user.is_authenticated and user != product.farmer %}
-                <a href="{% url 'start_conversation' product.pk %}" class="btn-primary">
-                    <i class="bi bi-chat-dots"></i> Contact Seller
-                </a>
-                <button type="button" class="btn-secondary">
-                    <i class="bi bi-cart-check-fill"></i> Buy Now
-                </button>
-                {% elif user == product.farmer %}
+                {% if user == product.farmer %}
                 <div class="edit-delete-buttons" style="width: 100%;">
                     <a href="{% url 'product_edit' product.pk %}" class="btn-edit">
                         <i class="bi bi-pencil"></i> Edit Product
                     </a>
                     <a href="{% url 'product_delete' product.pk %}" class="btn-delete">
-                        <i class="bi bi-trash"></i> Delete Product
+                        <i class="bi bi-eye-slash"></i> Unlist Product
                     </a>
                 </div>
                 {% else %}
-                <a href="{% url 'login' %}" class="btn-primary">
-                    <i class="bi bi-box-arrow-in-right"></i> Login to Contact Seller
+                <a href="{% url 'start_conversation' product.pk %}" class="btn-primary">
+                    <i class="bi bi-chat-dots"></i> Contact Seller
                 </a>
                 {% endif %}
             </div>
@@ -347,15 +387,19 @@
         <h3><i class="bi bi-file-text"></i> Product Description</h3>
         <p>{{ product.description }}</p>
     </div>
-    
+
     <!-- Farmer/Seller Section -->
     <div class="farmer-section">
         <div class="farmer-header">
             <div class="farmer-avatar">
+                {% if product.farmer.profile_picture %}
+                <img src="{{ product.farmer.profile_picture.url }}" alt="{{ product.farmer.get_full_name|default:product.farmer.username }}">
+                {% else %}
                 <i class="bi bi-person"></i>
+                {% endif %}
             </div>
             <div class="farmer-info">
-                <h3>{{ product.farmer.get_full_name|default:product.farmer.username }}</h3>
+                <h3>{{ product.farmer.username }}</h3>
                 <p><i class="bi bi-shield-check"></i> {{ product.farmer.get_user_type_display }}</p>
                 <p style="color: #4CAF50;"><i class="bi bi-box-seam"></i> {{ farmer_active_products_count }} active listing{{ farmer_active_products_count|pluralize }}</p>
             </div>
@@ -380,7 +424,7 @@
                     <div style="padding: 1rem;">
                         <div style="font-size: 1rem; font-weight: 600; color: #333;">{{ other_product.name }}</div>
                         <div style="font-size: 1.25rem; font-weight: 700; color: #4CAF50; margin-top: 0.5rem;">
-                            ₱{{ other_product.price }}<span style="font-size: 0.875rem; font-weight: 400;">/ {{ other_product.unit }}</span>
+                            ₱{{ other_product.price|floatformat:"-2"|intcomma }}<span style="font-size: 0.875rem; font-weight: 400;">/ {{ other_product.unit }}</span>
                         </div>
                     </div>
                 </div>

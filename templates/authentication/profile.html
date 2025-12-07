@@ -1,0 +1,1061 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .profile-header {
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        border-radius: 20px;
+        padding: 3rem;
+        color: white;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 60%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    }
+    
+    .profile-header-content {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .profile-avatar-wrapper {
+        position: relative;
+        flex-shrink: 0;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        border: 4px solid rgba(255,255,255,0.5);
+        overflow: hidden;
+        cursor: pointer;
+    }
+    
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-indicator {
+        position: absolute;
+        right: 2px;
+        bottom: 2px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #fff;
+        color: #27ae60;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        border: 2px solid #e6f5ed;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+        pointer-events: none;
+    }
+    
+    .profile-info h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .profile-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.35rem;
+        line-height: 1.3;
+    }
+    
+    .profile-info .role-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+        background: rgba(255,255,255,0.2);
+        padding: 0.25rem 0.7rem;
+        border-radius: 999px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        margin-bottom: 0.35rem;
+        color: #ffffff;
+        border: 1px solid rgba(255,255,255,0.9);
+        box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+        letter-spacing: 0.05px;
+        width: fit-content;
+    }
+    
+    .profile-info .role-badge i {
+        font-size: 1rem;
+        line-height: 1;
+    }
+    
+    .profile-info p {
+        opacity: 0.9;
+        margin: 0.1rem 0;
+    }
+    
+    .profile-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-profile-action {
+        background: rgba(255,255,255,0.2);
+        border: 2px solid rgba(255,255,255,0.5);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-profile-action:hover {
+        background: rgba(255,255,255,0.3);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .profile-sections {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+    }
+    
+    .profile-section {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .section-header {
+        background: #f8f9fa;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .section-header i {
+        font-size: 1.25rem;
+        color: #2ecc71;
+    }
+    
+    .section-header h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .section-content {
+        padding: 1.5rem;
+        max-width: 820px;
+        margin: 0 auto;
+    }
+    
+    .info-row {
+        display: grid;
+        grid-template-columns: 240px 1fr auto;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        color: #666;
+        font-weight: 500;
+    }
+    
+    .info-value {
+        color: #333;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .activity-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .activity-icon.product {
+        background: #e8f5e9;
+        color: #4CAF50;
+    }
+    
+    .activity-icon.calculation {
+        background: #e3f2fd;
+        color: #2196F3;
+    }
+    
+    .activity-icon.message {
+        background: #fff3e0;
+        color: #FF9800;
+    }
+    
+    .activity-content {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .activity-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .activity-meta {
+        font-size: 0.85rem;
+        color: #666;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #999;
+    }
+    
+    .empty-state i {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .stat-card {
+        text-align: center;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2ecc71;
+    }
+    
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .verified-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        background: #d4edda;
+        color: #155724;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .unverified-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        background: #fff3cd;
+        color: #856404;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    /* Verification status badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    .status-badge.pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-badge.approved {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-badge.rejected {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    /* Become a Farmer section */
+    .farmer-verification-box {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .farmer-verification-box.pending {
+        background: #fffbeb;
+        border: 1px solid #fcd34d;
+    }
+    
+    .farmer-verification-box.rejected {
+        background: #fef2f2;
+        border: 1px solid #fca5a5;
+    }
+    
+    .farmer-verification-box.approved {
+        background: #ecfdf5;
+        border: 1px solid #6ee7b7;
+    }
+    
+    .farmer-verification-box h4 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.1rem;
+        color: #333;
+    }
+    
+    .farmer-verification-box p {
+        margin: 0 0 1rem 0;
+        color: #666;
+        font-size: 0.95rem;
+    }
+    
+    .farmer-verification-box .rejection-reason {
+        background: white;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        text-align: left;
+        border-left: 4px solid #ef4444;
+    }
+    
+    .farmer-verification-box .rejection-reason strong {
+        color: #dc2626;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .btn-upload-permit {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-upload-permit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    }
+    
+    .permit-file-info {
+        margin-top: 1rem;
+        font-size: 0.85rem;
+        color: #666;
+    }
+    
+    .permit-file-info i {
+        margin-right: 0.25rem;
+    }
+    
+    /* Inline editing styles */
+    .info-value-editable {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .name-input {
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 0.4rem 0.6rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #333;
+        width: 120px;
+        transition: border-color 0.2s;
+    }
+    
+    .name-input:focus {
+        outline: none;
+        border-color: #2ecc71;
+    }
+    
+    .btn-save-name {
+        background: #2ecc71;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    
+    .btn-save-name:hover {
+        background: #27ae60;
+    }
+    
+    .change-link {
+        color: #2196F3;
+        text-decoration: underline;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.9rem;
+        margin-left: 0.5rem;
+    }
+    
+    .change-link:hover {
+        color: #1976D2;
+    }
+    
+    /* Modal styles */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-overlay.active {
+        display: flex;
+    }
+    
+    .modal-content {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        width: 90%;
+        max-width: 420px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        position: relative;
+    }
+    
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+    }
+    
+    .modal-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        color: #333;
+    }
+    
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #999;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+    }
+    
+    .modal-close:hover {
+        color: #333;
+    }
+    
+    .modal-body label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .modal-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        box-sizing: border-box;
+    }
+    
+    .modal-input:focus {
+        outline: none;
+        border-color: #2ecc71;
+    }
+    
+    .otp-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .otp-section p {
+        margin: 0 0 0.75rem 0;
+        font-size: 0.9rem;
+        color: #666;
+    }
+    
+    .btn-send-otp {
+        background: #f8f9fa;
+        border: 1px solid #2196F3;
+        color: #2196F3;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-send-otp:hover {
+        background: #e3f2fd;
+    }
+    
+    .otp-input-group {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+    }
+    
+    .otp-input {
+        flex: 1;
+        padding: 0.6rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 0.95rem;
+    }
+    
+    .otp-note {
+        font-size: 0.8rem;
+        color: #999;
+        margin-top: 0.5rem;
+        font-style: italic;
+    }
+    
+    .modal-footer {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+    
+    .btn-modal-cancel {
+        flex: 1;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #666;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    
+    .btn-modal-cancel:hover {
+        background: #e9ecef;
+    }
+    
+    .btn-modal-save {
+        flex: 1;
+        padding: 0.75rem;
+        background: #2ecc71;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        color: white;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    
+    .btn-modal-save:hover {
+        background: #27ae60;
+    }
+
+    /* Stat grid to keep cards same width */
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .profile-header-content {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .profile-actions {
+            margin-left: 0;
+            justify-content: center;
+        }
+        
+        .profile-sections {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-header-content">
+            <div class="profile-avatar-wrapper">
+                <div class="profile-avatar">
+                    {% if profile_user.profile_picture %}
+                        <img src="{{ profile_user.profile_picture.url }}" alt="{{ profile_user.username }}">
+                    {% else %}
+                        <i class="bi bi-person-fill"></i>
+                    {% endif %}
+                </div>
+                <div class="avatar-indicator"><i class="bi bi-camera-fill"></i></div>
+            </div>
+            <div class="profile-info">
+                <h1>{{ profile_user.username }}</h1>
+                <span class="role-badge">
+                    <i class="bi bi-{{ profile_user.user_type|default:'person' }}"></i>
+                    {{ profile_user.get_user_type_display }}
+                </span>
+                <p><i class="bi bi-envelope"></i> {{ profile_user.email }}</p>
+                {% if profile_user.phone_number %}
+                <p><i class="bi bi-telephone"></i> {{ profile_user.phone_number }}</p>
+                {% endif %}
+                <p>
+                    {% if profile_user.is_verified or profile_user.business_permit_status == 'approved' %}
+                        <span class="verified-badge"><i class="bi bi-patch-check-fill"></i> Verified</span>
+                    {% elif profile_user.business_permit_status == 'pending' %}
+                        <span class="unverified-badge"><i class="bi bi-hourglass-split"></i> Pending Verification</span>
+                    {% elif profile_user.business_permit_status == 'rejected' %}
+                        <span class="unverified-badge"><i class="bi bi-x-circle"></i> Rejected</span>
+                    {% else %}
+                        <span class="unverified-badge"><i class="bi bi-exclamation-circle"></i> Not Submitted</span>
+                    {% endif %}
+                </p>
+            </div>
+            <!-- Hidden upload form: clicking avatar or the Change Photo button will trigger file selection -->
+            <form id="avatarUploadForm" method="POST" action="{% url 'upload_profile_picture' %}" enctype="multipart/form-data" style="display:none;">
+                {% csrf_token %}
+                <input type="file" id="avatarInput" name="profile_picture" accept="image/jpeg,image/png,image/gif,image/webp">
+            </form>
+
+        </div>
+    </div>
+    
+    <!-- Profile Sections -->
+    <div class="profile-sections">
+        <!-- Account Details -->
+        <div class="profile-section">
+            <div class="section-header">
+                <i class="bi bi-person-badge"></i>
+                <h3>Account Details</h3>
+            </div>
+            <div class="section-content">
+                <div class="info-row">
+                    <span class="info-label">Username</span>
+                    <span class="info-value">{{ profile_user.username }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email</span>
+                    <span class="info-value">
+                        {{ profile_user.email }}
+                        <span class="change-link" onclick="openEmailModal()">Change</span>
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Name</span>
+                    <span class="info-value">
+                        <form id="nameForm" method="POST" action="{% url 'update_name' %}" style="margin: 0;">
+                            {% csrf_token %}
+                            <input type="text" name="full_name" id="nameInput" class="name-input" style="width: 200px;" placeholder="Enter your name" value="{% if profile_user.first_name or profile_user.last_name %}{{ profile_user.get_full_name }}{% endif %}">
+                        </form>
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Phone</span>
+                    <span class="info-value">
+                        {{ profile_user.phone_number|default:"Not set" }}
+                        <span class="change-link" onclick="openPhoneModal()">Change</span>
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Account Type</span>
+                    <span class="info-value">{{ profile_user.get_user_type_display }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Member Since</span>
+                    <span class="info-value">{{ profile_user.created_at|date:"M d, Y" }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Become a Farmer Section (only show for buyers who aren't already farmers) -->
+        {% if not profile_user.is_farmer %}
+        <div class="profile-section" style="margin-top: 2rem;">
+            <div class="section-header">
+                <i class="bi bi-shop"></i>
+                <h3>Become a Farmer</h3>
+            </div>
+            <div class="section-content">
+                {% if profile_user.business_permit_status == 'none' %}
+                <!-- No submission yet -->
+                <div class="farmer-verification-box">
+                    <h4><i class="bi bi-clipboard-check"></i> Want to sell your products?</h4>
+                    <p>Upload your business permit to become a verified farmer on AgriLink. Once approved by an admin, you'll be able to list and sell your products.</p>
+                    <form method="POST" action="{% url 'upload_business_permit' %}" enctype="multipart/form-data" id="permitUploadForm">
+                        {% csrf_token %}
+                        <input type="file" name="business_permit" id="permitInput" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf" style="display: none;">
+                        <button type="button" class="btn-upload-permit" onclick="document.getElementById('permitInput').click();">
+                            <i class="bi bi-upload"></i> Upload Business Permit
+                        </button>
+                    </form>
+                    <div class="permit-file-info">
+                        <i class="bi bi-info-circle"></i> Accepted formats: JPEG, PNG, GIF, WebP, PDF (max 5MB)
+                    </div>
+                </div>
+                
+                {% elif profile_user.business_permit_status == 'pending' %}
+                <!-- Pending review -->
+                <div class="farmer-verification-box pending">
+                    <span class="status-badge pending">
+                        <i class="bi bi-hourglass-split"></i> Verification Pending
+                    </span>
+                    <h4 style="margin-top: 1rem;">Your request is being reviewed</h4>
+                    <p>We've received your business permit and it's currently being reviewed by our admin team. You'll be notified once a decision is made.</p>
+                    {% if profile_user.business_permit_updated_at %}
+                    <div class="permit-file-info">
+                        <i class="bi bi-clock"></i> Submitted: {{ profile_user.business_permit_updated_at|date:"M d, Y H:i" }}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% elif profile_user.business_permit_status == 'rejected' %}
+                <!-- Rejected - allow resubmission -->
+                <div class="farmer-verification-box rejected">
+                    <span class="status-badge rejected">
+                        <i class="bi bi-x-circle"></i> Verification Rejected
+                    </span>
+                    <h4 style="margin-top: 1rem;">Your request was not approved</h4>
+                    {% if profile_user.business_permit_notes %}
+                    <div class="rejection-reason">
+                        <strong><i class="bi bi-exclamation-triangle"></i> Reason:</strong>
+                        {{ profile_user.business_permit_notes }}
+                    </div>
+                    {% endif %}
+                    <p>You can submit a new business permit to try again.</p>
+                    <form method="POST" action="{% url 'upload_business_permit' %}" enctype="multipart/form-data" id="permitReuploadForm">
+                        {% csrf_token %}
+                        <input type="file" name="business_permit" id="permitReuploadInput" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf" style="display: none;">
+                        <button type="button" class="btn-upload-permit" onclick="document.getElementById('permitReuploadInput').click();">
+                            <i class="bi bi-arrow-repeat"></i> Upload New Permit
+                        </button>
+                    </form>
+                    <div class="permit-file-info">
+                        <i class="bi bi-info-circle"></i> Accepted formats: JPEG, PNG, GIF, WebP, PDF (max 5MB)
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% elif profile_user.business_permit_status == 'approved' %}
+        <!-- Approved farmer status -->
+        <div class="profile-section" style="margin-top: 2rem;">
+            <div class="section-header">
+                <i class="bi bi-shop"></i>
+                <h3>Farmer Status</h3>
+            </div>
+            <div class="section-content">
+                <div class="farmer-verification-box approved">
+                    <span class="status-badge approved">
+                        <i class="bi bi-patch-check-fill"></i> Verified Farmer
+                    </span>
+                    <h4 style="margin-top: 1rem;">You're a verified farmer!</h4>
+                    <p>Your business permit has been verified. You can now list and sell your products on AgriLink.</p>
+                    {% if profile_user.business_permit_updated_at %}
+                    <div class="permit-file-info">
+                        <i class="bi bi-calendar-check"></i> Verified: {{ profile_user.business_permit_updated_at|date:"M d, Y" }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Email Change Modal -->
+<div class="modal-overlay" id="emailModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="bi bi-envelope"></i> Change Email</h3>
+            <button class="modal-close" onclick="closeEmailModal()">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'update_email' %}">
+            {% csrf_token %}
+            <div class="modal-body">
+                <label for="currentEmail">Current Email</label>
+                <input type="email" class="modal-input" id="currentEmail" value="{{ profile_user.email }}" disabled style="background: #f8f9fa; color: #666;">
+                
+                <label for="newEmail">New Email</label>
+                <input type="email" class="modal-input" id="newEmail" name="email" placeholder="Enter new email address" required>
+                
+                <div class="otp-section">
+                    <p><i class="bi bi-shield-check"></i> Verify your new email address</p>
+                    <button type="button" class="btn-send-otp" onclick="sendVerificationCode()">
+                        <i class="bi bi-send"></i> Send Verification Code
+                    </button>
+                    <div class="otp-input-group">
+                        <input type="text" class="otp-input" placeholder="Enter verification code" maxlength="6">
+                    </div>
+                    <p class="otp-note">* Verification is optional for MVP</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-cancel" onclick="closeEmailModal()">Cancel</button>
+                <button type="submit" class="btn-modal-save">Save Email</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Phone Change Modal -->
+<div class="modal-overlay" id="phoneModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="bi bi-telephone"></i> Change Phone</h3>
+            <button class="modal-close" onclick="closePhoneModal()">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'update_phone' %}">
+            {% csrf_token %}
+            <div class="modal-body">
+                <label for="currentPhone">Current Phone</label>
+                <input type="tel" class="modal-input" id="currentPhone" value="{{ profile_user.phone_number|default:'' }}" disabled style="background: #f8f9fa; color: #666;" placeholder="Not set">
+                
+                <label for="newPhone">New Phone Number</label>
+                <input type="tel" class="modal-input" id="newPhone" name="phone_number" placeholder="Enter new phone number">
+                
+                <div class="otp-section">
+                    <p><i class="bi bi-shield-check"></i> Verify your new phone number</p>
+                    <button type="button" class="btn-send-otp" onclick="sendOTP()">
+                        <i class="bi bi-send"></i> Send OTP
+                    </button>
+                    <div class="otp-input-group">
+                        <input type="text" class="otp-input" placeholder="Enter OTP code" maxlength="6">
+                    </div>
+                    <p class="otp-note">* OTP verification is optional for MVP</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-cancel" onclick="closePhoneModal()">Cancel</button>
+                <button type="submit" class="btn-modal-save">Save Phone</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const avatarWrapper = document.querySelector('.profile-avatar-wrapper');
+    const avatarInput = document.getElementById('avatarInput');
+    const avatarForm = document.getElementById('avatarUploadForm');
+
+    // Make avatar wrapper clickable and show pointer
+    if (avatarWrapper) {
+        avatarWrapper.style.cursor = 'pointer';
+        avatarWrapper.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (avatarInput) avatarInput.click();
+        });
+    }
+
+    // On file select submit the form automatically
+    if (avatarInput && avatarForm) {
+        avatarInput.addEventListener('change', function() {
+            if (!avatarInput.files || avatarInput.files.length === 0) return;
+            // Submit form with the selected file
+            avatarForm.submit();
+        });
+    }
+
+    // Business permit upload - auto-submit on file select
+    const permitInput = document.getElementById('permitInput');
+    const permitForm = document.getElementById('permitUploadForm');
+    if (permitInput && permitForm) {
+        permitInput.addEventListener('change', function() {
+            if (!permitInput.files || permitInput.files.length === 0) return;
+            permitForm.submit();
+        });
+    }
+    
+    // Business permit re-upload (for rejected status)
+    const permitReuploadInput = document.getElementById('permitReuploadInput');
+    const permitReuploadForm = document.getElementById('permitReuploadForm');
+    if (permitReuploadInput && permitReuploadForm) {
+        permitReuploadInput.addEventListener('change', function() {
+            if (!permitReuploadInput.files || permitReuploadInput.files.length === 0) return;
+            permitReuploadForm.submit();
+        });
+    }
+
+    // Auto-save name on blur
+    const nameInput = document.getElementById('nameInput');
+    const nameForm = document.getElementById('nameForm');
+    let originalName = nameInput ? nameInput.value : '';
+    
+    if (nameInput && nameForm) {
+        nameInput.addEventListener('blur', function() {
+            if (nameInput.value !== originalName) {
+                nameForm.submit();
+            }
+        });
+        
+        nameInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                nameInput.blur();
+            }
+        });
+    }
+
+    // Close modal on clicking overlay background
+    document.querySelectorAll('.modal-overlay').forEach(function(modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeEmailModal();
+            closePhoneModal();
+        }
+    });
+});
+
+// Email Modal functions
+function openEmailModal() {
+    document.getElementById('emailModal').classList.add('active');
+    document.getElementById('newEmail').focus();
+}
+
+function closeEmailModal() {
+    document.getElementById('emailModal').classList.remove('active');
+}
+
+function sendVerificationCode() {
+    const newEmail = document.getElementById('newEmail').value;
+    if (!newEmail) {
+        alert('Please enter a new email address first.');
+        return;
+    }
+    alert('Verification code sent to ' + newEmail + '\n\n(This is a demo - verification is optional for MVP)');
+}
+
+// Phone Modal functions
+function openPhoneModal() {
+    document.getElementById('phoneModal').classList.add('active');
+    document.getElementById('newPhone').focus();
+}
+
+function closePhoneModal() {
+    document.getElementById('phoneModal').classList.remove('active');
+}
+
+function sendOTP() {
+    const newPhone = document.getElementById('newPhone').value;
+    if (!newPhone) {
+        alert('Please enter a new phone number first.');
+        return;
+    }
+    alert('OTP sent to ' + newPhone + '\n\n(This is a demo - OTP verification is optional for MVP)');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,366 @@
+{% extends 'staff/base_staff.html' %}
+
+{% block title %}Product Management - Staff Panel{% endblock %}
+{% block page_title %}Product Management{% endblock %}
+
+{% block content %}
+<div class="staff-card">
+    <!-- Filter Bar -->
+    <form method="GET" class="filter-bar" id="filterForm">
+        <input type="text" name="search" class="form-control search-input" placeholder="Search products..." value="{{ search }}">
+        
+        <select name="farmer" class="form-select">
+            <option value="">All Farmers</option>
+            {% for f in farmers %}
+            <option value="{{ f.pk }}" {% if farmer_filter == f.pk|stringformat:"s" %}selected{% endif %}>{{ f.username }}</option>
+            {% endfor %}
+        </select>
+        
+        <select name="category" class="form-select">
+            <option value="">All Categories</option>
+            {% for c in categories %}
+            <option value="{{ c.pk }}" {% if category_filter == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+            {% endfor %}
+        </select>
+        
+        <select name="status" class="form-select">
+            <option value="">All Status</option>
+            <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+            <option value="unlisted" {% if status_filter == 'unlisted' %}selected{% endif %}>Unlisted</option>
+        </select>
+        
+        <select name="featured" class="form-select">
+            <option value="">Featured?</option>
+            <option value="yes" {% if featured_filter == 'yes' %}selected{% endif %}>Featured</option>
+            <option value="no" {% if featured_filter == 'no' %}selected{% endif %}>Not Featured</option>
+        </select>
+        
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-search"></i> Filter
+        </button>
+        
+        {% if search or farmer_filter or category_filter or status_filter or featured_filter %}
+        <a href="{% url 'staff_products_list' %}" class="btn btn-secondary">Clear</a>
+        {% endif %}
+    </form>
+    
+    <!-- Bulk Actions Bar -->
+    <div style="padding: 0.75rem 1.5rem; background: var(--gray-100); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 1rem;" id="bulkActionsBar">
+        <span class="small text-muted"><span id="selectedCount">0</span> selected</span>
+        <button type="button" class="btn btn-sm btn-danger" onclick="openBulkModal('unlist')" id="bulkUnlistBtn" disabled>
+            <i class="bi bi-eye-slash"></i> Unlist Selected
+        </button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="openBulkModal('restore')" id="bulkRestoreBtn" disabled>
+            <i class="bi bi-eye"></i> Restore Selected
+        </button>
+    </div>
+    
+    <!-- Table -->
+    <div class="staff-card-body" style="padding: 0;">
+        {% if products %}
+        <form method="POST" action="{% url 'staff_products_bulk_action' %}" id="bulkForm">
+            {% csrf_token %}
+            <input type="hidden" name="bulk_action" id="bulkActionInput" value="">
+            <input type="hidden" name="notes" id="bulkNotesInput" value="">
+            
+            <table class="staff-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">
+                            <input type="checkbox" class="form-check-input" id="selectAll">
+                        </th>
+                        <th>Product</th>
+                        <th>Farmer</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="form-check-input product-checkbox" name="product_ids" value="{{ product.pk }}">
+                        </td>
+                        <td>
+                            <div class="product-cell">
+                                <div class="product-thumb">
+                                    {% if product.image %}
+                                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                    {% else %}
+                                    <i class="bi bi-box"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <span class="fw-semibold">{{ product.name }}</span>
+                                    {% if product.is_featured %}
+                                    <span class="badge badge-warning" style="font-size: 0.65rem;">Featured</span>
+                                    {% endif %}
+                                    <br>
+                                    <span class="small text-muted">{{ product.stock_quantity }} {{ product.unit }} in stock</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="{% url 'staff_user_detail' product.farmer.pk %}" class="text-muted" style="text-decoration: none;">
+                                {{ product.farmer.username }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="badge badge-secondary">{{ product.category.name }}</span>
+                        </td>
+                        <td>
+                            <span class="fw-semibold">₱{{ product.price }}</span>
+                            <span class="small text-muted">/ {{ product.unit }}</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-{% if product.is_active %}success{% else %}danger{% endif %}">
+                                {% if product.is_active %}Active{% else %}Unlisted{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="actions">
+                                <a href="{% url 'product_detail' product.pk %}" target="_blank" class="btn btn-sm btn-outline" title="View Product">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                
+                                {% if product.is_active %}
+                                <button type="button" class="btn btn-sm btn-danger" onclick="openActionModal('unlist', {{ product.pk }}, '{{ product.name|escapejs }}')" title="Unlist">
+                                    <i class="bi bi-eye-slash"></i>
+                                </button>
+                                {% else %}
+                                <button type="button" class="btn btn-sm btn-primary" onclick="openActionModal('restore', {{ product.pk }}, '{{ product.name|escapejs }}')" title="Restore">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                {% endif %}
+                                
+                                {% if product.is_featured %}
+                                <button type="button" class="btn btn-sm btn-secondary" onclick="openActionModal('unfeature', {{ product.pk }}, '{{ product.name|escapejs }}')" title="Remove Featured">
+                                    <i class="bi bi-star-fill"></i>
+                                </button>
+                                {% else %}
+                                <button type="button" class="btn btn-sm btn-warning" onclick="openActionModal('feature', {{ product.pk }}, '{{ product.name|escapejs }}')" title="Feature">
+                                    <i class="bi bi-star"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+        
+        <!-- Pagination -->
+        {% if products.has_other_pages %}
+        <div class="pagination">
+            {% if products.has_previous %}
+            <a href="?page={{ products.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if farmer_filter %}&farmer={{ farmer_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if featured_filter %}&featured={{ featured_filter }}{% endif %}">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            {% endif %}
+            
+            {% for num in products.paginator.page_range %}
+                {% if products.number == num %}
+                <span class="current">{{ num }}</span>
+                {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                <a href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if farmer_filter %}&farmer={{ farmer_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if featured_filter %}&featured={{ featured_filter }}{% endif %}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if products.has_next %}
+            <a href="?page={{ products.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if farmer_filter %}&farmer={{ farmer_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if featured_filter %}&featured={{ featured_filter }}{% endif %}">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-box-seam"></i>
+            <h4>No Products Found</h4>
+            <p>{% if search or farmer_filter or category_filter or status_filter %}No products match your filters.{% else %}No products have been listed yet.{% endif %}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Single Action Modal -->
+<div class="modal-overlay" id="actionModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="actionModalTitle"></h3>
+            <button class="modal-close" onclick="closeModal('actionModal')">&times;</button>
+        </div>
+        <form method="POST" id="actionForm">
+            {% csrf_token %}
+            <input type="hidden" name="action" id="actionInput">
+            <div class="modal-body">
+                <p id="actionModalText"></p>
+                
+                <div class="form-group mt-3" id="notesGroup">
+                    <label class="form-label">Notes <span class="text-danger" id="notesRequired">*</span></label>
+                    <textarea name="notes" class="form-control" rows="3" id="actionNotes" placeholder="Add notes..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('actionModal')">Cancel</button>
+                <button type="submit" class="btn" id="actionSubmitBtn">Confirm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bulk Action Modal -->
+<div class="modal-overlay" id="bulkModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="bulkModalTitle"></h3>
+            <button class="modal-close" onclick="closeModal('bulkModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p id="bulkModalText"></p>
+            
+            <div class="form-group mt-3" id="bulkNotesGroup">
+                <label class="form-label">Notes <span class="text-danger" id="bulkNotesRequired">*</span></label>
+                <textarea class="form-control" rows="3" id="bulkNotes" placeholder="Add notes..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('bulkModal')">Cancel</button>
+            <button type="button" class="btn" id="bulkSubmitBtn" onclick="submitBulkAction()">Confirm</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Select all checkbox
+    const selectAll = document.getElementById('selectAll');
+    const productCheckboxes = document.querySelectorAll('.product-checkbox');
+    const selectedCount = document.getElementById('selectedCount');
+    const bulkUnlistBtn = document.getElementById('bulkUnlistBtn');
+    const bulkRestoreBtn = document.getElementById('bulkRestoreBtn');
+    
+    function updateSelectedCount() {
+        const checked = document.querySelectorAll('.product-checkbox:checked').length;
+        selectedCount.textContent = checked;
+        bulkUnlistBtn.disabled = checked === 0;
+        bulkRestoreBtn.disabled = checked === 0;
+    }
+    
+    if (selectAll) {
+        selectAll.addEventListener('change', function() {
+            productCheckboxes.forEach(cb => cb.checked = this.checked);
+            updateSelectedCount();
+        });
+    }
+    
+    productCheckboxes.forEach(cb => {
+        cb.addEventListener('change', updateSelectedCount);
+    });
+    
+    // Single action modal
+    let currentAction = '';
+    let currentProductId = null;
+    
+    function openActionModal(action, productId, productName) {
+        currentAction = action;
+        currentProductId = productId;
+        
+        const modal = document.getElementById('actionModal');
+        const title = document.getElementById('actionModalTitle');
+        const text = document.getElementById('actionModalText');
+        const actionInput = document.getElementById('actionInput');
+        const actionForm = document.getElementById('actionForm');
+        const submitBtn = document.getElementById('actionSubmitBtn');
+        const notesRequired = document.getElementById('notesRequired');
+        const notesInput = document.getElementById('actionNotes');
+        
+        actionInput.value = action;
+        actionForm.action = `/auth/staff/products/${productId}/action/`;
+        
+        if (action === 'unlist') {
+            title.innerHTML = '<i class="bi bi-eye-slash text-danger"></i> Unlist Product';
+            text.textContent = `Are you sure you want to unlist "${productName}"? It will no longer be visible to buyers.`;
+            submitBtn.className = 'btn btn-danger';
+            submitBtn.innerHTML = '<i class="bi bi-eye-slash"></i> Unlist';
+            notesRequired.style.display = 'inline';
+            notesInput.required = true;
+        } else if (action === 'restore') {
+            title.innerHTML = '<i class="bi bi-eye text-success"></i> Restore Product';
+            text.textContent = `Are you sure you want to restore "${productName}"? It will be visible to buyers again.`;
+            submitBtn.className = 'btn btn-primary';
+            submitBtn.innerHTML = '<i class="bi bi-eye"></i> Restore';
+            notesRequired.style.display = 'none';
+            notesInput.required = false;
+        } else if (action === 'feature') {
+            title.innerHTML = '<i class="bi bi-star text-warning"></i> Feature Product';
+            text.textContent = `Mark "${productName}" as featured? It will be highlighted on the homepage.`;
+            submitBtn.className = 'btn btn-warning';
+            submitBtn.innerHTML = '<i class="bi bi-star"></i> Feature';
+            notesRequired.style.display = 'none';
+            notesInput.required = false;
+        } else if (action === 'unfeature') {
+            title.innerHTML = '<i class="bi bi-star-fill text-secondary"></i> Remove Featured';
+            text.textContent = `Remove featured status from "${productName}"?`;
+            submitBtn.className = 'btn btn-secondary';
+            submitBtn.innerHTML = 'Remove Featured';
+            notesRequired.style.display = 'none';
+            notesInput.required = false;
+        }
+        
+        notesInput.value = '';
+        openModal('actionModal');
+    }
+    
+    // Bulk action modal
+    let bulkAction = '';
+    
+    function openBulkModal(action) {
+        bulkAction = action;
+        
+        const modal = document.getElementById('bulkModal');
+        const title = document.getElementById('bulkModalTitle');
+        const text = document.getElementById('bulkModalText');
+        const submitBtn = document.getElementById('bulkSubmitBtn');
+        const notesRequired = document.getElementById('bulkNotesRequired');
+        const notesInput = document.getElementById('bulkNotes');
+        
+        const count = document.querySelectorAll('.product-checkbox:checked').length;
+        
+        if (action === 'unlist') {
+            title.innerHTML = '<i class="bi bi-eye-slash text-danger"></i> Unlist Products';
+            text.textContent = `Are you sure you want to unlist ${count} product(s)? They will no longer be visible to buyers.`;
+            submitBtn.className = 'btn btn-danger';
+            submitBtn.innerHTML = '<i class="bi bi-eye-slash"></i> Unlist All';
+            notesRequired.style.display = 'inline';
+        } else if (action === 'restore') {
+            title.innerHTML = '<i class="bi bi-eye text-success"></i> Restore Products';
+            text.textContent = `Are you sure you want to restore ${count} product(s)? They will be visible to buyers again.`;
+            submitBtn.className = 'btn btn-primary';
+            submitBtn.innerHTML = '<i class="bi bi-eye"></i> Restore All';
+            notesRequired.style.display = 'none';
+        }
+        
+        notesInput.value = '';
+        openModal('bulkModal');
+    }
+    
+    function submitBulkAction() {
+        const notes = document.getElementById('bulkNotes').value.trim();
+        
+        if (bulkAction === 'unlist' && !notes) {
+            alert('Notes are required when unlisting products.');
+            return;
+        }
+        
+        document.getElementById('bulkActionInput').value = bulkAction;
+        document.getElementById('bulkNotesInput').value = notes;
+        document.getElementById('bulkForm').submit();
+    }
+</script>
+{% endblock %}
