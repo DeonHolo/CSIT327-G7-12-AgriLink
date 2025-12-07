@@ -1,0 +1,1916 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Staff Dashboard - AgriLink{% endblock %}</title>
+
+    
+
+    <!-- Bootstrap Icons -->
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    
+
+    <style>
+
+        /* ===== CSS RESET & BASE STYLES ===== */
+
+        * {
+
+            margin: 0;
+
+            padding: 0;
+
+            box-sizing: border-box;
+
+        }
+
+        
+
+        :root {
+
+            --primary-color: #2ecc71;
+
+            --secondary-color: #27ae60;
+
+            --dark-color: #2c3e50;
+
+            --light-color: #ecf0f1;
+
+            --white: #ffffff;
+
+            --gray-100: #f8f9fa;
+
+            --gray-200: #e9ecef;
+
+            --gray-300: #dee2e6;
+
+            --gray-400: #ced4da;
+
+            --gray-500: #adb5bd;
+
+            --gray-600: #6c757d;
+
+            --gray-700: #495057;
+
+            --gray-800: #343a40;
+
+            --gray-900: #212529;
+
+            --danger: #e74c3c;
+
+            --warning: #f39c12;
+
+            --info: #3498db;
+
+            --success: #2ecc71;
+
+            --staff-primary: #8e44ad;
+
+            --staff-secondary: #9b59b6;
+
+        }
+
+        
+
+        html {
+
+            font-size: 16px;
+
+            scroll-behavior: smooth;
+
+        }
+
+        
+
+        body {
+
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+            line-height: 1.6;
+
+            color: var(--gray-900);
+
+            background-color: var(--gray-100);
+
+            min-height: 100vh;
+
+        }
+
+        
+
+        /* ===== STAFF LAYOUT ===== */
+
+        .staff-wrapper {
+
+            display: flex;
+
+            min-height: 100vh;
+
+        }
+
+        
+
+        /* Staff Sidebar */
+
+        .staff-sidebar {
+
+            width: 260px;
+
+            background: linear-gradient(180deg, var(--dark-color), #34495e);
+
+            color: var(--white);
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            height: 100vh;
+
+            overflow-y: auto;
+
+            z-index: 1000;
+
+            transition: transform 0.3s ease;
+
+        }
+
+        
+
+        .staff-sidebar-header {
+
+            padding: 1.5rem;
+
+            background: rgba(0,0,0,0.2);
+
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+
+        }
+
+        
+
+        .staff-sidebar-header h3 {
+
+            font-size: 1.3rem;
+
+            margin-bottom: 0.25rem;
+
+        }
+
+        
+
+        .staff-sidebar-header small {
+
+            color: rgba(255,255,255,0.6);
+
+            font-size: 0.85rem;
+
+        }
+
+        
+
+        .staff-sidebar-nav {
+
+            padding: 1rem 0;
+
+        }
+
+        
+
+        .staff-nav-link {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.75rem;
+
+            padding: 0.875rem 1.5rem;
+
+            color: rgba(255,255,255,0.8);
+
+            text-decoration: none;
+
+            border-left: 3px solid transparent;
+
+            transition: all 0.2s ease;
+
+        }
+
+        
+
+        .staff-nav-link:hover {
+
+            background: rgba(255,255,255,0.1);
+
+            color: var(--white);
+
+            border-left-color: var(--staff-primary);
+
+        }
+
+        
+
+        .staff-nav-link.active {
+
+            background: rgba(142, 68, 173, 0.3);
+
+            color: var(--white);
+
+            border-left-color: var(--staff-primary);
+
+        }
+
+        
+
+        .staff-nav-link i {
+
+            font-size: 1.1rem;
+
+            width: 24px;
+
+            text-align: center;
+
+        }
+
+        
+
+        .staff-nav-divider {
+
+            height: 1px;
+
+            background: rgba(255,255,255,0.1);
+
+            margin: 0.5rem 1.5rem;
+
+        }
+
+        
+
+        .staff-nav-section {
+
+            padding: 0.5rem 1.5rem;
+
+            font-size: 0.75rem;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.5px;
+
+            color: rgba(255,255,255,0.4);
+
+        }
+
+        
+
+        /* Staff Main Content */
+
+        .staff-main {
+
+            flex: 1;
+
+            margin-left: 260px;
+
+        }
+
+        
+
+        .staff-topbar {
+
+            background: var(--white);
+
+            padding: 1rem 2rem;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 100;
+
+        }
+
+        
+
+        .staff-topbar-left {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 1rem;
+
+        }
+
+        
+
+        .staff-topbar-toggle {
+
+            display: none;
+
+            background: none;
+
+            border: none;
+
+            font-size: 1.5rem;
+
+            cursor: pointer;
+
+            color: var(--gray-700);
+
+        }
+
+        
+
+        .staff-topbar h1 {
+
+            font-size: 1.25rem;
+
+            font-weight: 600;
+
+            color: var(--dark-color);
+
+            margin: 0;
+
+        }
+
+        
+
+        .staff-topbar-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 1rem;
+
+        }
+
+        
+
+        .staff-user-info {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.5rem;
+
+            color: var(--gray-700);
+
+        }
+
+        
+
+        .staff-content {
+
+            padding: 2rem;
+
+        }
+
+        
+
+        /* ===== CARDS & WIDGETS ===== */
+
+        .staff-card {
+
+            background: var(--white);
+
+            border-radius: 12px;
+
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+            margin-bottom: 1.5rem;
+
+        }
+
+        
+
+        .staff-card-header {
+
+            padding: 1rem 1.5rem;
+
+            border-bottom: 1px solid var(--gray-200);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+        }
+
+        
+
+        .staff-card-header h2 {
+
+            font-size: 1.1rem;
+
+            font-weight: 600;
+
+            margin: 0;
+
+            color: var(--dark-color);
+
+        }
+
+        
+
+        .staff-card-body {
+
+            padding: 1.5rem;
+
+        }
+
+        
+
+        /* Metric Cards */
+
+        .metric-grid {
+
+            display: grid;
+
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
+            gap: 1.5rem;
+
+            margin-bottom: 2rem;
+
+        }
+
+        
+
+        .metric-card {
+
+            background: var(--white);
+
+            border-radius: 12px;
+
+            padding: 1.5rem;
+
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 1rem;
+
+        }
+
+        
+
+        .metric-icon {
+
+            width: 56px;
+
+            height: 56px;
+
+            border-radius: 12px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 1.5rem;
+
+        }
+
+        
+
+        .metric-icon.primary { background: rgba(46, 204, 113, 0.15); color: var(--primary-color); }
+
+        .metric-icon.info { background: rgba(52, 152, 219, 0.15); color: var(--info); }
+
+        .metric-icon.warning { background: rgba(243, 156, 18, 0.15); color: var(--warning); }
+
+        .metric-icon.danger { background: rgba(231, 76, 60, 0.15); color: var(--danger); }
+
+        .metric-icon.purple { background: rgba(142, 68, 173, 0.15); color: var(--staff-primary); }
+
+        
+
+        .metric-content h3 {
+
+            font-size: 1.75rem;
+
+            font-weight: 700;
+
+            margin: 0;
+
+            color: var(--dark-color);
+
+        }
+
+        
+
+        .metric-content p {
+
+            font-size: 0.875rem;
+
+            color: var(--gray-600);
+
+            margin: 0;
+
+        }
+
+        
+
+        /* ===== TABLES ===== */
+
+        .staff-table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+        }
+
+        
+
+        .staff-table th {
+
+            background: var(--gray-100);
+
+            padding: 0.875rem 1rem;
+
+            text-align: left;
+
+            font-weight: 600;
+
+            font-size: 0.875rem;
+
+            color: var(--gray-700);
+
+            border-bottom: 2px solid var(--gray-200);
+
+        }
+
+        
+
+        .staff-table td {
+
+            padding: 1rem;
+
+            border-bottom: 1px solid var(--gray-200);
+
+            vertical-align: middle;
+
+        }
+
+        
+
+        .staff-table tbody tr:hover {
+
+            background: var(--gray-50);
+
+        }
+
+        
+
+        .staff-table .actions {
+
+            display: flex;
+
+            gap: 0.5rem;
+
+        }
+
+        
+
+        /* ===== BADGES ===== */
+
+        .badge {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            padding: 0.25rem 0.75rem;
+
+            border-radius: 50px;
+
+            font-size: 0.75rem;
+
+            font-weight: 600;
+
+        }
+
+        
+
+        .badge-success { background: rgba(46, 204, 113, 0.15); color: #1e8449; }
+
+        .badge-warning { background: rgba(243, 156, 18, 0.15); color: #b7950b; }
+
+        .badge-danger { background: rgba(231, 76, 60, 0.15); color: #c0392b; }
+
+        .badge-info { background: rgba(52, 152, 219, 0.15); color: #2471a3; }
+
+        .badge-secondary { background: var(--gray-200); color: var(--gray-700); }
+
+        .badge-primary { background: rgba(46, 204, 113, 0.15); color: var(--secondary-color); }
+
+        .badge-purple { background: rgba(142, 68, 173, 0.15); color: var(--staff-primary); }
+
+        
+
+        /* ===== BUTTONS ===== */
+
+        .btn {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 0.5rem;
+
+            padding: 0.5rem 1rem;
+
+            border: none;
+
+            border-radius: 8px;
+
+            font-size: 0.875rem;
+
+            font-weight: 500;
+
+            cursor: pointer;
+
+            text-decoration: none;
+
+            transition: all 0.2s ease;
+
+        }
+
+        
+
+        .btn-sm {
+
+            padding: 0.375rem 0.75rem;
+
+            font-size: 0.8125rem;
+
+        }
+
+        
+
+        .btn-primary {
+
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+
+            color: var(--white);
+
+        }
+
+        
+
+        .btn-primary:hover {
+
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+
+            transform: translateY(-1px);
+
+        }
+
+        
+
+        .btn-secondary {
+
+            background: var(--gray-200);
+
+            color: var(--gray-700);
+
+        }
+
+        
+
+        .btn-secondary:hover {
+
+            background: var(--gray-300);
+
+        }
+
+        
+
+        .btn-danger {
+
+            background: var(--danger);
+
+            color: var(--white);
+
+        }
+
+        
+
+        .btn-danger:hover {
+
+            background: #c0392b;
+
+        }
+
+        
+
+        .btn-warning {
+
+            background: var(--warning);
+
+            color: var(--white);
+
+        }
+
+        
+
+        .btn-info {
+
+            background: var(--info);
+
+            color: var(--white);
+
+        }
+
+        
+
+        .btn-outline {
+
+            background: transparent;
+
+            border: 1px solid var(--gray-300);
+
+            color: var(--gray-700);
+
+        }
+
+        
+
+        .btn-outline:hover {
+
+            background: var(--gray-100);
+
+        }
+
+        
+
+        /* ===== FORMS ===== */
+
+        .form-group {
+
+            margin-bottom: 1rem;
+
+        }
+
+        
+
+        .form-label {
+
+            display: block;
+
+            font-weight: 500;
+
+            margin-bottom: 0.5rem;
+
+            color: var(--gray-700);
+
+        }
+
+        
+
+        .form-control {
+
+            width: 100%;
+
+            padding: 0.625rem 0.875rem;
+
+            border: 1px solid var(--gray-300);
+
+            border-radius: 8px;
+
+            font-size: 0.9375rem;
+
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+        }
+
+        
+
+        .form-control:focus {
+
+            outline: none;
+
+            border-color: var(--primary-color);
+
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.15);
+
+        }
+
+        
+
+        .form-select {
+
+            width: 100%;
+
+            padding: 0.625rem 0.875rem;
+
+            border: 1px solid var(--gray-300);
+
+            border-radius: 8px;
+
+            font-size: 0.9375rem;
+
+            background: var(--white);
+
+            cursor: pointer;
+
+        }
+
+        
+
+        textarea.form-control {
+
+            min-height: 100px;
+
+            resize: vertical;
+
+        }
+
+        
+
+        .form-text {
+
+            font-size: 0.8125rem;
+
+            color: var(--gray-600);
+
+            margin-top: 0.25rem;
+
+        }
+
+        
+
+        /* Filter Bar */
+
+        .filter-bar {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 1rem;
+
+            padding: 1rem 1.5rem;
+
+            background: var(--gray-50);
+
+            border-bottom: 1px solid var(--gray-200);
+
+        }
+
+        
+
+        .filter-bar .form-control,
+
+        .filter-bar .form-select {
+
+            max-width: 200px;
+
+        }
+
+        
+
+        .filter-bar .search-input {
+
+            max-width: 300px;
+
+        }
+
+        
+
+        /* ===== ALERTS ===== */
+
+        .alert {
+
+            padding: 1rem 1.25rem;
+
+            border-radius: 10px;
+
+            margin-bottom: 1rem;
+
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 0.75rem;
+
+        }
+
+        
+
+        .alert-success { background: #d4edda; color: #155724; }
+
+        .alert-danger { background: #f8d7da; color: #721c24; }
+
+        .alert-warning { background: #fff3cd; color: #856404; }
+
+        .alert-info { background: #d1ecf1; color: #0c5460; }
+
+        
+
+        .alert-close {
+
+            margin-left: auto;
+
+            background: none;
+
+            border: none;
+
+            font-size: 1.25rem;
+
+            cursor: pointer;
+
+            opacity: 0.5;
+
+        }
+
+        
+
+        .alert-close:hover {
+
+            opacity: 1;
+
+        }
+
+        
+
+        /* ===== MODALS ===== */
+
+        .modal-overlay {
+
+            display: none;
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            background: rgba(0,0,0,0.5);
+
+            z-index: 2000;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 1rem;
+
+        }
+
+        
+
+        .modal-overlay.active {
+
+            display: flex;
+
+        }
+
+        
+
+        .modal {
+
+            background: var(--white);
+
+            border-radius: 16px;
+
+            width: 100%;
+
+            max-width: 500px;
+
+            max-height: 90vh;
+
+            overflow-y: auto;
+
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+
+        }
+
+        
+
+        .modal-header {
+
+            padding: 1.25rem 1.5rem;
+
+            border-bottom: 1px solid var(--gray-200);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+        }
+
+        
+
+        .modal-header h3 {
+
+            font-size: 1.125rem;
+
+            font-weight: 600;
+
+            margin: 0;
+
+        }
+
+        
+
+        .modal-close {
+
+            background: none;
+
+            border: none;
+
+            font-size: 1.5rem;
+
+            cursor: pointer;
+
+            color: var(--gray-500);
+
+        }
+
+        
+
+        .modal-body {
+
+            padding: 1.5rem;
+
+        }
+
+        
+
+        .modal-footer {
+
+            padding: 1rem 1.5rem;
+
+            border-top: 1px solid var(--gray-200);
+
+            display: flex;
+
+            justify-content: flex-end;
+
+            gap: 0.75rem;
+
+        }
+
+        
+
+        /* ===== PAGINATION ===== */
+
+        .pagination {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 0.5rem;
+
+            padding: 1rem;
+
+        }
+
+        
+
+        .pagination a,
+
+        .pagination span {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            min-width: 36px;
+
+            height: 36px;
+
+            padding: 0 0.75rem;
+
+            border-radius: 8px;
+
+            text-decoration: none;
+
+            font-weight: 500;
+
+            transition: all 0.2s ease;
+
+        }
+
+        
+
+        .pagination a {
+
+            background: var(--white);
+
+            color: var(--gray-700);
+
+            border: 1px solid var(--gray-300);
+
+        }
+
+        
+
+        .pagination a:hover {
+
+            background: var(--gray-100);
+
+            border-color: var(--gray-400);
+
+        }
+
+        
+
+        .pagination .current {
+
+            background: var(--primary-color);
+
+            color: var(--white);
+
+            border: 1px solid var(--primary-color);
+
+        }
+
+        
+
+        .pagination .disabled {
+
+            color: var(--gray-400);
+
+            pointer-events: none;
+
+        }
+
+        
+
+        /* ===== USER/PRODUCT CELLS ===== */
+
+        .user-cell {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.75rem;
+
+        }
+
+        
+
+        .user-avatar {
+
+            width: 40px;
+
+            height: 40px;
+
+            border-radius: 50%;
+
+            background: var(--gray-200);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-weight: 600;
+
+            color: var(--gray-600);
+
+            overflow: hidden;
+
+        }
+
+        
+
+        .user-avatar img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+        }
+
+        
+
+        .user-info {
+
+            display: flex;
+
+            flex-direction: column;
+
+        }
+
+        
+
+        .user-name {
+
+            font-weight: 600;
+
+            color: var(--dark-color);
+
+        }
+
+        
+
+        .user-email {
+
+            font-size: 0.8125rem;
+
+            color: var(--gray-600);
+
+        }
+
+        
+
+        .product-cell {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.75rem;
+
+        }
+
+        
+
+        .product-thumb {
+
+            width: 48px;
+
+            height: 48px;
+
+            border-radius: 8px;
+
+            background: var(--gray-200);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            overflow: hidden;
+
+        }
+
+        
+
+        .product-thumb img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+        }
+
+        
+
+        .product-thumb i {
+
+            font-size: 1.25rem;
+
+            color: var(--gray-500);
+
+        }
+
+        
+
+        /* ===== RESPONSIVE ===== */
+
+        @media (max-width: 992px) {
+
+            .staff-sidebar {
+
+                transform: translateX(-100%);
+
+            }
+
+            
+
+            .staff-sidebar.active {
+
+                transform: translateX(0);
+
+            }
+
+            
+
+            .staff-main {
+
+                margin-left: 0;
+
+            }
+
+            
+
+            .staff-topbar-toggle {
+
+                display: block;
+
+            }
+
+            
+
+            .sidebar-overlay {
+
+                display: none;
+
+                position: fixed;
+
+                top: 0;
+
+                left: 0;
+
+                width: 100%;
+
+                height: 100%;
+
+                background: rgba(0,0,0,0.5);
+
+                z-index: 999;
+
+            }
+
+            
+
+            .sidebar-overlay.active {
+
+                display: block;
+
+            }
+
+        }
+
+        
+
+        @media (max-width: 768px) {
+
+            .metric-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+            
+
+            .filter-bar {
+
+                flex-direction: column;
+
+            }
+
+            
+
+            .filter-bar .form-control,
+
+            .filter-bar .form-select,
+
+            .filter-bar .search-input {
+
+                max-width: 100%;
+
+            }
+
+            
+
+            .staff-content {
+
+                padding: 1rem;
+
+            }
+
+            
+
+            .staff-table {
+
+                display: block;
+
+                overflow-x: auto;
+
+            }
+
+        }
+
+        
+
+        /* ===== UTILITIES ===== */
+
+        .text-muted { color: var(--gray-600) !important; }
+
+        .text-danger { color: var(--danger) !important; }
+
+        .text-success { color: var(--success) !important; }
+
+        .text-warning { color: var(--warning) !important; }
+
+        .text-info { color: var(--info) !important; }
+
+        
+
+        .mb-0 { margin-bottom: 0 !important; }
+
+        .mb-1 { margin-bottom: 0.25rem !important; }
+
+        .mb-2 { margin-bottom: 0.5rem !important; }
+
+        .mb-3 { margin-bottom: 1rem !important; }
+
+        .mb-4 { margin-bottom: 1.5rem !important; }
+
+        
+
+        .mt-0 { margin-top: 0 !important; }
+
+        .mt-1 { margin-top: 0.25rem !important; }
+
+        .mt-2 { margin-top: 0.5rem !important; }
+
+        .mt-3 { margin-top: 1rem !important; }
+
+        .mt-4 { margin-top: 1.5rem !important; }
+
+        
+
+        .d-flex { display: flex !important; }
+
+        .align-items-center { align-items: center !important; }
+
+        .justify-content-between { justify-content: space-between !important; }
+
+        .gap-2 { gap: 0.5rem !important; }
+
+        .gap-3 { gap: 1rem !important; }
+
+        
+
+        .fw-bold { font-weight: 700 !important; }
+
+        .fw-semibold { font-weight: 600 !important; }
+
+        
+
+        .small { font-size: 0.875rem !important; }
+
+        
+
+        /* Checkbox styling */
+
+        .form-check {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.5rem;
+
+        }
+
+        
+
+        .form-check-input {
+
+            width: 18px;
+
+            height: 18px;
+
+            cursor: pointer;
+
+        }
+
+        
+
+        /* Empty state */
+
+        .empty-state {
+
+            text-align: center;
+
+            padding: 3rem 1rem;
+
+            color: var(--gray-600);
+
+        }
+
+        
+
+        .empty-state i {
+
+            font-size: 3rem;
+
+            color: var(--gray-400);
+
+            margin-bottom: 1rem;
+
+        }
+
+        
+
+        .empty-state h4 {
+
+            margin-bottom: 0.5rem;
+
+            color: var(--gray-700);
+
+        }
+
+    </style>
+
+    
+
+    {% block extra_css %}{% endblock %}
+
+</head>
+
+<body>
+
+    <div class="staff-wrapper">
+
+        <!-- Sidebar -->
+
+        <aside class="staff-sidebar" id="staffSidebar">
+
+            <div class="staff-sidebar-header">
+
+                <h3><i class="bi bi-shield-check"></i> Staff Panel</h3>
+
+                <small>AgriLink Administration</small>
+
+            </div>
+
+            <nav class="staff-sidebar-nav">
+
+                <a href="{% url 'staff_dashboard' %}" class="staff-nav-link {% if request.resolver_match.url_name == 'staff_dashboard' %}active{% endif %}">
+
+                    <i class="bi bi-speedometer2"></i>
+
+                    <span>Dashboard</span>
+
+                </a>
+
+                
+
+                <div class="staff-nav-section">Verification</div>
+
+                <a href="{% url 'staff_verification_list' %}" class="staff-nav-link {% if 'verification' in request.resolver_match.url_name %}active{% endif %}">
+
+                    <i class="bi bi-file-earmark-check"></i>
+
+                    <span>Farmer Verification</span>
+
+                    {% if pending_verifications_count %}
+
+                    <span class="badge badge-warning" style="margin-left: auto;">{{ pending_verifications_count }}</span>
+
+                    {% endif %}
+
+                </a>
+
+                
+
+                <div class="staff-nav-section">Management</div>
+
+                <a href="{% url 'staff_products_list' %}" class="staff-nav-link {% if 'products' in request.resolver_match.url_name %}active{% endif %}">
+
+                    <i class="bi bi-box-seam"></i>
+
+                    <span>Products</span>
+
+                </a>
+
+                <a href="{% url 'staff_users_list' %}" class="staff-nav-link {% if 'users' in request.resolver_match.url_name %}active{% endif %}">
+
+                    <i class="bi bi-people"></i>
+
+                    <span>Users</span>
+
+                </a>
+
+                
+
+                <div class="staff-nav-divider"></div>
+
+                
+
+                <a href="{% url 'home' %}" class="staff-nav-link">
+
+                    <i class="bi bi-arrow-left"></i>
+
+                    <span>Back to Site</span>
+
+                </a>
+                <a href="{% url 'logout' %}" class="staff-nav-link logout-trigger">
+
+                    <i class="bi bi-box-arrow-right"></i>
+
+                    <span>Logout</span>
+
+                </a>
+
+            </nav>
+
+        </aside>
+
+        
+
+        <!-- Sidebar Overlay (mobile) -->
+
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        
+
+        <!-- Main Content -->
+
+        <main class="staff-main">
+
+            <header class="staff-topbar">
+
+                <div class="staff-topbar-left">
+
+                    <button class="staff-topbar-toggle" id="sidebarToggle">
+
+                        <i class="bi bi-list"></i>
+
+                    </button>
+
+                    <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+
+                </div>
+
+                <div class="staff-topbar-right">
+
+                    <div class="staff-user-info">
+
+                        <i class="bi bi-person-circle"></i>
+
+                        <span>{{ user.username }}</span>
+
+                        {% if user.is_superuser %}
+
+                        <span class="badge badge-purple">Superuser</span>
+
+                        {% else %}
+
+                        <span class="badge badge-info">Staff</span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </header>
+
+            
+
+            <!-- Messages -->
+
+            {% if messages %}
+
+            <div style="padding: 1rem 2rem 0;">
+
+                {% for message in messages %}
+
+                <div class="alert alert-{{ message.tags }}">
+
+                    <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+
+                    <span>{{ message }}</span>
+
+                    <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            {% endif %}
+
+            
+
+            <div class="staff-content">
+
+                {% block content %}{% endblock %}
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- Logout confirmation modal -->
+    <div class="modal-overlay" id="logoutModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="bi bi-box-arrow-right"></i> Confirm Logout</h3>
+                <button class="modal-close" id="logoutModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to log out?</p>
+                <p class="text-muted small mb-0">You will need to log in again to continue.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="logoutCancelBtn">Stay Logged In</button>
+                <button class="btn btn-primary" id="logoutConfirmBtn"><i class="bi bi-box-arrow-right"></i> Log Out</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+
+    <script>
+
+        // Sidebar toggle
+
+        const sidebar = document.getElementById('staffSidebar');
+
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        const sidebarToggle = document.getElementById('sidebarToggle');
+
+        
+
+        if (sidebarToggle) {
+
+            sidebarToggle.addEventListener('click', function() {
+
+                sidebar.classList.toggle('active');
+
+                sidebarOverlay.classList.toggle('active');
+
+            });
+
+        }
+
+        
+
+        if (sidebarOverlay) {
+
+            sidebarOverlay.addEventListener('click', function() {
+
+                sidebar.classList.remove('active');
+
+                sidebarOverlay.classList.remove('active');
+
+            });
+
+        }
+
+        
+
+        // Generic modal functions
+
+        function openModal(modalId) {
+
+            const modal = document.getElementById(modalId);
+
+            if (modal) modal.classList.add('active');
+
+        }
+
+        
+
+        function closeModal(modalId) {
+
+            const modal = document.getElementById(modalId);
+
+            if (modal) modal.classList.remove('active');
+
+        }
+
+        
+
+        // Close modal on overlay click
+
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+
+            overlay.addEventListener('click', function(e) {
+
+                if (e.target === overlay) {
+
+                    overlay.classList.remove('active');
+
+                }
+
+            });
+
+        });
+
+        
+
+        // Close modal on Escape key
+
+        document.addEventListener('keydown', function(e) {
+
+            if (e.key === 'Escape') {
+
+                document.querySelectorAll('.modal-overlay.active').forEach(modal => {
+
+                    modal.classList.remove('active');
+
+                });
+
+            }
+
+        });
+
+        // Logout confirmation modal handling
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutConfirmBtn = document.getElementById('logoutConfirmBtn');
+        const logoutCancelBtn = document.getElementById('logoutCancelBtn');
+        const logoutModalClose = document.getElementById('logoutModalClose');
+        let pendingLogout = null;
+
+        function closeLogoutModal() {
+            if (logoutModal) logoutModal.classList.remove('active');
+            pendingLogout = null;
+        }
+
+        function openLogoutModal(action) {
+            pendingLogout = action;
+            if (logoutModal) logoutModal.classList.add('active');
+        }
+
+        document.querySelectorAll('.logout-trigger').forEach(el => {
+            el.addEventListener('click', function(e) {
+                e.preventDefault();
+                const href = this.getAttribute('href');
+                openLogoutModal({ href });
+            });
+        });
+
+        if (logoutConfirmBtn) {
+            logoutConfirmBtn.addEventListener('click', function() {
+                if (!pendingLogout) {
+                    closeLogoutModal();
+                    return;
+                }
+                if (pendingLogout.href) {
+                    window.location.href = pendingLogout.href;
+                }
+                closeLogoutModal();
+            });
+        }
+
+        [logoutCancelBtn, logoutModalClose].forEach(btn => {
+            if (btn) {
+                btn.addEventListener('click', function() {
+                    closeLogoutModal();
+                });
+            }
+        });
+
+        if (logoutModal) {
+            logoutModal.addEventListener('click', function(e) {
+                if (e.target === logoutModal) closeLogoutModal();
+            });
+        }
+
+    </script>
+
+    
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+
+</html>

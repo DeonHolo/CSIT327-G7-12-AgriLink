@@ -1,0 +1,421 @@
+{% extends 'staff/base_staff.html' %}
+
+{% block title %}{{ user_obj.username }} - User Detail{% endblock %}
+{% block page_title %}User Detail{% endblock %}
+
+{% block content %}
+<div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+    <!-- Main Info -->
+    <div style="flex: 2; min-width: 400px;">
+        <!-- User Info Card -->
+        <div class="staff-card">
+            <div class="staff-card-header">
+                <h2><i class="bi bi-person-badge"></i> User Information</h2>
+                <div class="d-flex gap-2">
+                    <span class="badge badge-{% if user_obj.is_active %}success{% else %}danger{% endif %}">
+                        {% if user_obj.is_active %}Active{% else %}Inactive{% endif %}
+                    </span>
+                    {% if user_obj.is_superuser %}
+                    <span class="badge badge-purple">Superuser</span>
+                    {% elif user_obj.is_staff %}
+                    <span class="badge badge-info">Staff</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="staff-card-body">
+                <div class="user-cell mb-4" style="gap: 1rem;">
+                    <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2rem;">
+                        {% if user_obj.profile_picture %}
+                        <img src="{{ user_obj.profile_picture.url }}" alt="{{ user_obj.username }}">
+                        {% else %}
+                        {{ user_obj.username|slice:":1"|upper }}
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.5rem;">{{ user_obj.username }}</h3>
+                        {% if user_obj.first_name or user_obj.last_name %}
+                        <p class="text-muted mb-1">{{ user_obj.first_name }} {{ user_obj.last_name }}</p>
+                        {% endif %}
+                        <span class="badge badge-{% if user_obj.user_type == 'farmer' %}primary{% elif user_obj.user_type == 'both' %}info{% else %}secondary{% endif %}">
+                            {{ user_obj.get_user_type_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+                    <div>
+                        <label class="form-label text-muted small">Email</label>
+                        <p class="mb-0">
+                            <i class="bi bi-envelope text-muted"></i> 
+                            <a href="mailto:{{ user_obj.email }}">{{ user_obj.email }}</a>
+                        </p>
+                    </div>
+                    <div>
+                        <label class="form-label text-muted small">Phone</label>
+                        <p class="mb-0">
+                            <i class="bi bi-telephone text-muted"></i> 
+                            {% if user_obj.phone_number %}{{ user_obj.phone_number }}{% else %}<span class="text-muted">Not provided</span>{% endif %}
+                        </p>
+                    </div>
+                    <div>
+                        <label class="form-label text-muted small">Joined</label>
+                        <p class="mb-0">{{ user_obj.date_joined|date:"M d, Y H:i" }}</p>
+                    </div>
+                    <div>
+                        <label class="form-label text-muted small">Last Login</label>
+                        <p class="mb-0">
+                            {% if user_obj.last_login %}
+                            {{ user_obj.last_login|date:"M d, Y H:i" }}
+                            {% else %}
+                            <span class="text-muted">Never</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div>
+                        <label class="form-label text-muted small">Permit Status</label>
+                        <p class="mb-0">
+                            <span class="badge badge-{% if user_obj.business_permit_status == 'pending' %}warning{% elif user_obj.business_permit_status == 'approved' %}success{% elif user_obj.business_permit_status == 'rejected' %}danger{% else %}secondary{% endif %}">
+                                {{ user_obj.get_business_permit_status_display }}
+                            </span>
+                            {% if user_obj.business_permit_status == 'pending' %}
+                            <a href="{% url 'staff_verification_detail' user_obj.pk %}" class="btn btn-sm btn-outline" style="margin-left: 0.5rem;">Review</a>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div>
+                        <label class="form-label text-muted small">Products Listed</label>
+                        <p class="mb-0 fw-bold">{{ products|length }}{% if user_obj.is_farmer %} products{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User's Products -->
+        {% if products %}
+        <div class="staff-card">
+            <div class="staff-card-header">
+                <h2><i class="bi bi-box-seam"></i> Recent Products</h2>
+                <a href="{% url 'staff_products_list' %}?farmer={{ user_obj.pk }}" class="btn btn-sm btn-outline">View All</a>
+            </div>
+            <div class="staff-card-body" style="padding: 0;">
+                <table class="staff-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>
+                                <div class="product-cell">
+                                    <div class="product-thumb">
+                                        {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                        {% else %}
+                                        <i class="bi bi-box"></i>
+                                        {% endif %}
+                                    </div>
+                                    <span class="fw-semibold">{{ product.name }}</span>
+                                </div>
+                            </td>
+                            <td>₱{{ product.price }}/{{ product.unit }}</td>
+                            <td>
+                                <span class="badge badge-{% if product.is_active %}success{% else %}danger{% endif %}">
+                                    {% if product.is_active %}Active{% else %}Unlisted{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Actions Sidebar -->
+    <div style="flex: 1; min-width: 300px;">
+        <!-- Actions Card -->
+        <div class="staff-card">
+            <div class="staff-card-header">
+                <h2><i class="bi bi-lightning"></i> Actions</h2>
+            </div>
+            <div class="staff-card-body">
+                <h4 class="small text-muted mb-2">Role Management</h4>
+                
+                {% if user_obj.user_type != 'farmer' %}
+                <button onclick="openModal('setFarmerModal')" class="btn btn-primary" style="width: 100%; margin-bottom: 0.5rem;">
+                    <i class="bi bi-shop"></i> Set as Farmer
+                </button>
+                {% endif %}
+                
+                {% if user_obj.user_type != 'buyer' %}
+                <button onclick="openModal('setBuyerModal')" class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;">
+                    <i class="bi bi-person"></i> Set as Buyer
+                </button>
+                {% endif %}
+                
+                {% if request.user.is_superuser %}
+                <hr style="margin: 1rem 0;">
+                <h4 class="small text-muted mb-2">Staff Access</h4>
+                
+                {% if not user_obj.is_staff %}
+                <button onclick="openModal('setStaffModal')" class="btn btn-info" style="width: 100%; margin-bottom: 0.5rem;">
+                    <i class="bi bi-shield-plus"></i> Promote to Staff
+                </button>
+                {% else %}
+                <button onclick="openModal('removeStaffModal')" class="btn btn-warning" style="width: 100%; margin-bottom: 0.5rem;">
+                    <i class="bi bi-shield-minus"></i> Remove Staff Access
+                </button>
+                {% endif %}
+                {% endif %}
+                
+                <hr style="margin: 1rem 0;">
+                <h4 class="small text-muted mb-2">Account Status</h4>
+                
+                {% if user_obj.is_active %}
+                <button onclick="openModal('deactivateModal')" class="btn btn-danger" style="width: 100%; margin-bottom: 0.5rem;">
+                    <i class="bi bi-person-x"></i> Deactivate Account
+                </button>
+                {% else %}
+                <button onclick="openModal('reactivateModal')" class="btn btn-primary" style="width: 100%; margin-bottom: 0.5rem;">
+                    <i class="bi bi-person-check"></i> Reactivate Account
+                </button>
+                {% endif %}
+                
+                <button onclick="openModal('clearSessionsModal')" class="btn btn-outline" style="width: 100%;">
+                    <i class="bi bi-box-arrow-right"></i> Clear All Sessions
+                </button>
+            </div>
+        </div>
+        
+        <!-- Audit History -->
+        <div class="staff-card">
+            <div class="staff-card-header">
+                <h2><i class="bi bi-clock-history"></i> Audit History</h2>
+            </div>
+            <div class="staff-card-body" style="padding: 0;">
+                {% if audit_history %}
+                <div style="max-height: 400px; overflow-y: auto;">
+                    {% for audit in audit_history %}
+                    <div style="padding: 1rem; border-bottom: 1px solid var(--gray-200);">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="badge badge-{% if 'approve' in audit.action or 'reactivate' in audit.action or 'restore' in audit.action %}success{% elif 'reject' in audit.action or 'deactivate' in audit.action or 'unlist' in audit.action %}danger{% elif 'role' in audit.action %}info{% else %}warning{% endif %}">
+                                {{ audit.get_action_display }}
+                            </span>
+                            <span class="small text-muted">{{ audit.created_at|timesince }} ago</span>
+                        </div>
+                        <p class="small mb-0">by {{ audit.actor.username }}</p>
+                        {% if audit.previous_status or audit.new_status %}
+                        <p class="small text-muted mb-0">{{ audit.previous_status }} → {{ audit.new_status }}</p>
+                        {% endif %}
+                        {% if audit.notes %}
+                        <p class="small text-muted mb-0 mt-1" style="font-style: italic;">"{{ audit.notes|truncatewords:15 }}"</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state" style="padding: 1.5rem;">
+                    <p class="text-muted mb-0">No audit history.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Set Farmer Modal -->
+<div class="modal-overlay" id="setFarmerModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="bi bi-shop text-primary"></i> Set as Farmer</h3>
+            <button class="modal-close" onclick="closeModal('setFarmerModal')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'staff_user_action' user_obj.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="set_farmer">
+            <div class="modal-body">
+                <p>Change <strong>{{ user_obj.username }}</strong>'s role to Farmer?</p>
+                <p class="text-muted small">They will be able to list products.</p>
+                
+                <div class="form-group mt-3">
+                    <label class="form-label">Notes (optional)</label>
+                    <textarea name="notes" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('setFarmerModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Confirm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Set Buyer Modal -->
+<div class="modal-overlay" id="setBuyerModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="bi bi-person"></i> Set as Buyer</h3>
+            <button class="modal-close" onclick="closeModal('setBuyerModal')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'staff_user_action' user_obj.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="set_buyer">
+            <div class="modal-body">
+                <p>Change <strong>{{ user_obj.username }}</strong>'s role to Buyer?</p>
+                <p class="text-muted small">They will no longer be able to list products.</p>
+                
+                <div class="form-group mt-3">
+                    <label class="form-label">Notes (optional)</label>
+                    <textarea name="notes" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('setBuyerModal')">Cancel</button>
+                <button type="submit" class="btn btn-secondary">Confirm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Set Staff Modal -->
+<div class="modal-overlay" id="setStaffModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="bi bi-shield-plus text-info"></i> Promote to Staff</h3>
+            <button class="modal-close" onclick="closeModal('setStaffModal')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'staff_user_action' user_obj.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="set_staff">
+            <div class="modal-body">
+                <p>Promote <strong>{{ user_obj.username }}</strong> to Staff?</p>
+                <p class="text-muted small">They will have access to this admin panel.</p>
+                
+                <div class="form-group mt-3">
+                    <label class="form-label">Notes (optional)</label>
+                    <textarea name="notes" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('setStaffModal')">Cancel</button>
+                <button type="submit" class="btn btn-info">Promote</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Remove Staff Modal -->
+<div class="modal-overlay" id="removeStaffModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="bi bi-shield-minus text-warning"></i> Remove Staff Access</h3>
+            <button class="modal-close" onclick="closeModal('removeStaffModal')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'staff_user_action' user_obj.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="remove_staff">
+            <div class="modal-body">
+                <p>Remove staff access from <strong>{{ user_obj.username }}</strong>?</p>
+                <p class="text-muted small">They will no longer have access to this admin panel.</p>
+                
+                <div class="form-group mt-3">
+                    <label class="form-label">Notes (optional)</label>
+                    <textarea name="notes" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('removeStaffModal')">Cancel</button>
+                <button type="submit" class="btn btn-warning">Remove Access</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Deactivate Modal -->
+<div class="modal-overlay" id="deactivateModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="bi bi-person-x text-danger"></i> Deactivate Account</h3>
+            <button class="modal-close" onclick="closeModal('deactivateModal')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'staff_user_action' user_obj.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="deactivate">
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <span>This will prevent <strong>{{ user_obj.username }}</strong> from logging in.</span>
+                </div>
+                
+                <div class="form-group mt-3">
+                    <label class="form-label">Reason for Deactivation</label>
+                    <textarea name="notes" class="form-control" rows="3" placeholder="Why is this account being deactivated?"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('deactivateModal')">Cancel</button>
+                <button type="submit" class="btn btn-danger">Deactivate</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Reactivate Modal -->
+<div class="modal-overlay" id="reactivateModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="bi bi-person-check text-success"></i> Reactivate Account</h3>
+            <button class="modal-close" onclick="closeModal('reactivateModal')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'staff_user_action' user_obj.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reactivate">
+            <div class="modal-body">
+                <p>Reactivate <strong>{{ user_obj.username }}</strong>'s account?</p>
+                <p class="text-muted small">They will be able to log in again.</p>
+                
+                <div class="form-group mt-3">
+                    <label class="form-label">Notes (optional)</label>
+                    <textarea name="notes" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('reactivateModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Reactivate</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Clear Sessions Modal -->
+<div class="modal-overlay" id="clearSessionsModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="bi bi-box-arrow-right"></i> Clear All Sessions</h3>
+            <button class="modal-close" onclick="closeModal('clearSessionsModal')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'staff_user_action' user_obj.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="clear_sessions">
+            <div class="modal-body">
+                <p>This will log <strong>{{ user_obj.username }}</strong> out from all devices.</p>
+                <p class="text-muted small">They will need to log in again to access their account.</p>
+                
+                <div class="form-group mt-3">
+                    <label class="form-label">Notes (optional)</label>
+                    <textarea name="notes" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('clearSessionsModal')">Cancel</button>
+                <button type="submit" class="btn btn-info">Clear Sessions</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

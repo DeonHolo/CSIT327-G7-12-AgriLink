@@ -1,0 +1,322 @@
+{% extends 'staff/base_staff.html' %}
+
+{% block title %}Review Verification - {{ user_obj.username }}{% endblock %}
+{% block page_title %}Review Verification{% endblock %}
+
+{% block content %}
+<div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+    <!-- Main Info -->
+    <div style="flex: 2; min-width: 400px;">
+        <div class="staff-card">
+            <div class="staff-card-header">
+                <h2><i class="bi bi-person-badge"></i> Submitter Information</h2>
+                <span class="badge badge-{% if user_obj.business_permit_status == 'pending' %}warning{% elif user_obj.business_permit_status == 'approved' %}success{% elif user_obj.business_permit_status == 'rejected' %}danger{% else %}secondary{% endif %}">
+                    {{ user_obj.get_business_permit_status_display }}
+                </span>
+            </div>
+            <div class="staff-card-body">
+                <div class="user-cell mb-4" style="gap: 1rem;">
+                    <div class="user-avatar" style="width: 64px; height: 64px; font-size: 1.5rem;">
+                        {% if user_obj.profile_picture %}
+                        <img src="{{ user_obj.profile_picture.url }}" alt="{{ user_obj.username }}">
+                        {% else %}
+                        {{ user_obj.username|slice:":1"|upper }}
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.25rem;">{{ user_obj.username }}</h3>
+                        <p class="text-muted mb-0">{{ user_obj.email }}</p>
+                        {% if user_obj.phone_number %}
+                        <p class="text-muted mb-0"><i class="bi bi-telephone"></i> {{ user_obj.phone_number }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                    <div>
+                        <label class="form-label text-muted small">Current Role</label>
+                        <p class="fw-semibold">{{ user_obj.get_user_type_display }}</p>
+                    </div>
+                    <div>
+                        <label class="form-label text-muted small">Account Status</label>
+                        <p>
+                            <span class="badge badge-{% if user_obj.is_active %}success{% else %}danger{% endif %}">
+                                {% if user_obj.is_active %}Active{% else %}Inactive{% endif %}
+                            </span>
+                        </p>
+                    </div>
+                    <div>
+                        <label class="form-label text-muted small">Joined</label>
+                        <p>{{ user_obj.date_joined|date:"M d, Y H:i" }}</p>
+                    </div>
+                    <div>
+                        <label class="form-label text-muted small">Last Updated</label>
+                        <p>
+                            {% if user_obj.business_permit_updated_at %}
+                            {{ user_obj.business_permit_updated_at|date:"M d, Y H:i" }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                {% if user_obj.business_permit_notes %}
+                <div class="mt-3">
+                    <label class="form-label text-muted small">Previous Notes</label>
+                    <div style="background: var(--gray-100); padding: 1rem; border-radius: 8px;">
+                        {{ user_obj.business_permit_notes }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Business Permit Preview -->
+        <div class="staff-card">
+            <div class="staff-card-header">
+                <h2><i class="bi bi-file-earmark-text"></i> Business Permit Document</h2>
+            </div>
+            <div class="staff-card-body">
+                {% if user_obj.business_permit %}
+                <div style="margin-bottom: 1rem;">
+                    <a href="{{ user_obj.business_permit.url }}" target="_blank" class="btn btn-primary">
+                        <i class="bi bi-download"></i> Download / View Document
+                    </a>
+                </div>
+                
+                {% if user_obj.business_permit.url|slice:"-4:" == '.pdf' %}
+                <div style="background: var(--gray-100); padding: 2rem; border-radius: 8px; text-align: center;">
+                    <i class="bi bi-file-earmark-pdf" style="font-size: 3rem; color: var(--danger);"></i>
+                    <p class="mt-2">PDF Document</p>
+                    <a href="{{ user_obj.business_permit.url }}" target="_blank" class="btn btn-sm btn-outline">Open in New Tab</a>
+                </div>
+                {% else %}
+                <div style="text-align: center;">
+                    <img src="{{ user_obj.business_permit.url }}" alt="Business Permit" style="max-width: 100%; max-height: 500px; border-radius: 8px; border: 1px solid var(--gray-300);">
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-file-earmark-x"></i>
+                    <h4>No Document Uploaded</h4>
+                    <p>The user has not uploaded a business permit.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Actions Sidebar -->
+    <div style="flex: 1; min-width: 300px;">
+        <!-- Actions Card -->
+        <div class="staff-card">
+            <div class="staff-card-header">
+                <h2><i class="bi bi-lightning"></i> Actions</h2>
+            </div>
+            <div class="staff-card-body">
+                {% if user_obj.business_permit_status == 'pending' %}
+                <!-- Approve -->
+                <button onclick="openModal('approveModal')" class="btn btn-primary" style="width: 100%; margin-bottom: 0.75rem;">
+                    <i class="bi bi-check-circle"></i> Approve as Farmer
+                </button>
+                
+                <!-- Reject -->
+                <button onclick="openModal('rejectModal')" class="btn btn-danger" style="width: 100%; margin-bottom: 0.75rem;">
+                    <i class="bi bi-x-circle"></i> Reject Request
+                </button>
+                
+                <!-- Request Reupload -->
+                <button onclick="openModal('reuploadModal')" class="btn btn-warning" style="width: 100%; margin-bottom: 0.75rem;">
+                    <i class="bi bi-arrow-repeat"></i> Request Reupload
+                </button>
+                
+                {% elif user_obj.business_permit_status == 'approved' %}
+                <div class="alert alert-success mb-3">
+                    <i class="bi bi-check-circle"></i>
+                    <span>This verification has been approved.</span>
+                </div>
+                
+                <!-- Reset to Pending -->
+                <button onclick="openModal('resetModal')" class="btn btn-secondary" style="width: 100%;">
+                    <i class="bi bi-arrow-counterclockwise"></i> Reset to Pending
+                </button>
+                
+                {% elif user_obj.business_permit_status == 'rejected' %}
+                <div class="alert alert-danger mb-3">
+                    <i class="bi bi-x-circle"></i>
+                    <span>This verification was rejected.</span>
+                </div>
+                
+                <!-- Reset to Pending -->
+                <button onclick="openModal('resetModal')" class="btn btn-secondary" style="width: 100%;">
+                    <i class="bi bi-arrow-counterclockwise"></i> Reset to Pending
+                </button>
+                
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    <span>No verification request submitted.</span>
+                </div>
+                {% endif %}
+                
+                <hr style="margin: 1.5rem 0;">
+                
+                <a href="{% url 'staff_user_detail' user_obj.pk %}" class="btn btn-outline" style="width: 100%;">
+                    <i class="bi bi-person"></i> View Full Profile
+                </a>
+            </div>
+        </div>
+        
+        <!-- Audit History -->
+        <div class="staff-card">
+            <div class="staff-card-header">
+                <h2><i class="bi bi-clock-history"></i> History</h2>
+            </div>
+            <div class="staff-card-body" style="padding: 0;">
+                {% if audit_history %}
+                <div style="max-height: 400px; overflow-y: auto;">
+                    {% for audit in audit_history %}
+                    <div style="padding: 1rem; border-bottom: 1px solid var(--gray-200);">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="badge badge-{% if 'approve' in audit.action %}success{% elif 'reject' in audit.action %}danger{% elif 'reupload' in audit.action %}warning{% else %}info{% endif %}">
+                                {{ audit.get_action_display }}
+                            </span>
+                            <span class="small text-muted">{{ audit.created_at|timesince }} ago</span>
+                        </div>
+                        <p class="small mb-0">by {{ audit.actor.username }}</p>
+                        {% if audit.notes %}
+                        <p class="small text-muted mb-0 mt-1" style="font-style: italic;">"{{ audit.notes|truncatewords:20 }}"</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state" style="padding: 1.5rem;">
+                    <p class="text-muted mb-0">No history yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Approve Modal -->
+<div class="modal-overlay" id="approveModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="bi bi-check-circle text-success"></i> Approve Verification</h3>
+            <button class="modal-close" onclick="closeModal('approveModal')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'staff_verification_action' user_obj.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="approve">
+            <div class="modal-body">
+                <p>You are about to approve <strong>{{ user_obj.username }}</strong> as a farmer. This will:</p>
+                <ul style="margin-left: 1.5rem; color: var(--gray-700);">
+                    <li>Set their verification status to <strong>Approved</strong></li>
+                    <li>Change their role to <strong>Farmer</strong></li>
+                    <li>Allow them to list products</li>
+                </ul>
+                
+                <div class="form-group mt-3">
+                    <label class="form-label">Notes (optional)</label>
+                    <textarea name="notes" class="form-control" rows="3" placeholder="Add any notes about this approval..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('approveModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i> Approve
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Reject Modal -->
+<div class="modal-overlay" id="rejectModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="bi bi-x-circle text-danger"></i> Reject Verification</h3>
+            <button class="modal-close" onclick="closeModal('rejectModal')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'staff_verification_action' user_obj.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reject">
+            <div class="modal-body">
+                <p>You are about to reject the verification request for <strong>{{ user_obj.username }}</strong>.</p>
+                
+                <div class="form-group mt-3">
+                    <label class="form-label">Reason for Rejection <span class="text-danger">*</span></label>
+                    <textarea name="notes" class="form-control" rows="4" placeholder="Explain why this request is being rejected..." required></textarea>
+                    <p class="form-text">This note will be visible to the user.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('rejectModal')">Cancel</button>
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-x-circle"></i> Reject
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Reupload Modal -->
+<div class="modal-overlay" id="reuploadModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="bi bi-arrow-repeat text-warning"></i> Request Reupload</h3>
+            <button class="modal-close" onclick="closeModal('reuploadModal')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'staff_verification_action' user_obj.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reupload">
+            <div class="modal-body">
+                <p>You are requesting <strong>{{ user_obj.username }}</strong> to upload a new document. The current document will be removed.</p>
+                
+                <div class="form-group mt-3">
+                    <label class="form-label">Reason for Reupload Request <span class="text-danger">*</span></label>
+                    <textarea name="notes" class="form-control" rows="4" placeholder="Explain what's wrong with the current document..." required></textarea>
+                    <p class="form-text">This note will be visible to the user.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('reuploadModal')">Cancel</button>
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-arrow-repeat"></i> Request Reupload
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Reset Modal -->
+<div class="modal-overlay" id="resetModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="bi bi-arrow-counterclockwise"></i> Reset to Pending</h3>
+            <button class="modal-close" onclick="closeModal('resetModal')">&times;</button>
+        </div>
+        <form method="POST" action="{% url 'staff_verification_action' user_obj.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reset">
+            <div class="modal-body">
+                <p>You are about to reset <strong>{{ user_obj.username }}</strong>'s verification status back to pending.</p>
+                
+                <div class="form-group mt-3">
+                    <label class="form-label">Notes (optional)</label>
+                    <textarea name="notes" class="form-control" rows="3" placeholder="Add any notes about this reset..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('resetModal')">Cancel</button>
+                <button type="submit" class="btn btn-info">
+                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

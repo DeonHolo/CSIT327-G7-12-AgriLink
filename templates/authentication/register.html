@@ -311,6 +311,23 @@
     .password-wrapper {
         position: relative;
     }
+    .password-feedback {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 0.75rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        z-index: 20;
+        margin-top: 0.35rem;
+        display: none;
+    }
+    .password-feedback.show {
+        display: block;
+    }
     
     /* User Type Selection Styles */
     .user-type-selection {
@@ -565,6 +582,28 @@
         width: 0%;
         transition: all 0.3s ease;
     }
+
+    /* Password checklist */
+    .pwd-checklist {
+        list-style: none;
+        padding-left: 0;
+        margin: 0.75rem 0 0 0;
+        display: grid;
+        gap: 0.35rem;
+    }
+    .pwd-check-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    .pwd-check-item i {
+        font-size: 1rem;
+    }
+    .pwd-check-item.success {
+        color: #2e7d32;
+    }
     
     .invalid-feedback {
         display: none;
@@ -768,13 +807,18 @@
                                 <div class="password-wrapper">
                                     {{ form.password1 }}
                                     <i class="bi bi-eye password-toggle" id="togglePassword1"></i>
+                                    <div class="password-feedback" id="pwdPopover" aria-live="polite">
+                                        <div class="password-strength">
+                                            <div class="password-strength-bar" id="strengthBar"></div>
+                                        </div>
+                                        <ul class="pwd-checklist" id="pwdChecklist">
+                                            <li class="pwd-check-item" data-rule="length"><i class="bi bi-circle"></i><span>8+ Characters</span></li>
+                                            <li class="pwd-check-item" data-rule="numeric"><i class="bi bi-circle"></i><span>Not numeric only</span></li>
+                                            <li class="pwd-check-item" data-rule="common"><i class="bi bi-circle"></i><span>Not common</span></li>
+                                            <li class="pwd-check-item" data-rule="personal"><i class="bi bi-circle"></i><span>Not personal info</span></li>
+                                        </ul>
+                                    </div>
                                 </div>
-                                <div class="password-strength">
-                                    <div class="password-strength-bar" id="strengthBar"></div>
-                                </div>
-                                <small class="text-muted">
-                                    Must be at least 8 characters with letters and numbers
-                                </small>
                                 <div class="error-message" id="{{ form.password1.id_for_label }}-error"></div>
                             </div>
                             
@@ -875,7 +919,58 @@
     
     // Password strength indicator
     const strengthBar = document.getElementById('strengthBar');
+    const checklistItems = document.querySelectorAll('#pwdChecklist .pwd-check-item');
+    const pwdPopover = document.getElementById('pwdPopover');
+    const commonPasswords = ['password', '123456', '12345678', 'qwerty', 'abc123', 'letmein', 'welcome', '111111', '123123', 'password1', 'admin'];
+
+    function updateChecklist(password) {
+        const username = usernameField.value.trim().toLowerCase();
+        const email = emailField.value.trim().toLowerCase();
+        const emailLocal = email.includes('@') ? email.split('@')[0] : '';
+
+        const rules = {
+            length: password.length >= 8,
+            numeric: !(password && /^\d+$/.test(password)),
+            common: password ? !commonPasswords.includes(password.toLowerCase()) : false,
+            personal: (() => {
+                const tokens = [username, emailLocal].filter(t => t && t.length >= 3);
+                const lower = password.toLowerCase();
+                return tokens.every(t => !lower.includes(t));
+            })()
+        };
+
+        checklistItems.forEach(item => {
+            const rule = item.dataset.rule;
+            const passed = rules[rule];
+            const icon = item.querySelector('i');
+            if (passed) {
+                item.classList.add('success');
+                icon.classList.remove('bi-circle');
+                icon.classList.add('bi-check-circle-fill');
+            } else {
+                item.classList.remove('success');
+                icon.classList.add('bi-circle');
+                icon.classList.remove('bi-check-circle-fill');
+            }
+        });
+    }
     
+    function showPwdPopover() {
+        pwdPopover.classList.add('show');
+    }
+    function hidePwdPopover() {
+        pwdPopover.classList.remove('show');
+    }
+
+    password1.addEventListener('focus', () => {
+        showPwdPopover();
+        updateChecklist(password1.value);
+    });
+    password1.addEventListener('blur', () => {
+        // Small timeout to allow clicks on the popover (if needed)
+        setTimeout(hidePwdPopover, 100);
+    });
+
     password1.addEventListener('input', function() {
         const password = this.value;
         let strength = 0;
@@ -894,6 +989,9 @@
         } else {
             strengthBar.style.backgroundColor = '#2ecc71';
         }
+
+        updateChecklist(password);
+        showPwdPopover();
     });
     
     // Form validation functions
@@ -930,6 +1028,11 @@
     const terms = document.getElementById('terms');
     const usernameField = document.getElementById('{{ form.username.id_for_label }}');
     const emailField = document.getElementById('{{ form.email.id_for_label }}');
+
+    // Update checklist on load and when username/email change
+    updateChecklist(password1.value);
+    usernameField.addEventListener('input', () => updateChecklist(password1.value));
+    emailField.addEventListener('input', () => updateChecklist(password1.value));
     
     form.addEventListener('submit', function(e) {
         e.preventDefault();

@@ -92,7 +92,7 @@ def product_list(request):
         'min_price': min_price,
         'max_price': max_price,
         'sort_by': sort_by,
-        'total_results': total_results
+        'total_results': total_results,
     }
     return render(request, 'products/product_list.html', context)
 
@@ -123,7 +123,7 @@ def product_detail(request, pk):
         'title': f'{product.name} - AgriLink',
         'product': product,
         'other_products': other_products,
-        'farmer_active_products_count': farmer_active_products_count
+        'farmer_active_products_count': farmer_active_products_count,
     }
     return render(request, 'products/product_detail.html', context)
 
@@ -390,6 +390,10 @@ def fair_price_view(request):
     POST: Save a new calculation to the database
     """
     import json
+    
+    if not request.user.is_farmer():
+        messages.error(request, 'The calculator is available to farmers only.')
+        return redirect('product_list')
     
     if request.method == 'POST':
         try:

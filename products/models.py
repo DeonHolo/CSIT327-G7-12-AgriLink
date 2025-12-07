@@ -79,6 +79,16 @@ class Product(models.Model):
         default=0,
         help_text='Total units sold (for "Top Products" - FR-11)'
     )
+    average_rating = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        default=0,
+        help_text='Average product rating'
+    )
+    rating_count = models.PositiveIntegerField(
+        default=0,
+        help_text='Number of product ratings'
+    )
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     

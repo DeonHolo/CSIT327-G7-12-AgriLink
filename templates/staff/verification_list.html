@@ -1,0 +1,131 @@
+{% extends 'staff/base_staff.html' %}
+
+{% block title %}Farmer Verification - Staff Panel{% endblock %}
+{% block page_title %}Farmer Verification{% endblock %}
+
+{% block content %}
+<div class="staff-card">
+    <!-- Filter Bar -->
+    <form method="GET" class="filter-bar">
+        <input type="text" name="search" class="form-control search-input" placeholder="Search by name or email..." value="{{ search }}">
+        
+        <select name="status" class="form-select">
+            <option value="">All Statuses</option>
+            <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+            <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+            <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+        </select>
+        
+        <div class="d-flex align-items-center gap-2">
+            <label class="form-label small text-muted mb-0" for="date_from">From</label>
+            <input type="date" id="date_from" name="date_from" class="form-control" value="{{ date_from }}">
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <label class="form-label small text-muted mb-0" for="date_to">To</label>
+            <input type="date" id="date_to" name="date_to" class="form-control" value="{{ date_to }}">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-search"></i> Filter
+        </button>
+        
+        {% if search or status_filter or date_from or date_to %}
+        <a href="{% url 'staff_verification_list' %}" class="btn btn-secondary">Clear</a>
+        {% endif %}
+    </form>
+    
+    <!-- Table -->
+    <div class="staff-card-body" style="padding: 0;">
+        {% if verifications %}
+        <table class="staff-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Current Role</th>
+                    <th>Status</th>
+                    <th>Submitted</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in verifications %}
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-avatar">
+                                {% if v.profile_picture %}
+                                <img src="{{ v.profile_picture.url }}" alt="{{ v.username }}">
+                                {% else %}
+                                {{ v.username|slice:":1"|upper }}
+                                {% endif %}
+                            </div>
+                            <div class="user-info">
+                                <span class="user-name">{{ v.username }}</span>
+                                <span class="user-email">{{ v.email }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge badge-{% if v.user_type == 'farmer' %}primary{% elif v.user_type == 'both' %}info{% else %}secondary{% endif %}">
+                            {{ v.get_user_type_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge badge-{% if v.business_permit_status == 'pending' %}warning{% elif v.business_permit_status == 'approved' %}success{% elif v.business_permit_status == 'rejected' %}danger{% else %}secondary{% endif %}">
+                            {{ v.get_business_permit_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="small text-muted">
+                            {% if v.business_permit_updated_at %}
+                            {{ v.business_permit_updated_at|date:"M d, Y H:i" }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'staff_verification_detail' v.pk %}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-eye"></i> Review
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Pagination -->
+        {% if verifications.has_other_pages %}
+        <div class="pagination">
+            {% if verifications.has_previous %}
+            <a href="?page={{ verifications.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            {% endif %}
+            
+            {% for num in verifications.paginator.page_range %}
+                {% if verifications.number == num %}
+                <span class="current">{{ num }}</span>
+                {% elif num > verifications.number|add:'-3' and num < verifications.number|add:'3' %}
+                <a href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if verifications.has_next %}
+            <a href="?page={{ verifications.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-file-earmark-check"></i>
+            <h4>No Verification Requests</h4>
+            <p>{% if search or status_filter %}No results match your filters.{% else %}No farmer verification requests have been submitted yet.{% endif %}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
