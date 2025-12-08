@@ -1324,8 +1324,8 @@
     
     // Track last message timestamp for polling
     let lastMessageTimestamp = '{{ last_message_timestamp|default:"" }}';
-    const currentUserAvatar = "{{ user.profile_picture.url|default:'' }}";
-    const otherUserAvatar = "{{ other_user.profile_picture.url|default:'' }}";
+    const currentUserAvatar = "{% if user.profile_picture %}{{ user.profile_picture.url }}{% endif %}";
+    const otherUserAvatar = "{% if other_user.profile_picture %}{{ other_user.profile_picture.url }}{% endif %}";
     
     // Track displayed messages and deals
     let displayedMessageIds = new Set();

@@ -329,246 +329,6 @@
         display: block;
     }
     
-    /* User Type Selection Styles */
-    .user-type-selection {
-        margin-bottom: 2rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-    }
-    
-    .selection-title {
-        color: #2c3e50;
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        text-align: center;
-    }
-    
-    .user-type-cards {
-        display: flex;
-        justify-content: center;
-        align-items: stretch;
-        gap: 1rem;
-        width: 100%;
-        max-width: 600px;
-        margin: 0 auto;
-    }
-    
-    .card-wrapper {
-        position: relative;
-        flex: 1;
-        max-width: 280px;
-    }
-    
-    .card-wrapper input[type="radio"] {
-        display: none;
-    }
-    
-    .user-card {
-        background: #ffffff;
-        border: 3px solid #e0e0e0;
-        border-radius: 15px;
-        padding: 1.5rem;
-        cursor: pointer;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        min-height: 220px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        width: 100%;
-    }
-    
-    .user-card::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border-radius: 13px;
-        background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(39, 174, 96, 0.1));
-        opacity: 0;
-        transition: opacity 0.4s ease;
-        pointer-events: none;
-    }
-    
-    .user-card:hover {
-        border-color: #2ecc71;
-        transform: translateY(-5px) scale(1.02);
-        box-shadow: 0 10px 30px rgba(46, 204, 113, 0.25);
-    }
-    
-    .user-card:hover::after {
-        opacity: 1;
-    }
-    
-    .user-card:has(input:checked) {
-        border-color: #2ecc71;
-        background: linear-gradient(135deg, rgba(46, 204, 113, 0.05), rgba(39, 174, 96, 0.05));
-        box-shadow: 0 5px 20px rgba(46, 204, 113, 0.2);
-    }
-    
-    .card-icon {
-        width: 70px;
-        height: 70px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #2ecc71, #27ae60);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1rem;
-        transition: all 0.4s ease;
-        box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
-        position: relative;
-        z-index: 2;
-    }
-    
-    .card-icon i {
-        font-size: 2rem;
-        color: white;
-        transition: transform 0.4s ease;
-    }
-    
-    .user-card:hover .card-icon {
-        transform: scale(1.1) rotate(5deg);
-        box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5);
-    }
-    
-    .user-card:hover .card-icon i {
-        transform: scale(1.1);
-    }
-    
-    .card-content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        width: 100%;
-    }
-    
-    .card-content h5 {
-        color: #2c3e50;
-        font-size: 1.2rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-    
-    .card-content p {
-        color: #6c757d;
-        font-size: 0.9rem;
-        margin-bottom: 1rem;
-        line-height: 1.4;
-    }
-    
-    .card-content ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        width: 100%;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .card-content li {
-        color: #6c757d;
-        font-size: 0.8rem;
-        padding: 0.25rem 0;
-        position: relative;
-        text-align: center;
-        width: auto;
-    }
-    
-    .card-content li:before {
-        content: "✓";
-        color: #2ecc71;
-        font-weight: bold;
-        margin-right: 0.5rem;
-    }
-    
-    .selection-indicator {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: #e0e0e0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        border: 3px solid #e0e0e0;
-    }
-    
-    .selection-indicator i {
-        font-size: 0.8rem;
-        color: #6c757d;
-        opacity: 0;
-        transition: all 0.3s ease;
-    }
-    
-    /* Show selection indicator when input is checked - full green circle */
-    #buyer-toggle:checked + .buyer-card .selection-indicator {
-        background: #2ecc71;
-        border-color: #2ecc71;
-        box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
-    }
-    
-    #buyer-toggle:checked + .buyer-card .selection-indicator i {
-        display: none;
-    }
-    
-    #farmer-toggle:checked + .farmer-card .selection-indicator {
-        background: #2ecc71;
-        border-color: #2ecc71;
-        box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
-    }
-    
-    #farmer-toggle:checked + .farmer-card .selection-indicator i {
-        display: none;
-    }
-    
-    /* Specific styling for buyer card when selected */
-    #buyer-toggle:checked + .buyer-card {
-        border-color: #2ecc71;
-        background: linear-gradient(135deg, rgba(46, 204, 113, 0.05), rgba(39, 174, 96, 0.05));
-        box-shadow: 0 5px 20px rgba(46, 204, 113, 0.2);
-    }
-    
-    /* Specific styling for farmer card when selected */
-    #farmer-toggle:checked + .farmer-card {
-        border-color: #2ecc71;
-        background: linear-gradient(135deg, rgba(46, 204, 113, 0.05), rgba(39, 174, 96, 0.05));
-        box-shadow: 0 5px 20px rgba(46, 204, 113, 0.2);
-    }
-    
-    /* Text color changes when selected */
-    #buyer-toggle:checked + .buyer-card .card-content h5,
-    #farmer-toggle:checked + .farmer-card .card-content h5 {
-        color: #2ecc71;
-    }
-    
-    #buyer-toggle:checked + .buyer-card .card-content p,
-    #farmer-toggle:checked + .farmer-card .card-content p {
-        color: #27ae60;
-        font-weight: 500;
-    }
-    
-    #buyer-toggle:checked + .buyer-card .card-content li,
-    #farmer-toggle:checked + .farmer-card .card-content li {
-        color: #2c3e50;
-    }
-    
     .password-strength {
         height: 5px;
         border-radius: 3px;
@@ -674,47 +434,6 @@
             .auth-form {
                 padding: 2rem;
             }
-            
-            .user-type-cards {
-                flex-direction: column;
-                gap: 0.75rem;
-                justify-content: center;
-                align-items: center;
-                max-width: 100%;
-            }
-            
-            .card-wrapper {
-                max-width: 100%;
-                width: 100%;
-            }
-            
-            .user-card {
-                min-height: 160px;
-                padding: 1rem;
-            }
-            
-            .card-icon {
-                width: 50px;
-                height: 50px;
-                margin-bottom: 0.75rem;
-            }
-            
-            .card-icon i {
-                font-size: 1.5rem;
-            }
-            
-            .card-content h5 {
-                font-size: 1.1rem;
-            }
-            
-            .card-content p {
-                font-size: 0.85rem;
-                margin-bottom: 0.75rem;
-            }
-            
-            .card-content li {
-                font-size: 0.75rem;
-            }
         }
 </style>
 {% endblock %}
@@ -728,54 +447,6 @@
                     <div class="auth-form">
                         <h3 id="form-title" tabindex="-1">Create Account</h3>
                         <p class="text-muted mb-4">Join AgriLink and start connecting today</p>
-                        
-                        <!-- User Type Selection -->
-                        <div class="user-type-selection mb-4">
-                            <h4 class="selection-title">I want to join as:</h4>
-                            <div class="user-type-cards">
-                                <div class="card-wrapper">
-                                    <input type="radio" id="buyer-toggle" name="user_type" value="buyer" checked>
-                                    <label for="buyer-toggle" class="user-card buyer-card">
-                                        <div class="card-icon">
-                                            <i class="bi bi-cart3"></i>
-                                        </div>
-                                        <div class="card-content">
-                                            <h5>Buyer</h5>
-                                            <p>Purchase fresh produce directly from farmers</p>
-                                            <ul>
-                                                <li>Access to fresh, local produce</li>
-                                                <li>Direct farmer connections</li>
-                                                <li>Competitive pricing</li>
-                                            </ul>
-                                        </div>
-                                        <div class="selection-indicator">
-                                            <i class="bi bi-check-circle-fill"></i>
-                                        </div>
-                                    </label>
-                                </div>
-                                
-                                <div class="card-wrapper">
-                                    <input type="radio" id="farmer-toggle" name="user_type" value="farmer">
-                                    <label for="farmer-toggle" class="user-card farmer-card">
-                                        <div class="card-icon">
-                                            <i class="bi bi-shop"></i>
-                                        </div>
-                                        <div class="card-content">
-                                            <h5>Farmer</h5>
-                                            <p>Sell your fresh produce to local buyers</p>
-                                            <ul>
-                                                <li>Direct sales to customers</li>
-                                                <li>Fair pricing for your crops</li>
-                                                <li>Local market expansion</li>
-                                            </ul>
-                                        </div>
-                                        <div class="selection-indicator">
-                                            <i class="bi bi-check-circle-fill"></i>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
                         
                         <form method="post" novalidate id="registrationForm">
                             {% csrf_token %}
@@ -847,12 +518,6 @@
                             <button type="submit" class="btn btn-primary btn-register w-100">
                                 <i class="bi bi-person-plus"></i> Create Account
                             </button>
-                        </form>
-                        
-                        <!-- Divider -->
-                        <div class="divider">
-                            <span>Already have an account?</span>
-                        </div>
                         
                         <!-- Login Link -->
                         <a href="{% url 'login' %}" class="btn btn-outline-primary w-100">
@@ -870,10 +535,10 @@
                 
                 <!-- Right Side - Image and Info -->
                 <div class="col-lg-5 d-none d-lg-block" style="padding: 0;">
-                    <div class="auth-image h-100" id="authImage">
-                        <i class="bi bi-cart3" id="authIcon"></i>
-                        <h2 id="authTitle">Join as Buyer</h2>
-                        <p class="lead" id="authDescription">Connect with farmers and sell your produce in your local community. Start your journey in agricultural trade.</p>
+                    <div class="auth-image h-100">
+                        <i class="bi bi-people"></i>
+                        <h2>Welcome to AgriLink</h2>
+                        <p class="lead">Your gateway to fresh, local produce. Connect directly with farmers and discover quality agricultural products.</p>
                         <div class="mt-4">
                             <div class="mb-2">
                                 <i class="bi bi-check-circle me-2"></i> Free to join
@@ -921,6 +586,7 @@
     const strengthBar = document.getElementById('strengthBar');
     const checklistItems = document.querySelectorAll('#pwdChecklist .pwd-check-item');
     const pwdPopover = document.getElementById('pwdPopover');
+    // NOTE: This list is for user experience only. Actual password validation, including checks against common passwords, is performed server-side using Django's password validators.
     const commonPasswords = ['password', '123456', '12345678', 'qwerty', 'abc123', 'letmein', 'welcome', '111111', '123123', 'password1', 'admin'];
 
     function updateChecklist(password) {
@@ -1126,45 +792,6 @@
             clearError('terms');
         }
     });
-    
-    // User type toggle functionality
-    const buyerToggle = document.getElementById('buyer-toggle');
-    const farmerToggle = document.getElementById('farmer-toggle');
-    const userTypeField = document.getElementById('user_type_field');
-    const authImage = document.getElementById('authImage');
-    const authIcon = document.getElementById('authIcon');
-    const authTitle = document.getElementById('authTitle');
-    const authDescription = document.getElementById('authDescription');
-    
-    function updateAuthContent(userType) {
-        if (userType === 'farmer') {
-            authImage.style.background = "linear-gradient(135deg, rgba(46, 204, 113, 0.95), rgba(39, 174, 96, 0.95)), url('https://images.unsplash.com/photo-1574943320219-553eb213f72d?q=80&w=800') center/cover";
-            // Use non-fill variant to ensure glyph exists in current Bootstrap Icons set
-            authIcon.className = "bi bi-shop";
-            authTitle.textContent = "Join as Farmer";
-            authDescription.textContent = "Connect with buyers and showcase your produce. Start your journey in sustainable farming and direct sales.";
-            userTypeField.value = 'farmer';
-        } else {
-            authImage.style.background = "linear-gradient(135deg, rgba(46, 204, 113, 0.95), rgba(39, 174, 96, 0.95)), url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=800') center/cover";
-            // Use non-fill variant to ensure glyph exists in current Bootstrap Icons set
-            authIcon.className = "bi bi-cart3";
-            authTitle.textContent = "Join as Buyer";
-            authDescription.textContent = "Connect with farmers and buy fresh produce in your local community. Start your journey in agricultural trade.";
-            userTypeField.value = 'buyer';
-        }
-
-    }
-    
-    buyerToggle.addEventListener('change', function() {
-        if (this.checked) updateAuthContent('buyer');
-    });
-    
-    farmerToggle.addEventListener('change', function() {
-        if (this.checked) updateAuthContent('farmer');
-    });
-    
-    // Ensure correct initial icon/content on load
-    updateAuthContent(buyerToggle.checked ? 'buyer' : 'farmer');
 </script>
 {% endblock %}
 
