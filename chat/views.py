@@ -100,28 +100,6 @@ def conversation_detail(request, pk):
         'product', 'farmer', 'buyer', 'cancelled_by', 'created_by'
     ).prefetch_related('review').order_by('created_at')
     
-    # Create a combined timeline of messages and deals sorted chronologically
-    timeline = []
-    
-    # Add messages to timeline (only from current page for pagination)
-    for msg in page_obj:
-        timeline.append({
-            'type': 'message',
-            'timestamp': msg.timestamp,
-            'data': msg
-        })
-    
-    # Add deals to timeline
-    for deal in deals:
-        timeline.append({
-            'type': 'deal',
-            'timestamp': deal.created_at,
-            'data': deal
-        })
-    
-    # Sort timeline by timestamp
-    timeline.sort(key=lambda x: x['timestamp'])
-    
     # Check if current user is a farmer (can create offers)
     is_farmer = request.user.is_farmer()
     
@@ -149,7 +127,6 @@ def conversation_detail(request, pk):
         'product': conversation.product,
         'last_message_timestamp': last_message_timestamp,
         'deals': deals,
-        'timeline': timeline,
         'is_farmer': is_farmer,
         'is_product_owner': is_product_owner,
         'farmer_products': list(farmer_products),
