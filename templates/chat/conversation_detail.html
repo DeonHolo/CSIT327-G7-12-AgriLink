@@ -1,14 +1,17 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <style>
     .chat-detail-container {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 2rem 1rem;
-        height: calc(100vh - 100px);
+        padding: 1.5rem 1rem 0;
+        height: calc(100vh - 80px);
+        min-height: calc(100vh - 80px);
         display: flex;
         flex-direction: column;
+        overflow: hidden;
     }
     
     .chat-header {
@@ -19,6 +22,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        flex-shrink: 0;
     }
     
     .chat-user-info {
@@ -72,6 +76,7 @@
         background: white;
         padding: 0;
         border-bottom: 1px solid #e0e0e0;
+        flex-shrink: 0;
     }
     
     .product-info-card {
@@ -108,11 +113,12 @@
     .messages-container {
         flex: 1;
         background: #f5f5f5;
-        padding: 2rem;
+        padding: 1.5rem;
         overflow-y: auto;
         display: flex;
         flex-direction: column;
         gap: 1rem;
+        min-height: 0;
     }
     
     .message {
@@ -186,11 +192,42 @@
         color: white;
     }
     
+    .message-content {
+        position: relative;
+    }
+
     .message-timestamp {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%) translateX(6px);
         font-size: 0.75rem;
         color: #666;
-        margin-top: 0.25rem;
-        padding: 0 0.5rem;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
+        pointer-events: none;
+    }
+
+    .message-content:hover .message-timestamp {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(-50%) translateX(0);
+        transition-delay: 0.25s;
+    }
+
+    .message .message-timestamp {
+        left: calc(100% + 8px);
+    }
+
+    .message.sent .message-timestamp {
+        left: auto;
+        right: calc(100% + 8px);
+        text-align: right;
     }
     
     .message.sent .message-timestamp {
@@ -218,9 +255,13 @@
     
     .message-input-area {
         background: white;
-        padding: 1rem;
-        border-radius: 0 0 16px 16px;
-        box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+        padding: 1rem 1.25rem;
+        border-top: 1px solid #e0e0e0;
+        box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+        position: sticky;
+        bottom: 0;
+        z-index: 5;
+        flex-shrink: 0;
     }
     
     .message-form {
@@ -273,6 +314,542 @@
         color: #666;
         font-size: 0.875rem;
     }
+
+    /* Create Offer Button */
+    .create-offer-btn {
+        padding: 0.75rem 1.25rem;
+        background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .create-offer-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+    }
+
+    /* Deal Card Styles */
+    .deal-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        overflow: hidden;
+        max-width: 400px;
+        margin: 0.5rem 0;
+        align-self: center;
+    }
+    
+    .deal-card-header {
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .deal-card-header .deal-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+    
+    .deal-card.pending .deal-icon {
+        background: #fff3e0;
+        color: #ef6c00;
+    }
+    
+    .deal-card.confirmed .deal-icon {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+    
+    .deal-card.completed .deal-icon {
+        background: #e3f2fd;
+        color: #1565c0;
+    }
+    
+    .deal-card.cancelled .deal-icon,
+    .deal-card.declined .deal-icon {
+        background: #ffebee;
+        color: #c62828;
+    }
+    
+    .deal-card-header-text {
+        flex: 1;
+    }
+    const currentUserAvatar = "{{ user.profile_picture.url|default:''|escapejs }}";
+    .deal-card-title {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.9rem;
+    }
+    
+    .deal-card-subtitle {
+        font-size: 0.75rem;
+        color: #666;
+    }
+    
+    .deal-status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .deal-card.pending .deal-status-badge {
+        background: #fff3e0;
+        color: #ef6c00;
+    }
+    
+    .deal-card.confirmed .deal-status-badge {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+    
+    .deal-card.completed .deal-status-badge {
+        background: #e3f2fd;
+        color: #1565c0;
+    }
+    
+    .deal-card.cancelled .deal-status-badge,
+    .deal-card.declined .deal-status-badge {
+        background: #ffebee;
+        color: #c62828;
+    }
+    
+    .deal-card-body {
+        padding: 1rem;
+    }
+    
+    .deal-product-info {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .deal-product-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        object-fit: cover;
+        background: #f5f5f5;
+    }
+    
+    .deal-product-image.placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        font-size: 2rem;
+    }
+    
+    .deal-product-details h4 {
+        margin: 0 0 0.25rem 0;
+        font-size: 1rem;
+        color: #333;
+    }
+    
+    .deal-product-details .quantity {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 0.5rem;
+    }
+    
+    .deal-product-details .price {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #2e7d32;
+    }
+    
+    .deal-card-actions {
+        display: flex;
+        gap: 0.5rem;
+        padding: 1rem;
+        border-top: 1px solid #e0e0e0;
+        background: #fafafa;
+    }
+    
+    .deal-card-actions button {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.875rem;
+    }
+    
+    .deal-btn-accept {
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        color: white;
+    }
+    
+    .deal-btn-accept:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+    }
+    
+    .deal-btn-decline {
+        background: #f5f5f5;
+        color: #666;
+    }
+    
+    .deal-btn-decline:hover {
+        background: #e0e0e0;
+    }
+    
+    .deal-btn-cancel {
+        background: #ffebee;
+        color: #c62828;
+    }
+    
+    .deal-btn-cancel:hover {
+        background: #ffcdd2;
+    }
+    
+    .deal-btn-complete {
+        background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+        color: white;
+    }
+    
+    .deal-btn-complete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+    }
+    
+    .deal-waiting-label {
+        flex: 1;
+        text-align: center;
+        padding: 0.75rem;
+        color: #666;
+        font-style: italic;
+    }
+    
+    .deal-card.completed,
+    .deal-card.cancelled,
+    .deal-card.declined {
+        opacity: 0.8;
+    }
+    
+    .deal-card.confirmed {
+        border: 2px solid #4CAF50;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 1rem;
+    }
+    
+    .modal-overlay.active {
+        display: flex;
+    }
+    
+    .modal-content {
+        background: white;
+        border-radius: 16px;
+        max-width: 500px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .modal-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        color: #333;
+    }
+    
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #666;
+        cursor: pointer;
+        padding: 0.25rem;
+        line-height: 1;
+    }
+    
+    .modal-close:hover {
+        color: #333;
+    }
+    
+    .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+    }
+
+    /* Form Styles */
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .form-group select,
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: border-color 0.2s;
+    }
+    
+    .form-group select:focus,
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #4CAF50;
+    }
+    
+    .quantity-input-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .quantity-btn {
+        width: 40px;
+        height: 40px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        background: white;
+        font-size: 1.25rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+    
+    .quantity-btn:hover {
+        background: #f5f5f5;
+        border-color: #4CAF50;
+    }
+    
+    .quantity-input-group input {
+        flex: 1;
+        text-align: center;
+        font-weight: 600;
+    }
+    
+    .price-display {
+        background: #e8f5e9;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+    
+    .price-display .label {
+        font-size: 0.875rem;
+        color: #666;
+        margin-bottom: 0.25rem;
+    }
+    
+    .price-display .amount {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2e7d32;
+    }
+    
+    .price-override {
+        margin-top: 0.75rem;
+        text-align: left !important;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100% !important;
+        align-self: stretch !important;
+        margin-left: 0 !important;
+        gap: 0.5rem;
+    }
+    
+    .form-group .price-override label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        justify-content: flex-start;
+        width: auto;
+        margin: 0 !important;
+        margin-bottom: 0 !important;
+        font-weight: normal;
+        color: #666;
+        cursor: pointer;
+        text-align: left !important;
+    }
+    
+    .form-group .price-override label input[type="checkbox"] {
+        margin: 0;
+        flex-shrink: 0;
+        width: auto !important;
+        min-width: auto !important;
+    }
+
+    /* Cancel modal sizing */
+    #cancelDealModal .modal-content {
+        max-width: 420px;
+        padding: 1.5rem;
+    }
+    #cancelDealModal .modal-header h3 {
+        font-size: 1.05rem;
+    }
+    #cancelDealModal .modal-body p {
+        font-size: 0.95rem;
+        line-height: 1.45;
+    }
+
+    /* Star Rating Styles */
+    .star-rating {
+        display: flex;
+        gap: 0.25rem;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+    
+    .star-rating input {
+        display: none;
+    }
+    
+    .star-rating label {
+        font-size: 2rem;
+        color: #ddd;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating input:checked ~ label {
+        color: #ffc107;
+    }
+    
+    .review-section {
+        padding: 1.25rem;
+        background: #f9f9f9;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+    }
+    
+    .review-section h4 {
+        margin: 0 0 1rem 0;
+        color: #333;
+        font-size: 1rem;
+    }
+    
+    .review-section textarea {
+        margin-top: 0.75rem;
+    }
+    
+    .btn-primary {
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+    }
+    
+    .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    .btn-secondary {
+        padding: 0.75rem 1.5rem;
+        background: #f5f5f5;
+        color: #666;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-secondary:hover {
+        background: #e0e0e0;
+    }
+
+    /* Stock info */
+    .stock-info {
+        font-size: 0.875rem;
+        color: #666;
+        margin-top: 0.25rem;
+    }
+    
+    .stock-info.low {
+        color: #ef6c00;
+    }
+
+    /* Review display on deal card */
+    .deal-review-summary {
+        padding: 0.75rem 1rem;
+        background: #f5f5f5;
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    .deal-review-summary .stars {
+        color: #ffc107;
+        font-size: 0.875rem;
+    }
+    
+    .deal-review-summary .review-text {
+        font-size: 0.75rem;
+        color: #666;
+        margin-top: 0.25rem;
+    }
 </style>
 
 <div class="chat-detail-container">
@@ -282,18 +859,23 @@
             <a href="{% url 'conversation_list' %}" class="back-link">
                 <i class="bi bi-arrow-left"></i> Back
             </a>
-            <div class="user-avatar">
+            <div class="user-avatar {% if other_user.is_farmer %}farmer-clickable{% endif %}" {% if other_user.is_farmer %}onclick="openFarmerProfileModal({{ other_user.id }})" style="cursor: pointer;"{% endif %}>
                 {% if other_user.profile_picture %}
                 <img src="{{ other_user.profile_picture.url }}" alt="{{ other_user.username }}">
                 {% else %}
                 <i class="bi bi-person"></i>
                 {% endif %}
             </div>
-            <div>
+            <div {% if other_user.is_farmer %}onclick="openFarmerProfileModal({{ other_user.id }})" style="cursor: pointer;"{% endif %} class="{% if other_user.is_farmer %}farmer-clickable{% endif %}">
                 <div class="chat-user-name">{{ other_user.username }}</div>
-                <div class="chat-user-role">{{ other_user.get_user_type_display }}</div>
+                <div class="chat-user-role">{{ other_user.get_user_type_display }}{% if other_user.is_farmer %} <i class="bi bi-chevron-right" style="font-size: 0.75rem;"></i>{% endif %}</div>
             </div>
         </div>
+        {% if is_farmer %}
+        <button type="button" class="create-offer-btn" onclick="openCreateOfferModal()">
+            <i class="bi bi-tag"></i> Create Offer
+        </button>
+        {% endif %}
     </div>
     
     <!-- Product Info (if conversation is about a product) -->
@@ -314,7 +896,7 @@
     
     <!-- Messages Container -->
     <div class="messages-container" id="messagesContainer">
-        {% if page_obj.object_list %}
+        {% if page_obj.object_list or deals %}
             {% if page_obj.has_previous %}
             <div class="pagination-info">
                 <a href="?page={{ page_obj.previous_page_number }}" style="color: #4CAF50; text-decoration: none;">
@@ -347,6 +929,101 @@
                 </div>
             </div>
             {% endfor %}
+            
+            <!-- Deal Cards Container -->
+            <div id="dealsContainer">
+                {% for deal in deals %}
+                <div class="deal-card {{ deal.status }}" data-deal-id="{{ deal.id }}" id="deal-{{ deal.id }}">
+                    <div class="deal-card-header">
+                        <div class="deal-icon">
+                            {% if deal.status == 'pending' %}
+                            <i class="bi bi-hourglass-split"></i>
+                            {% elif deal.status == 'confirmed' %}
+                            <i class="bi bi-check-circle"></i>
+                            {% elif deal.status == 'completed' %}
+                            <i class="bi bi-trophy"></i>
+                            {% else %}
+                            <i class="bi bi-x-circle"></i>
+                            {% endif %}
+                        </div>
+                        <div class="deal-card-header-text">
+                            <div class="deal-card-title">
+                                {% if deal.status == 'pending' %}Offer from {{ deal.farmer.username }}
+                                {% elif deal.status == 'confirmed' %}Order Confirmed - Ready for Pickup
+                                {% elif deal.status == 'completed' %}Transaction Completed
+                                {% elif deal.status == 'cancelled' %}Cancelled by {{ deal.cancelled_by.username }}
+                                {% else %}Declined
+                                {% endif %}
+                            </div>
+                            <div class="deal-card-subtitle">{{ deal.created_at|date:"M d, Y g:i A" }}</div>
+                        </div>
+                        <span class="deal-status-badge">{{ deal.get_status_display }}</span>
+                    </div>
+                    <div class="deal-card-body">
+                        <div class="deal-product-info">
+                            {% if deal.product.image %}
+                            <img src="{{ deal.product.image.url }}" alt="{{ deal.product.name }}" class="deal-product-image">
+                            {% else %}
+                            <div class="deal-product-image placeholder">
+                                <i class="bi bi-box"></i>
+                            </div>
+                            {% endif %}
+                            <div class="deal-product-details">
+                                <h4>{{ deal.product.name }}</h4>
+                                <div class="quantity">{{ deal.quantity }} {{ deal.product.unit }}</div>
+                                <div class="price">₱{{ deal.total_price }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if deal.status == 'pending' %}
+                    <div class="deal-card-actions">
+                        {% if user == deal.buyer %}
+                        <button class="deal-btn-accept" onclick="acceptDeal({{ deal.id }})">
+                            <i class="bi bi-check-lg"></i> Accept Deal
+                        </button>
+                        <button class="deal-btn-decline" onclick="declineDeal({{ deal.id }})">
+                            <i class="bi bi-x-lg"></i> Decline
+                        </button>
+                        {% else %}
+                        <span class="deal-waiting-label">
+                            <i class="bi bi-hourglass-split"></i> Waiting for {{ deal.buyer.username }}...
+                        </span>
+                        <button class="deal-btn-cancel" onclick="cancelDeal({{ deal.id }})">
+                            Cancel Offer
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% elif deal.status == 'confirmed' %}
+                    <div class="deal-card-actions">
+                        {% if user == deal.buyer %}
+                        <button class="deal-btn-complete" onclick="completeDeal({{ deal.id }})">
+                            <i class="bi bi-bag-check"></i> I Received My Order
+                        </button>
+                        <button class="deal-btn-cancel" onclick="cancelDeal({{ deal.id }})">
+                            Cancel Order
+                        </button>
+                        {% else %}
+                        <span class="deal-waiting-label">
+                            <i class="bi bi-clock-history"></i> Waiting for Pickup...
+                        </span>
+                        <button class="deal-btn-cancel" onclick="cancelDeal({{ deal.id }})">
+                            Cancel Order
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% elif deal.status == 'completed' and deal.is_reviewed %}
+                    <div class="deal-review-summary">
+                        <div class="stars">
+                            {% with deal.review as review %}
+                            <i class="bi bi-star-fill"></i> Seller: {{ review.seller_rating }}/5 | Product: {{ review.product_rating }}/5
+                            {% endwith %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
             
             {% if page_obj.has_next %}
             <div class="pagination-info">
@@ -383,31 +1060,183 @@
     </div>
 </div>
 
+<!-- Create Offer Modal -->
+<div class="modal-overlay" id="createOfferModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="bi bi-tag"></i> Create Offer</h3>
+            <button class="modal-close" onclick="closeCreateOfferModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="createOfferForm">
+                <div class="form-group">
+                    <label>Product</label>
+                    <div class="d-flex justify-between align-center" style="gap: 0.5rem; margin-bottom: 0.25rem;">
+                        <div style="font-weight: 700;" id="productDisplay">
+                            {% if product %}{{ product.name }}{% else %}No product linked{% endif %}
+                        </div>
+                        <div style="color: #4CAF50; font-weight: 600;" id="productPriceDisplay">
+                            {% if product %}₱{{ product.price }}/{{ product.unit }}{% else %}--{% endif %}
+                        </div>
+                    </div>
+                    <div class="stock-info" id="stockInfo"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <div class="quantity-input-group">
+                        <button type="button" class="quantity-btn" onclick="adjustQuantity(-1)">-</button>
+                        <input type="number" id="quantityInput" min="1" value="1" required onchange="calculateTotal()">
+                        <button type="button" class="quantity-btn" onclick="adjustQuantity(1)">+</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="price-display">
+                        <div class="label">Total Price</div>
+                        <div class="amount" id="totalPriceDisplay">₱0.00</div>
+                    </div>
+                    <div class="price-override">
+                        <label>
+                            <input type="checkbox" id="overridePrice" onchange="togglePriceOverride()">
+                            Override price (for discount)
+                        </label>
+                        <input type="number" id="customPriceInput" step="0.01" min="0.01" 
+                               style="display: none; margin-top: 0.5rem;" 
+                               placeholder="Enter custom price"
+                               onchange="updateCustomPrice()">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="closeCreateOfferModal()">Cancel</button>
+            <button type="button" class="btn-primary" id="sendOfferBtn" onclick="sendOffer()">
+                <i class="bi bi-send"></i> Send Offer
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Review Modal -->
+<div class="modal-overlay" id="reviewModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="bi bi-star"></i> How was your order?</h3>
+            <button class="modal-close" onclick="closeReviewModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="reviewForm">
+                <input type="hidden" id="reviewDealId">
+                
+                <div class="review-section">
+                    <h4><i class="bi bi-person"></i> How was the service from <span id="reviewFarmerName"></span>?</h4>
+                    <div class="star-rating" id="sellerRating">
+                        <input type="radio" name="seller_rating" id="seller5" value="5">
+                        <label for="seller5"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="seller_rating" id="seller4" value="4">
+                        <label for="seller4"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="seller_rating" id="seller3" value="3">
+                        <label for="seller3"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="seller_rating" id="seller2" value="2">
+                        <label for="seller2"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="seller_rating" id="seller1" value="1">
+                        <label for="seller1"><i class="bi bi-star-fill"></i></label>
+                    </div>
+                    <textarea id="sellerComment" placeholder="Share your experience with the seller (optional)" rows="3"></textarea>
+                </div>
+                
+                <div class="review-section">
+                    <h4><i class="bi bi-box"></i> How was the <span id="reviewProductName"></span>?</h4>
+                    <div class="star-rating" id="productRating">
+                        <input type="radio" name="product_rating" id="product5" value="5">
+                        <label for="product5"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="product_rating" id="product4" value="4">
+                        <label for="product4"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="product_rating" id="product3" value="3">
+                        <label for="product3"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="product_rating" id="product2" value="2">
+                        <label for="product2"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="product_rating" id="product1" value="1">
+                        <label for="product1"><i class="bi bi-star-fill"></i></label>
+                    </div>
+                    <textarea id="productComment" placeholder="Share your thoughts about the product quality (optional)" rows="3"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="closeReviewModal()">Skip</button>
+            <button type="button" class="btn-primary" id="submitReviewBtn" onclick="submitReview()" disabled>
+                <i class="bi bi-check-lg"></i> Submit Review
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Deal Modal -->
+<div class="modal-overlay" id="cancelDealModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="bi bi-x-circle"></i> Cancel Offer</h3>
+            <button class="modal-close" onclick="closeCancelDealModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-weight:600; color:#333;">Are you sure you want to cancel this offer?</p>
+            <p style="color:#666;">Stock will be restored and the buyer will see this offer as cancelled.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal-cancel" onclick="closeCancelDealModal()">Keep Offer</button>
+            <button class="btn-modal-save" id="confirmCancelDealBtn" onclick="confirmCancelDeal()">
+                <i class="bi bi-x-circle"></i> Cancel Offer
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
-    // Track last message timestamp for polling
-    let lastMessageTimestamp = '{{ last_message_timestamp|default:"" }}';
+    // Configuration
     const currentUserId = {{ user.id }};
     const conversationId = {{ conversation.pk }};
+    const csrfToken = '{{ csrf_token }}';
+    const isFarmer = {{ is_farmer|yesno:"true,false" }};
+    
+    // Selected product comes from the current conversation product
+    let selectedProduct = {% if product %}{
+        id: {{ product.id }},
+        name: "{{ product.name|escapejs }}",
+        price: {{ product.price|default:0 }},
+        unit: "{{ product.unit|escapejs }}",
+        stock: {{ product.stock_quantity|default:0 }}
+    }{% else %}null{% endif %};
+    let calculatedTotal = 0;
+    
+    // Track last message timestamp for polling
+    let lastMessageTimestamp = '{{ last_message_timestamp|default:"" }}';
     const currentUserAvatar = "{{ user.profile_picture.url|default:'' }}";
     const otherUserAvatar = "{{ other_user.profile_picture.url|default:'' }}";
+    
+    // Track displayed messages and deals
+    let displayedMessageIds = new Set();
+    let displayedDealIds = new Set();
+    let pendingCancelDealId = null;
+    
+    // Initialize displayed deals
+    {% for deal in deals %}
+    displayedDealIds.add({{ deal.id }});
+    {% endfor %}
     
     // Auto-scroll to bottom on page load
     document.addEventListener('DOMContentLoaded', function() {
         const container = document.getElementById('messagesContainer');
         container.scrollTop = container.scrollHeight;
 
-        // Auto-resize textarea functionality (Facebook Messenger style)
+        // Auto-resize textarea functionality
         const textarea = document.getElementById('messageInput');
         function autoResizeTextarea() {
-            // Set height to 'auto' first to shrink when text is deleted
             textarea.style.height = 'auto';
-
-            // Then set height to scrollHeight to fit content
             const scrollHeight = textarea.scrollHeight;
             textarea.style.height = scrollHeight + 'px';
-
-            // Ensure height doesn't exceed max-height
-            const maxHeight = 120; // 120px as specified
+            const maxHeight = 120;
             if (scrollHeight > maxHeight) {
                 textarea.style.height = maxHeight + 'px';
                 textarea.style.overflowY = 'auto';
@@ -415,43 +1244,45 @@
                 textarea.style.overflowY = 'hidden';
             }
         }
-
-        // Listen for input events to resize
         textarea.addEventListener('input', autoResizeTextarea);
-
-        // Initial resize to set proper height
         autoResizeTextarea();
 
-        // Start polling for new messages
+        // Start polling
         startPolling();
         
-        // Add Enter key listener for message input
+        // Enter key listener
         const messageInput = document.getElementById('messageInput');
         messageInput.addEventListener('keydown', function(e) {
-            // Submit form when Enter is pressed (without Shift)
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 document.getElementById('messageForm').dispatchEvent(new Event('submit', {cancelable: true}));
             }
-            // Shift+Enter creates a new line (default behavior)
+        });
+        
+        // Populate products dropdown if farmer
+        if (isFarmer) {
+            populateProductsDropdown();
+        }
+        
+        // Review form rating listeners
+        document.querySelectorAll('#sellerRating input, #productRating input').forEach(input => {
+            input.addEventListener('change', validateReviewForm);
         });
     });
     
-    // Auto-scroll to bottom
+    // ==================== MESSAGE FUNCTIONS ====================
+    
     function scrollToBottom() {
         const container = document.getElementById('messagesContainer');
         container.scrollTop = container.scrollHeight;
     }
     
-    // Append new message to DOM
     function appendMessage(messageData) {
-        // Mark message as displayed to prevent duplicates
         displayedMessageIds.add(messageData.id);
-        
         const container = document.getElementById('messagesContainer');
+        const dealsContainer = document.getElementById('dealsContainer');
         const isSent = messageData.sender_id === currentUserId;
         
-        // Create message HTML
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
         const avatarUrl = isSent ? currentUserAvatar : otherUserAvatar;
@@ -470,72 +1301,71 @@
         }
         
         messageDiv.innerHTML = `
-            <div class="message-avatar">
-                ${avatarHtml}
-            </div>
+            <div class="message-avatar">${avatarHtml}</div>
             <div class="message-content">
                 ${messageBadge}
-                <div class="message-bubble">
-                    ${escapeHtml(messageData.content)}
-                </div>
-                <div class="message-timestamp">
-                    ${messageData.timestamp_display}
-                </div>
+                <div class="message-bubble">${escapeHtml(messageData.content)}</div>
+                <div class="message-timestamp">${messageData.timestamp_display}</div>
             </div>
         `;
         
-        container.appendChild(messageDiv);
+        // Insert before deals container
+        if (dealsContainer) {
+            container.insertBefore(messageDiv, dealsContainer);
+        } else {
+            container.appendChild(messageDiv);
+        }
         scrollToBottom();
-        
-        // Update last message timestamp
         lastMessageTimestamp = messageData.timestamp;
     }
     
-    // Escape HTML to prevent XSS
     function escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
     
-    // Track messages that have been displayed to prevent duplicates
-    let displayedMessageIds = new Set();
-    
-    // Poll for new messages
     function startPolling() {
         setInterval(function() {
-            if (!lastMessageTimestamp) return;
+            // Poll for new messages
+            if (lastMessageTimestamp) {
+                fetch(`/chat/${conversationId}/messages/new/${encodeURIComponent(lastMessageTimestamp)}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.messages && data.messages.length > 0) {
+                            data.messages.forEach(msg => {
+                                if (!displayedMessageIds.has(msg.id)) {
+                                    appendMessage(msg);
+                                }
+                            });
+                        }
+                    })
+                    .catch(error => console.error('Polling error:', error));
+            }
             
-            fetch(`/chat/${conversationId}/messages/new/${encodeURIComponent(lastMessageTimestamp)}/`)
+            // Poll for deal updates
+            fetch(`/chat/${conversationId}/deals/`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.success && data.messages && data.messages.length > 0) {
-                        data.messages.forEach(msg => {
-                            // Only append if we haven't displayed this message yet
-                            if (!displayedMessageIds.has(msg.id)) {
-                                appendMessage(msg);
-                            }
+                    if (data.success && data.deals) {
+                        data.deals.forEach(deal => {
+                            updateOrCreateDealCard(deal);
                         });
                     }
                 })
-                .catch(error => {
-                    console.error('Polling error:', error);
-                });
-        }, 3000); // Poll every 3 seconds
+                .catch(error => console.error('Deal polling error:', error));
+        }, 3000);
     }
     
-    // Handle form submission via AJAX
+    // Handle message form submission
     document.getElementById('messageForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
         const formData = new FormData(this);
         const content = formData.get('content');
         
-        if (!content.trim()) {
-            return;
-        }
+        if (!content.trim()) return;
         
-        // Disable send button to prevent double-sending
         const sendBtn = this.querySelector('.send-btn');
         sendBtn.disabled = true;
         sendBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Sending...';
@@ -543,21 +1373,14 @@
         fetch(this.action, {
             method: 'POST',
             body: formData,
-            headers: {
-                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-            }
+            headers: { 'X-CSRFToken': formData.get('csrfmiddlewaretoken') }
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Clear input
                 document.getElementById('messageInput').value = '';
                 document.getElementById('messageType').value = 'text';
-                
-                // Append message to DOM immediately
                 appendMessage(data.message);
-                
-                // Re-enable send button
                 sendBtn.disabled = false;
                 sendBtn.innerHTML = '<i class="bi bi-send"></i> Send';
             } else {
@@ -573,6 +1396,508 @@
             sendBtn.innerHTML = '<i class="bi bi-send"></i> Send';
         });
     });
+    
+    // ==================== CREATE OFFER FUNCTIONS ====================
+    
+    function openCreateOfferModal() {
+        if (!selectedProduct) {
+            alert('No product is linked to this conversation.');
+            return;
+        }
+        document.getElementById('createOfferModal').classList.add('active');
+        resetOfferForm();
+    }
+    
+    function closeCreateOfferModal() {
+        document.getElementById('createOfferModal').classList.remove('active');
+    }
+    
+    function setSelectedProductInfo() {
+        const stockInfo = document.getElementById('stockInfo');
+        const productDisplay = document.getElementById('productDisplay');
+        const priceDisplay = document.getElementById('productPriceDisplay');
+        const qtyInput = document.getElementById('quantityInput');
+        
+        if (!selectedProduct) {
+            productDisplay.textContent = 'No product linked';
+            priceDisplay.textContent = '--';
+            stockInfo.textContent = '';
+            qtyInput.removeAttribute('max');
+            qtyInput.value = 1;
+            return;
+        }
+        
+        productDisplay.textContent = selectedProduct.name;
+        priceDisplay.textContent = `₱${parseFloat(selectedProduct.price).toFixed(2)}/${selectedProduct.unit}`;
+        stockInfo.textContent = `${selectedProduct.stock} ${selectedProduct.unit} available`;
+        stockInfo.className = selectedProduct.stock < 10 ? 'stock-info low' : 'stock-info';
+        if (selectedProduct.stock > 0) {
+            qtyInput.max = selectedProduct.stock;
+            qtyInput.value = Math.min(parseInt(qtyInput.value) || 1, selectedProduct.stock);
+        } else {
+            qtyInput.removeAttribute('max');
+            qtyInput.value = 1;
+        }
+    }
+    
+    function adjustQuantity(delta) {
+        const input = document.getElementById('quantityInput');
+        let value = parseInt(input.value) + delta;
+        
+        if (selectedProduct) {
+            value = Math.max(1, Math.min(value, selectedProduct.stock));
+        } else {
+            value = Math.max(1, value);
+        }
+        
+        input.value = value;
+        calculateTotal();
+    }
+    
+    function calculateTotal() {
+        if (!selectedProduct) return;
+        
+        const quantity = parseInt(document.getElementById('quantityInput').value) || 1;
+        const unitPrice = parseFloat(selectedProduct.price) || 0;
+        calculatedTotal = unitPrice * quantity;
+        
+        if (!document.getElementById('overridePrice').checked) {
+            document.getElementById('totalPriceDisplay').textContent = `₱${calculatedTotal.toFixed(2)}`;
+        }
+    }
+    
+    function togglePriceOverride() {
+        const customInput = document.getElementById('customPriceInput');
+        const isChecked = document.getElementById('overridePrice').checked;
+        
+        customInput.style.display = isChecked ? 'block' : 'none';
+        
+        if (!isChecked) {
+            customInput.value = '';
+            calculateTotal();
+        }
+    }
+    
+    function updateCustomPrice() {
+        const customPrice = parseFloat(document.getElementById('customPriceInput').value);
+        if (customPrice > 0) {
+            document.getElementById('totalPriceDisplay').textContent = `₱${customPrice.toFixed(2)}`;
+        }
+    }
+    
+    function resetOfferForm() {
+        document.getElementById('quantityInput').value = 1;
+        document.getElementById('overridePrice').checked = false;
+        document.getElementById('customPriceInput').style.display = 'none';
+        document.getElementById('customPriceInput').value = '';
+        document.getElementById('totalPriceDisplay').textContent = '₱0.00';
+        calculatedTotal = 0;
+        setSelectedProductInfo();
+        calculateTotal();
+    }
+    
+    function sendOffer() {
+        if (!selectedProduct) {
+            alert('Please select a product');
+            return;
+        }
+        
+        const quantity = parseInt(document.getElementById('quantityInput').value);
+        if (quantity < 1 || quantity > selectedProduct.stock) {
+            alert('Invalid quantity');
+            return;
+        }
+        
+        let totalPrice = calculatedTotal;
+        if (document.getElementById('overridePrice').checked) {
+            totalPrice = parseFloat(document.getElementById('customPriceInput').value);
+            if (!totalPrice || totalPrice <= 0) {
+                alert('Please enter a valid custom price');
+                return;
+            }
+        }
+        
+        const btn = document.getElementById('sendOfferBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Sending...';
+        
+        fetch(`/chat/${conversationId}/create-offer/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                product_id: selectedProduct.id,
+                quantity: quantity,
+                total_price: totalPrice
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeCreateOfferModal();
+                updateOrCreateDealCard(data.deal);
+                scrollToBottom();
+                
+                // Update local stock for the linked product
+                if (selectedProduct) {
+                    selectedProduct.stock = Math.max(0, selectedProduct.stock - quantity);
+                    setSelectedProductInfo();
+                }
+            } else {
+                alert('Error: ' + (data.error || 'Failed to create offer'));
+            }
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-send"></i> Send Offer';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to create offer. Please try again.');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-send"></i> Send Offer';
+        });
+    }
+    
+    // ==================== DEAL CARD FUNCTIONS ====================
+    
+    function updateOrCreateDealCard(deal) {
+        let card = document.getElementById(`deal-${deal.id}`);
+        
+        if (card) {
+            // Update existing card
+            card.className = `deal-card ${deal.status}`;
+            card.innerHTML = generateDealCardHTML(deal);
+        } else {
+            // Create new card
+            displayedDealIds.add(deal.id);
+            card = document.createElement('div');
+            card.className = `deal-card ${deal.status}`;
+            card.id = `deal-${deal.id}`;
+            card.dataset.dealId = deal.id;
+            card.innerHTML = generateDealCardHTML(deal);
+            
+            const dealsContainer = document.getElementById('dealsContainer');
+            if (dealsContainer) {
+                dealsContainer.appendChild(card);
+            } else {
+                const container = document.getElementById('messagesContainer');
+                const newDealsContainer = document.createElement('div');
+                newDealsContainer.id = 'dealsContainer';
+                newDealsContainer.appendChild(card);
+                container.appendChild(newDealsContainer);
+            }
+        }
+    }
+    
+    function generateDealCardHTML(deal) {
+        const isFarmerView = deal.is_farmer;
+        const isBuyerView = deal.is_buyer;
+        
+        let icon, title;
+        switch(deal.status) {
+            case 'pending':
+                icon = '<i class="bi bi-hourglass-split"></i>';
+                title = `Offer from ${deal.farmer.username}`;
+                break;
+            case 'confirmed':
+                icon = '<i class="bi bi-check-circle"></i>';
+                title = 'Order Confirmed - Ready for Pickup';
+                break;
+            case 'completed':
+                icon = '<i class="bi bi-trophy"></i>';
+                title = 'Transaction Completed';
+                break;
+            case 'cancelled':
+                icon = '<i class="bi bi-x-circle"></i>';
+                title = `Cancelled by ${deal.cancelled_by ? deal.cancelled_by.username : 'user'}`;
+                break;
+            case 'declined':
+                icon = '<i class="bi bi-x-circle"></i>';
+                title = 'Declined';
+                break;
+        }
+        
+        const productImage = deal.product.image 
+            ? `<img src="${deal.product.image}" alt="${deal.product.name}" class="deal-product-image">`
+            : `<div class="deal-product-image placeholder"><i class="bi bi-box"></i></div>`;
+        
+        let actionsHTML = '';
+        if (deal.status === 'pending') {
+            if (isBuyerView) {
+                actionsHTML = `
+                    <div class="deal-card-actions">
+                        <button class="deal-btn-accept" onclick="acceptDeal(${deal.id})">
+                            <i class="bi bi-check-lg"></i> Accept Deal
+                        </button>
+                        <button class="deal-btn-decline" onclick="declineDeal(${deal.id})">
+                            <i class="bi bi-x-lg"></i> Decline
+                        </button>
+                    </div>
+                `;
+            } else {
+                actionsHTML = `
+                    <div class="deal-card-actions">
+                        <span class="deal-waiting-label">
+                            <i class="bi bi-hourglass-split"></i> Waiting for ${deal.buyer.username}...
+                        </span>
+                        <button class="deal-btn-cancel" onclick="cancelDeal(${deal.id})">
+                            Cancel Offer
+                        </button>
+                    </div>
+                `;
+            }
+        } else if (deal.status === 'confirmed') {
+            if (isBuyerView) {
+                actionsHTML = `
+                    <div class="deal-card-actions">
+                        <button class="deal-btn-complete" onclick="completeDeal(${deal.id})">
+                            <i class="bi bi-bag-check"></i> I Received My Order
+                        </button>
+                        <button class="deal-btn-cancel" onclick="cancelDeal(${deal.id})">
+                            Cancel Order
+                        </button>
+                    </div>
+                `;
+            } else {
+                actionsHTML = `
+                    <div class="deal-card-actions">
+                        <span class="deal-waiting-label">
+                            <i class="bi bi-clock-history"></i> Waiting for Pickup...
+                        </span>
+                        <button class="deal-btn-cancel" onclick="cancelDeal(${deal.id})">
+                            Cancel Order
+                        </button>
+                    </div>
+                `;
+            }
+        } else if (deal.status === 'completed' && deal.is_reviewed) {
+            actionsHTML = `
+                <div class="deal-review-summary">
+                    <div class="stars">
+                        <i class="bi bi-star-fill"></i> Seller: ${deal.review.seller_rating}/5 | Product: ${deal.review.product_rating}/5
+                    </div>
+                </div>
+            `;
+        }
+        
+        return `
+            <div class="deal-card-header">
+                <div class="deal-icon">${icon}</div>
+                <div class="deal-card-header-text">
+                    <div class="deal-card-title">${title}</div>
+                    <div class="deal-card-subtitle">${deal.created_at_display}</div>
+                </div>
+                <span class="deal-status-badge">${deal.status_display}</span>
+            </div>
+            <div class="deal-card-body">
+                <div class="deal-product-info">
+                    ${productImage}
+                    <div class="deal-product-details">
+                        <h4>${deal.product.name}</h4>
+                        <div class="quantity">${deal.quantity} ${deal.product.unit}</div>
+                        <div class="price">₱${deal.total_price}</div>
+                    </div>
+                </div>
+            </div>
+            ${actionsHTML}
+        `;
+    }
+    
+    function acceptDeal(dealId) {
+        if (!confirm('Accept this deal? The items will be reserved for you.')) return;
+        
+        fetch(`/chat/deal/${dealId}/accept/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateOrCreateDealCard(data.deal);
+            } else {
+                alert('Error: ' + (data.error || 'Failed to accept deal'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to accept deal. Please try again.');
+        });
+    }
+    
+    function declineDeal(dealId) {
+        if (!confirm('Decline this offer?')) return;
+        
+        fetch(`/chat/deal/${dealId}/decline/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateOrCreateDealCard(data.deal);
+            } else {
+                alert('Error: ' + (data.error || 'Failed to decline deal'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to decline deal. Please try again.');
+        });
+    }
+    
+    function cancelDeal(dealId) {
+        pendingCancelDealId = dealId;
+        document.getElementById('cancelDealModal').classList.add('active');
+    }
+    
+    function closeCancelDealModal() {
+        pendingCancelDealId = null;
+        document.getElementById('cancelDealModal').classList.remove('active');
+        const btn = document.getElementById('confirmCancelDealBtn');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-x-circle"></i> Cancel Offer';
+        }
+    }
+    
+    function confirmCancelDeal() {
+        if (!pendingCancelDealId) {
+            closeCancelDealModal();
+            return;
+        }
+        
+        const btn = document.getElementById('confirmCancelDealBtn');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Cancelling...';
+        }
+        
+        fetch(`/chat/deal/${pendingCancelDealId}/cancel/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateOrCreateDealCard(data.deal);
+                closeCancelDealModal();
+            } else {
+                alert('Error: ' + (data.error || 'Failed to cancel deal'));
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-x-circle"></i> Cancel Offer';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to cancel deal. Please try again.');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-x-circle"></i> Cancel Offer';
+            }
+        });
+    }
+    
+    function completeDeal(dealId) {
+        fetch(`/chat/deal/${dealId}/complete/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateOrCreateDealCard(data.deal);
+                
+                // Open review modal immediately
+                if (data.show_review_modal) {
+                    openReviewModal(data.review_data);
+                }
+            } else {
+                alert('Error: ' + (data.error || 'Failed to complete deal'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to complete deal. Please try again.');
+        });
+    }
+    
+    // ==================== REVIEW MODAL FUNCTIONS ====================
+    
+    function openReviewModal(reviewData) {
+        document.getElementById('reviewDealId').value = reviewData.deal_id;
+        document.getElementById('reviewFarmerName').textContent = reviewData.farmer_name;
+        document.getElementById('reviewProductName').textContent = reviewData.product_name;
+        
+        // Reset form
+        document.querySelectorAll('#reviewForm input[type="radio"]').forEach(r => r.checked = false);
+        document.getElementById('sellerComment').value = '';
+        document.getElementById('productComment').value = '';
+        document.getElementById('submitReviewBtn').disabled = true;
+        
+        document.getElementById('reviewModal').classList.add('active');
+    }
+    
+    function closeReviewModal() {
+        document.getElementById('reviewModal').classList.remove('active');
+    }
+    
+    function validateReviewForm() {
+        const sellerRating = document.querySelector('input[name="seller_rating"]:checked');
+        const productRating = document.querySelector('input[name="product_rating"]:checked');
+        
+        document.getElementById('submitReviewBtn').disabled = !(sellerRating && productRating);
+    }
+    
+    function submitReview() {
+        const dealId = document.getElementById('reviewDealId').value;
+        const sellerRating = document.querySelector('input[name="seller_rating"]:checked')?.value;
+        const productRating = document.querySelector('input[name="product_rating"]:checked')?.value;
+        const sellerComment = document.getElementById('sellerComment').value;
+        const productComment = document.getElementById('productComment').value;
+        
+        if (!sellerRating || !productRating) {
+            alert('Please rate both the seller and the product');
+            return;
+        }
+        
+        const btn = document.getElementById('submitReviewBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Submitting...';
+        
+        fetch(`/chat/deal/${dealId}/review/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                seller_rating: parseInt(sellerRating),
+                seller_comment: sellerComment,
+                product_rating: parseInt(productRating),
+                product_comment: productComment
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeReviewModal();
+                updateOrCreateDealCard(data.deal);
+                alert('Thank you for your review!');
+            } else {
+                alert('Error: ' + (data.error || 'Failed to submit review'));
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check-lg"></i> Submit Review';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to submit review. Please try again.');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-check-lg"></i> Submit Review';
+        });
+    }
 </script>
 {% endblock %}
-

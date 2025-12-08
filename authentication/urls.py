@@ -19,6 +19,9 @@ urlpatterns = [
     path('profile/picture/', views.upload_profile_picture_view, name='upload_profile_picture'),
     path('profile/business-permit/', views.upload_business_permit_view, name='upload_business_permit'),
     
+    # API Endpoints
+    path('api/farmer/<int:user_id>/', views.get_farmer_profile, name='get_farmer_profile'),
+    
     # Staff Dashboard URLs
     path('staff/', staff_views.staff_dashboard, name='staff_dashboard'),
     # Farmer Verification

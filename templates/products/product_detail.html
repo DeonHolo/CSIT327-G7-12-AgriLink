@@ -268,6 +268,142 @@
         color: white;
     }
     
+    .btn-relist {
+        background: #4CAF50;
+        color: white;
+    }
+    
+    /* Product Reviews Styles */
+    .reviews-section {
+        padding: 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-top: 2rem;
+    }
+    
+    .reviews-section h3 {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .rating-summary {
+        background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .rating-big {
+        text-align: center;
+    }
+    
+    .rating-big .number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+    }
+    
+    .rating-big .stars {
+        color: #ffc107;
+        font-size: 1.25rem;
+    }
+    
+    .rating-big .count {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 0.25rem;
+    }
+    
+    .review-item {
+        padding: 1.25rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .review-item:last-child {
+        border-bottom: none;
+    }
+    
+    .review-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .reviewer-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1rem;
+        overflow: hidden;
+    }
+    
+    .reviewer-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .reviewer-info {
+        flex: 1;
+    }
+    
+    .reviewer-name {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .review-date {
+        font-size: 0.8rem;
+        color: #999;
+    }
+    
+    .review-stars {
+        color: #ffc107;
+        font-size: 1rem;
+    }
+    
+    .review-stars .empty {
+        color: #ddd;
+    }
+    
+    .review-comment {
+        color: #555;
+        font-size: 0.95rem;
+        margin-top: 0.5rem;
+        padding-left: 0.5rem;
+        border-left: 3px solid #e0e0e0;
+    }
+    
+    .review-quantity {
+        font-size: 0.8rem;
+        color: #888;
+        margin-top: 0.5rem;
+    }
+    
+    .empty-reviews {
+        text-align: center;
+        padding: 2rem;
+        color: #999;
+    }
+    
+    .empty-reviews i {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
     @media (max-width: 768px) {
         .product-layout {
             grid-template-columns: 1fr;
@@ -369,9 +505,15 @@
                     <a href="{% url 'product_edit' product.pk %}" class="btn-edit">
                         <i class="bi bi-pencil"></i> Edit Product
                     </a>
-                    <a href="{% url 'product_delete' product.pk %}" class="btn-delete">
+                    {% if product.is_active %}
+                    <a href="#" class="btn-delete" onclick="event.preventDefault(); openUnlistModal();">
                         <i class="bi bi-eye-slash"></i> Unlist Product
                     </a>
+                    {% else %}
+                    <a href="#" class="btn-delete btn-relist" onclick="event.preventDefault(); openRelistModal();">
+                        <i class="bi bi-arrow-clockwise"></i> Relist Product
+                    </a>
+                    {% endif %}
                 </div>
                 {% else %}
                 <a href="{% url 'start_conversation' product.pk %}" class="btn-primary">
@@ -387,10 +529,75 @@
         <h3><i class="bi bi-file-text"></i> Product Description</h3>
         <p>{{ product.description }}</p>
     </div>
+    
+    <!-- Product Reviews Section -->
+    <div class="reviews-section">
+        <h3><i class="bi bi-star"></i> Product Reviews</h3>
+        
+        {% if product.rating_count > 0 %}
+        <div class="rating-summary">
+            <div class="rating-big">
+                <div class="number">{{ product.average_rating|floatformat:1 }}</div>
+                <div class="stars">
+                    {% with avg=product.average_rating|floatformat:0|add:0 %}
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= avg %}
+                        <i class="bi bi-star-fill"></i>
+                        {% else %}
+                        <i class="bi bi-star-fill empty"></i>
+                        {% endif %}
+                    {% endfor %}
+                    {% endwith %}
+                </div>
+                <div class="count">{{ product.rating_count }} review{{ product.rating_count|pluralize }}</div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if product_reviews %}
+            {% for review in product_reviews %}
+            <div class="review-item">
+                <div class="review-header">
+                    <div class="reviewer-avatar">
+                        {% if review.reviewer.profile_picture %}
+                        <img src="{{ review.reviewer.profile_picture.url }}" alt="{{ review.reviewer.username }}">
+                        {% else %}
+                        <i class="bi bi-person"></i>
+                        {% endif %}
+                    </div>
+                    <div class="reviewer-info">
+                        <div class="reviewer-name">{{ review.reviewer.username }}</div>
+                        <div class="review-date">{{ review.created_at|date:"M d, Y" }}</div>
+                    </div>
+                    <div class="review-stars">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= review.product_rating %}
+                            <i class="bi bi-star-fill"></i>
+                            {% else %}
+                            <i class="bi bi-star-fill empty"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% if review.product_comment %}
+                <div class="review-comment">{{ review.product_comment }}</div>
+                {% endif %}
+                <div class="review-quantity">
+                    <i class="bi bi-bag"></i> Purchased {{ review.deal.quantity }} {{ product.unit }}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="empty-reviews">
+            <i class="bi bi-star"></i>
+            <p>No reviews yet. Be the first to purchase and review this product!</p>
+        </div>
+        {% endif %}
+    </div>
 
     <!-- Farmer/Seller Section -->
     <div class="farmer-section">
-        <div class="farmer-header">
+        <div class="farmer-header farmer-clickable" style="cursor: pointer;" onclick="openFarmerProfileModal({{ product.farmer.id }})">
             <div class="farmer-avatar">
                 {% if product.farmer.profile_picture %}
                 <img src="{{ product.farmer.profile_picture.url }}" alt="{{ product.farmer.get_full_name|default:product.farmer.username }}">
@@ -402,6 +609,9 @@
                 <h3>{{ product.farmer.username }}</h3>
                 <p><i class="bi bi-shield-check"></i> {{ product.farmer.get_user_type_display }}</p>
                 <p style="color: #4CAF50;"><i class="bi bi-box-seam"></i> {{ farmer_active_products_count }} active listing{{ farmer_active_products_count|pluralize }}</p>
+            </div>
+            <div style="margin-left: auto; color: #4CAF50;">
+                <i class="bi bi-chevron-right"></i>
             </div>
         </div>
     </div>
@@ -434,5 +644,229 @@
     </div>
     {% endif %}
 </div>
+{% if user == product.farmer %}
+<style>
+    /* Unlist modal (reuses existing modal styles) */
+    #unlistModal.modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        align-items: center;
+        justify-content: center;
+        z-index: 1100;
+        padding: 1rem;
+        box-sizing: border-box;
+    }
+    #unlistModal.modal-overlay.active {
+        display: flex;
+    }
+    #unlistModal .modal-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        max-width: 420px;
+        width: 100%;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+    }
+    #unlistModal .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+    }
+    #unlistModal .modal-header h3 {
+        margin: 0;
+        font-size: 1.15rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    #unlistModal .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+    }
+    #unlistModal .modal-body p {
+        margin: 0 0 0.75rem 0;
+        color: #555;
+    }
+    #unlistModal .modal-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+    #unlistModal .btn-modal-cancel,
+    #unlistModal .btn-modal-confirm {
+        flex: 1;
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        border: none;
+    }
+    #unlistModal .btn-modal-cancel {
+        background: #f5f5f5;
+        color: #555;
+    }
+    #unlistModal .btn-modal-confirm {
+        background: #f44336;
+        color: white;
+    }
+</style>
+
+<div class="modal-overlay" id="unlistModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3><i class="bi bi-eye-slash"></i> Unlist Product</h3>
+            <button class="modal-close" type="button" onclick="closeUnlistModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-weight:600;">Unlist "{{ product.name }}"?</p>
+            <p style="color:#555;">Buyers will no longer see this listing until you relist it.</p>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn-modal-cancel" onclick="closeUnlistModal()">Cancel</button>
+            <button type="button" class="btn-modal-confirm" onclick="confirmUnlist()">Unlist</button>
+        </div>
+    </div>
+</div>
+
+<form id="unlistForm" method="post" action="{% url 'product_delete' product.pk %}" style="display: none;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="unlist">
+</form>
+
+<!-- Relist Modal -->
+<style>
+    #relistModal.modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        align-items: center;
+        justify-content: center;
+        z-index: 1100;
+        padding: 1rem;
+        box-sizing: border-box;
+    }
+    #relistModal.modal-overlay.active {
+        display: flex;
+    }
+    #relistModal .modal-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        max-width: 420px;
+        width: 100%;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+    }
+    #relistModal .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+    }
+    #relistModal .modal-header h3 {
+        margin: 0;
+        font-size: 1.15rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    #relistModal .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+    }
+    #relistModal .modal-body p {
+        margin: 0 0 0.75rem 0;
+        color: #555;
+    }
+    #relistModal .modal-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+    #relistModal .btn-modal-cancel,
+    #relistModal .btn-modal-confirm {
+        flex: 1;
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        border: none;
+    }
+    #relistModal .btn-modal-cancel {
+        background: #f5f5f5;
+        color: #555;
+    }
+    #relistModal .btn-modal-confirm {
+        background: #4CAF50;
+        color: white;
+    }
+</style>
+
+<div class="modal-overlay" id="relistModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3><i class="bi bi-arrow-clockwise"></i> Relist Product</h3>
+            <button class="modal-close" type="button" onclick="closeRelistModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to relist "<strong>{{ product.name }}</strong>"?</p>
+            <p style="font-size: 0.9rem; color: #666;">This will make your product visible to buyers again.</p>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn-modal-cancel" onclick="closeRelistModal()">Cancel</button>
+            <button type="button" class="btn-modal-confirm" onclick="confirmRelist()">Relist</button>
+        </div>
+    </div>
+</div>
+
+<form id="relistForm" method="post" action="{% url 'product_delete' product.pk %}" style="display: none;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="relist">
+</form>
+
+<script>
+function openUnlistModal() {
+    const modal = document.getElementById('unlistModal');
+    if (modal) modal.classList.add('active');
+}
+function closeUnlistModal() {
+    const modal = document.getElementById('unlistModal');
+    if (modal) modal.classList.remove('active');
+}
+function confirmUnlist() {
+    const form = document.getElementById('unlistForm');
+    if (form) form.submit();
+}
+function openRelistModal() {
+    const modal = document.getElementById('relistModal');
+    if (modal) modal.classList.add('active');
+}
+function closeRelistModal() {
+    const modal = document.getElementById('relistModal');
+    if (modal) modal.classList.remove('active');
+}
+function confirmRelist() {
+    const form = document.getElementById('relistForm');
+    if (form) form.submit();
+}
+</script>
+{% endif %}
 {% endblock %}
 

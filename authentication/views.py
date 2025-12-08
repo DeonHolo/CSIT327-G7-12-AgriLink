@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.db.models import Prefetch
 from django.utils import timezone
+from django.http import JsonResponse
 from .forms import RegistrationForm, PasswordChangeForm, ProfilePictureForm, NotificationPreferencesForm
 from .models import User
 import os
@@ -127,6 +128,17 @@ def home_view(request):
     # Featured and top products for highlights section (3 each)
     featured_products = all_active_products.filter(is_featured=True)[:3]
     top_products = all_active_products.order_by('-total_sales')[:3]
+
+    # Merge featured/top into a single list with flags to avoid duplicates
+    highlight_map = {}
+    for p in featured_products:
+        highlight_map[p.id] = {'product': p, 'is_featured': True, 'is_top': False}
+    for p in top_products:
+        if p.id not in highlight_map:
+            highlight_map[p.id] = {'product': p, 'is_featured': False, 'is_top': True}
+        else:
+            highlight_map[p.id]['is_top'] = True
+    highlight_products = list(highlight_map.values())
     
     # Recent conversations for both roles
     recent_conversations = Conversation.objects.filter(
@@ -154,6 +166,7 @@ def home_view(request):
         'title': 'Dashboard - AgriLink',
         'featured_products': featured_products,
         'top_products': top_products,
+        'highlight_products': highlight_products,
         'recent_conversations': recent_conversation_data,
         'unread_messages': unread_messages,
     }
@@ -220,8 +233,17 @@ def profile_view(request):
     # Get activity history
     # Products (for farmers)
     products = []
+    seller_reviews = []
     if user.is_farmer():
         products = user.products.all().order_by('-created_at')[:10]
+        
+        # Get seller reviews (reviews on deals where this user was the farmer)
+        from chat.models import Review
+        seller_reviews = Review.objects.filter(
+            deal__farmer=user
+        ).select_related(
+            'deal__product', 'reviewer', 'deal'
+        ).order_by('-created_at')[:10]
     
     # Saved calculations
     calculations = user.calculations.all().order_by('-created_at')[:10]
@@ -237,6 +259,7 @@ def profile_view(request):
         'products': products,
         'calculations': calculations,
         'recent_messages': recent_messages,
+        'seller_reviews': seller_reviews,
     }
     return render(request, 'authentication/profile.html', context)
 
@@ -506,3 +529,65 @@ def logout_all_sessions_view(request):
         'You have been logged out from all sessions. Please log in again.'
     )
     return redirect('login')
+
+
+def get_farmer_profile(request, user_id):
+    """
+    API endpoint to get farmer profile data with reviews.
+    Returns JSON with farmer info, rating summary, and recent reviews.
+    """
+    farmer = get_object_or_404(User, pk=user_id)
+    
+    # Check if the user is a farmer
+    if not farmer.is_farmer():
+        return JsonResponse({'error': 'User is not a farmer'}, status=404)
+    
+    # Get recent seller reviews
+    from chat.models import Review
+    from products.models import Product
+    
+    reviews = Review.objects.filter(
+        deal__farmer=farmer
+    ).select_related(
+        'deal__product', 'reviewer'
+    ).order_by('-created_at')[:5]
+    
+    reviews_data = []
+    for review in reviews:
+        reviews_data.append({
+            'id': review.id,
+            'reviewer_name': review.reviewer.username,
+            'reviewer_avatar': review.reviewer.profile_picture.url if review.reviewer.profile_picture else None,
+            'seller_rating': review.seller_rating,
+            'seller_comment': review.seller_comment,
+            'product_name': review.deal.product.name,
+            'quantity': review.deal.quantity,
+            'unit': review.deal.product.unit,
+            'created_at': review.created_at.strftime('%b %d, %Y'),
+        })
+    
+    # Get active products count
+    active_products_count = Product.objects.filter(
+        farmer=farmer,
+        is_active=True
+    ).count()
+    
+    # Build response
+    data = {
+        'success': True,
+        'farmer': {
+            'id': farmer.id,
+            'username': farmer.username,
+            'full_name': farmer.get_full_name() or farmer.username,
+            'profile_picture': farmer.profile_picture.url if farmer.profile_picture else None,
+            'user_type': farmer.get_user_type_display(),
+            'is_verified': farmer.business_permit_status == 'approved',
+            'average_rating': float(farmer.average_farmer_rating),
+            'rating_count': farmer.farmer_rating_count,
+            'active_products_count': active_products_count,
+            'member_since': farmer.created_at.strftime('%b %Y'),
+        },
+        'reviews': reviews_data,
+    }
+    
+    return JsonResponse(data)

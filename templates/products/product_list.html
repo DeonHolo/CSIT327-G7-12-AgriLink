@@ -573,7 +573,7 @@
                     <div class="product-name">{{ product.name }}</div>
                     <div class="product-price">₱{{ product.price|floatformat:"-2"|intcomma }}<span style="font-size: 0.875rem; font-weight: 400;">/ {{ product.unit }}</span></div>
                     <div class="product-meta">
-                        <div class="product-farmer">
+                        <div class="product-farmer farmer-clickable" onclick="openFarmerProfileModal({{ product.farmer.id }}); event.preventDefault(); event.stopPropagation();">
                             <i class="bi bi-person-circle"></i>
                             {{ product.farmer.username }}
                         </div>
