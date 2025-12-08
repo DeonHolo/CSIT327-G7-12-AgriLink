@@ -4,15 +4,42 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.db.models import Q, Max, Count, Prefetch
 from django.core.paginator import Paginator
-from django.db import transaction
+from django.db import transaction, OperationalError
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django.core.cache import cache
 from decimal import Decimal
 from datetime import timedelta
 import json
+import time
+import functools
 from .models import Conversation, Message, Deal, Review
 from products.models import Product
+
+
+def retry_on_db_lock(max_retries=3, delay=0.1):
+    """
+    Decorator to retry database operations on SQLite lock errors.
+    Uses exponential backoff between retries.
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            last_exception = None
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except OperationalError as e:
+                    if 'database is locked' in str(e).lower():
+                        last_exception = e
+                        # Exponential backoff: 0.1s, 0.2s, 0.4s
+                        time.sleep(delay * (2 ** attempt))
+                    else:
+                        raise
+            # All retries exhausted
+            raise last_exception
+        return wrapper
+    return decorator
 
 # Typing indicator timeout in seconds
 TYPING_TIMEOUT = 3
@@ -139,6 +166,7 @@ def conversation_detail(request, pk):
 
 
 @login_required
+@retry_on_db_lock(max_retries=5, delay=0.1)
 def message_send(request, pk):
     """
     Handle message sending (AJAX endpoint)
@@ -395,6 +423,7 @@ def get_farmer_products(request, pk):
 
 @login_required
 @require_POST
+@retry_on_db_lock(max_retries=5, delay=0.1)
 def create_offer(request, pk):
     """
     Any farmer in the conversation can create a deal offer.
@@ -493,6 +522,7 @@ def create_offer(request, pk):
 
 @login_required
 @require_POST
+@retry_on_db_lock(max_retries=5, delay=0.1)
 def accept_deal(request, deal_id):
     """
     Offer recipient accepts a deal offer. Reserves stock atomically.
@@ -545,6 +575,7 @@ def accept_deal(request, deal_id):
 
 @login_required
 @require_POST
+@retry_on_db_lock(max_retries=5, delay=0.1)
 def decline_deal(request, deal_id):
     """
     Offer recipient declines a deal offer.
@@ -574,6 +605,7 @@ def decline_deal(request, deal_id):
 
 @login_required
 @require_POST
+@retry_on_db_lock(max_retries=5, delay=0.1)
 def cancel_deal(request, deal_id):
     """
     Cancel a deal. Farmer can cancel pending offers.
@@ -611,6 +643,7 @@ def cancel_deal(request, deal_id):
 
 @login_required
 @require_POST
+@retry_on_db_lock(max_retries=5, delay=0.1)
 def complete_deal(request, deal_id):
     """
     Buyer marks deal as completed (received the order).
@@ -653,6 +686,7 @@ def complete_deal(request, deal_id):
 
 @login_required
 @require_POST
+@retry_on_db_lock(max_retries=5, delay=0.1)
 def submit_review(request, deal_id):
     """
     Buyer submits a dual review (seller + product) for a completed deal.

@@ -152,6 +152,10 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# WhiteNoise configuration - serve media files in production
+# On Render's ephemeral disk, files persist during the session but are lost on redeploy
+WHITENOISE_ROOT = BASE_DIR / 'media' if not DEBUG else None
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 

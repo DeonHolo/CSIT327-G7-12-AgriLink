@@ -89,6 +89,169 @@
         margin: 0;
         padding: 1.25rem;
     }
+
+    /* Minimal Deal Info Bar */
+    .deal-info-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.75rem 1.25rem;
+        flex-shrink: 0;
+    }
+    
+    .deal-info-bar.pending {
+        background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+        border-bottom: 2px solid #ff9800;
+    }
+    
+    .deal-info-bar.confirmed {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        border-bottom: 2px solid #4caf50;
+    }
+    
+    .deal-info-bar.completed {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-bottom: 2px solid #2196f3;
+    }
+    
+    .deal-info-bar.cancelled,
+    .deal-info-bar.declined {
+        background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+        border-bottom: 2px solid #f44336;
+    }
+    
+    .deal-info-left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .deal-info-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .deal-info-bar.pending .deal-info-icon {
+        background: #fff;
+        color: #ef6c00;
+    }
+    
+    .deal-info-bar.confirmed .deal-info-icon {
+        background: #fff;
+        color: #2e7d32;
+    }
+    
+    .deal-info-bar.completed .deal-info-icon {
+        background: #fff;
+        color: #1565c0;
+    }
+    
+    .deal-info-bar.cancelled .deal-info-icon,
+    .deal-info-bar.declined .deal-info-icon {
+        background: #fff;
+        color: #c62828;
+    }
+    
+    .deal-info-text {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+    
+    .deal-info-title {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .deal-info-subtitle {
+        font-size: 0.75rem;
+        color: #666;
+    }
+    
+    .deal-info-price {
+        font-weight: 700;
+        font-size: 1rem;
+        color: #2e7d32;
+        white-space: nowrap;
+    }
+    
+    .deal-info-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-shrink: 0;
+    }
+    
+    .deal-info-actions button {
+        padding: 0.5rem 0.875rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.75rem;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .deal-info-actions .btn-accept {
+        background: #4CAF50;
+        color: white;
+    }
+    
+    .deal-info-actions .btn-accept:hover {
+        background: #43a047;
+    }
+    
+    .deal-info-actions .btn-decline {
+        background: #f5f5f5;
+        color: #666;
+    }
+    
+    .deal-info-actions .btn-decline:hover {
+        background: #e0e0e0;
+    }
+    
+    .deal-info-actions .btn-cancel {
+        background: #ffebee;
+        color: #c62828;
+    }
+    
+    .deal-info-actions .btn-cancel:hover {
+        background: #ffcdd2;
+    }
+    
+    .deal-info-actions .btn-complete {
+        background: #2196F3;
+        color: white;
+    }
+    
+    .deal-info-actions .btn-complete:hover {
+        background: #1e88e5;
+    }
+    
+    .deal-info-waiting {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: #666;
+        font-style: italic;
+        padding: 0.5rem 0;
+    }
     
     .product-info-card > i {
         font-size: 2rem;
@@ -339,219 +502,6 @@
         background: linear-gradient(135deg, #9e9e9e 0%, #757575 100%);
         cursor: not-allowed;
         opacity: 0.7;
-    }
-
-    /* Deal Card Styles */
-    .deal-card {
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        overflow: hidden;
-        max-width: 400px;
-        margin: 0.5rem 0;
-        align-self: center;
-    }
-    
-    .deal-card-header {
-        padding: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        border-bottom: 1px solid #e0e0e0;
-    }
-    
-    .deal-card-header .deal-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.25rem;
-    }
-    
-    .deal-card.pending .deal-icon {
-        background: #fff3e0;
-        color: #ef6c00;
-    }
-    
-    .deal-card.confirmed .deal-icon {
-        background: #e8f5e9;
-        color: #2e7d32;
-    }
-    
-    .deal-card.completed .deal-icon {
-        background: #e3f2fd;
-        color: #1565c0;
-    }
-    
-    .deal-card.cancelled .deal-icon,
-    .deal-card.declined .deal-icon {
-        background: #ffebee;
-        color: #c62828;
-    }
-    
-    .deal-card-header-text {
-        flex: 1;
-    }
-    const currentUserAvatar = "{{ user.profile_picture.url|default:''|escapejs }}";
-    .deal-card-title {
-        font-weight: 600;
-        color: #333;
-        font-size: 0.9rem;
-    }
-    
-    .deal-card-subtitle {
-        font-size: 0.75rem;
-        color: #666;
-    }
-    
-    .deal-status-badge {
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-    
-    .deal-card.pending .deal-status-badge {
-        background: #fff3e0;
-        color: #ef6c00;
-    }
-    
-    .deal-card.confirmed .deal-status-badge {
-        background: #e8f5e9;
-        color: #2e7d32;
-    }
-    
-    .deal-card.completed .deal-status-badge {
-        background: #e3f2fd;
-        color: #1565c0;
-    }
-    
-    .deal-card.cancelled .deal-status-badge,
-    .deal-card.declined .deal-status-badge {
-        background: #ffebee;
-        color: #c62828;
-    }
-    
-    .deal-card-body {
-        padding: 1rem;
-    }
-    
-    .deal-product-info {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-    
-    .deal-product-image {
-        width: 80px;
-        height: 80px;
-        border-radius: 12px;
-        object-fit: cover;
-        background: #f5f5f5;
-    }
-    
-    .deal-product-image.placeholder {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #999;
-        font-size: 2rem;
-    }
-    
-    .deal-product-details h4 {
-        margin: 0 0 0.25rem 0;
-        font-size: 1rem;
-        color: #333;
-    }
-    
-    .deal-product-details .quantity {
-        font-size: 0.9rem;
-        color: #666;
-        margin-bottom: 0.5rem;
-    }
-    
-    .deal-product-details .price {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #2e7d32;
-    }
-    
-    .deal-card-actions {
-        display: flex;
-        gap: 0.5rem;
-        padding: 1rem;
-        border-top: 1px solid #e0e0e0;
-        background: #fafafa;
-    }
-    
-    .deal-card-actions button {
-        flex: 1;
-        padding: 0.75rem 1rem;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        font-size: 0.875rem;
-    }
-    
-    .deal-btn-accept {
-        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-        color: white;
-    }
-    
-    .deal-btn-accept:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
-    }
-    
-    .deal-btn-decline {
-        background: #f5f5f5;
-        color: #666;
-    }
-    
-    .deal-btn-decline:hover {
-        background: #e0e0e0;
-    }
-    
-    .deal-btn-cancel {
-        background: #ffebee;
-        color: #c62828;
-    }
-    
-    .deal-btn-cancel:hover {
-        background: #ffcdd2;
-    }
-    
-    .deal-btn-complete {
-        background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
-        color: white;
-    }
-    
-    .deal-btn-complete:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
-    }
-    
-    .deal-waiting-label {
-        flex: 1;
-        text-align: center;
-        padding: 0.75rem;
-        color: #666;
-        font-style: italic;
-    }
-    
-    .deal-card.completed,
-    .deal-card.cancelled,
-    .deal-card.declined {
-        opacity: 0.8;
-    }
-    
-    .deal-card.confirmed {
-        border: 2px solid #4CAF50;
     }
 
     /* Modal Styles */
@@ -1035,6 +985,66 @@
     </div>
     {% endif %}
     
+    <!-- Active Deal Info Bar (minimal, fixed at top) - Only show the most recent deal -->
+    {% with deals|first as deal %}
+    {% if deal %}
+    <div class="deal-info-bar {{ deal.status }}" id="deal-bar-{{ deal.id }}" data-deal-id="{{ deal.id }}">
+        <div class="deal-info-left">
+            <div class="deal-info-icon">
+                {% if deal.status == 'pending' %}
+                <i class="bi bi-hourglass-split"></i>
+                {% elif deal.status == 'confirmed' %}
+                <i class="bi bi-check-circle"></i>
+                {% elif deal.status == 'completed' %}
+                <i class="bi bi-trophy"></i>
+                {% else %}
+                <i class="bi bi-x-circle"></i>
+                {% endif %}
+            </div>
+            <div class="deal-info-text">
+                <span class="deal-info-title">
+                    {% if deal.status == 'pending' %}Offer: {{ deal.quantity }} {{ deal.product.unit }} of {{ deal.product.name }}
+                    {% elif deal.status == 'confirmed' %}Confirmed: {{ deal.quantity }} {{ deal.product.unit }}
+                    {% elif deal.status == 'completed' %}Completed: {{ deal.quantity }} {{ deal.product.unit }}
+                    {% elif deal.status == 'cancelled' %}Cancelled
+                    {% else %}Declined
+                    {% endif %}
+                </span>
+                <span class="deal-info-subtitle">{{ deal.created_at|date:"M d, g:i A" }}</span>
+            </div>
+            <span class="deal-info-price">₱{{ deal.total_price }}</span>
+        </div>
+        <div class="deal-info-actions">
+            {% if deal.status == 'pending' %}
+                {% if deal.created_by and user != deal.created_by or not deal.created_by and user != deal.farmer %}
+                <button class="btn-accept" onclick="acceptDeal({{ deal.id }})">
+                    <i class="bi bi-check-lg"></i> Accept
+                </button>
+                <button class="btn-decline" onclick="declineDeal({{ deal.id }})">
+                    <i class="bi bi-x-lg"></i> Decline
+                </button>
+                {% else %}
+                <span class="deal-info-waiting"><i class="bi bi-hourglass-split"></i> Waiting...</span>
+                <button class="btn-cancel" onclick="cancelDeal({{ deal.id }})">Cancel</button>
+                {% endif %}
+            {% elif deal.status == 'confirmed' %}
+                {% if user == deal.buyer %}
+                <button class="btn-complete" onclick="completeDeal({{ deal.id }})">
+                    <i class="bi bi-bag-check"></i> Received
+                </button>
+                <button class="btn-cancel" onclick="cancelDeal({{ deal.id }})">Cancel</button>
+                {% else %}
+                <span class="deal-info-waiting"><i class="bi bi-clock-history"></i> Awaiting pickup...</span>
+                <button class="btn-cancel" onclick="cancelDeal({{ deal.id }})">Cancel</button>
+                {% endif %}
+            {% elif deal.status == 'completed' and deal.is_reviewed %}
+                <span class="deal-info-waiting"><i class="bi bi-star-fill"></i> Reviewed</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+    
     <!-- Messages Container -->
     <div class="messages-container" id="messagesContainer">
         {% if page_obj.object_list or deals %}
@@ -1070,104 +1080,6 @@
                 </div>
             </div>
             {% endfor %}
-            
-            <!-- Deal Cards Container -->
-            <div id="dealsContainer">
-                {% for deal in deals %}
-                <div class="deal-card {{ deal.status }}" data-deal-id="{{ deal.id }}" id="deal-{{ deal.id }}">
-                    <div class="deal-card-header">
-                        <div class="deal-icon">
-                            {% if deal.status == 'pending' %}
-                            <i class="bi bi-hourglass-split"></i>
-                            {% elif deal.status == 'confirmed' %}
-                            <i class="bi bi-check-circle"></i>
-                            {% elif deal.status == 'completed' %}
-                            <i class="bi bi-trophy"></i>
-                            {% else %}
-                            <i class="bi bi-x-circle"></i>
-                            {% endif %}
-                        </div>
-                        <div class="deal-card-header-text">
-                            <div class="deal-card-title">
-                                {% if deal.status == 'pending' %}Offer from {% if deal.created_by %}{{ deal.created_by.username }}{% else %}{{ deal.farmer.username }}{% endif %}
-                                {% elif deal.status == 'confirmed' %}Order Confirmed - Ready for Pickup
-                                {% elif deal.status == 'completed' %}Transaction Completed
-                                {% elif deal.status == 'cancelled' %}Cancelled by {{ deal.cancelled_by.username }}
-                                {% else %}Declined
-                                {% endif %}
-                            </div>
-                            <div class="deal-card-subtitle">{{ deal.created_at|date:"M d, Y g:i A" }}</div>
-                        </div>
-                        <span class="deal-status-badge">{{ deal.get_status_display }}</span>
-                    </div>
-                    <div class="deal-card-body">
-                        <div class="deal-product-info">
-                            {% if deal.product.image %}
-                            <img src="{{ deal.product.image.url }}" alt="{{ deal.product.name }}" class="deal-product-image">
-                            {% else %}
-                            <div class="deal-product-image placeholder">
-                                <i class="bi bi-box"></i>
-                            </div>
-                            {% endif %}
-                            <div class="deal-product-details">
-                                <h4>{{ deal.product.name }}</h4>
-                                <div class="quantity">{{ deal.quantity }} {{ deal.product.unit }}</div>
-                                <div class="price">₱{{ deal.total_price }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {% if deal.status == 'pending' %}
-                    <div class="deal-card-actions">
-                        {# Check if current user is the offer recipient (NOT the creator) #}
-                        {% if deal.created_by and user != deal.created_by or not deal.created_by and user != deal.farmer %}
-                        {# User is the recipient - show Accept/Decline buttons #}
-                        <button class="deal-btn-accept" onclick="acceptDeal({{ deal.id }})">
-                            <i class="bi bi-check-lg"></i> Accept Deal
-                        </button>
-                        <button class="deal-btn-decline" onclick="declineDeal({{ deal.id }})">
-                            <i class="bi bi-x-lg"></i> Decline
-                        </button>
-                        {% else %}
-                        {# User is the creator - show Waiting label #}
-                        <span class="deal-waiting-label">
-                            <i class="bi bi-hourglass-split"></i> Waiting for {% if deal.created_by == deal.farmer or not deal.created_by %}{{ deal.buyer.username }}{% else %}{{ deal.farmer.username }}{% endif %}...
-                        </span>
-                        <button class="deal-btn-cancel" onclick="cancelDeal({{ deal.id }})">
-                            Cancel Offer
-                        </button>
-                        {% endif %}
-                    </div>
-                    {% elif deal.status == 'confirmed' %}
-                    <div class="deal-card-actions">
-                        {% if user == deal.buyer %}
-                        <button class="deal-btn-complete" onclick="completeDeal({{ deal.id }})">
-                            <i class="bi bi-bag-check"></i> I Received My Order
-                        </button>
-                        <button class="deal-btn-cancel" onclick="cancelDeal({{ deal.id }})">
-                            Cancel Order
-                        </button>
-                        {% else %}
-                        <span class="deal-waiting-label">
-                            <i class="bi bi-clock-history"></i> Waiting for Pickup...
-                        </span>
-                        <button class="deal-btn-cancel" onclick="cancelDeal({{ deal.id }})">
-                            Cancel Order
-                        </button>
-                        {% endif %}
-                    </div>
-                    {% elif deal.status == 'completed' and deal.is_reviewed %}
-                    <div class="deal-review-summary">
-                        <div class="stars">
-                            {% with deal.review as review %}
-                            <i class="bi bi-star-fill"></i> Seller: {{ review.seller_rating }}/5 | Product: {{ review.product_rating }}/5
-                            {% endwith %}
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
             
             {% if page_obj.has_next %}
             <div class="pagination-info">
@@ -1829,152 +1741,107 @@
         });
     }
     
-    // ==================== DEAL CARD FUNCTIONS ====================
+    // ==================== DEAL INFO BAR FUNCTIONS ====================
     
     function updateOrCreateDealCard(deal) {
-        let card = document.getElementById(`deal-${deal.id}`);
+        // Update the deal info bar (minimal banner) instead of creating deal cards
+        updateDealInfoBar(deal);
+    }
+    
+    function updateDealInfoBar(deal) {
+        // Remove any existing deal info bars first
+        document.querySelectorAll('.deal-info-bar').forEach(bar => bar.remove());
         
-        if (card) {
-            // Update existing card
-            card.className = `deal-card ${deal.status}`;
-            card.innerHTML = generateDealCardHTML(deal);
-        } else {
-            // Create new card
-            displayedDealIds.add(deal.id);
-            card = document.createElement('div');
-            card.className = `deal-card ${deal.status}`;
-            card.id = `deal-${deal.id}`;
-            card.dataset.dealId = deal.id;
-            card.innerHTML = generateDealCardHTML(deal);
-            
-            const dealsContainer = document.getElementById('dealsContainer');
-            if (dealsContainer) {
-                dealsContainer.appendChild(card);
-            } else {
-                const container = document.getElementById('messagesContainer');
-                const newDealsContainer = document.createElement('div');
-                newDealsContainer.id = 'dealsContainer';
-                newDealsContainer.appendChild(card);
-                container.appendChild(newDealsContainer);
-            }
+        // Don't show bar for completed, cancelled, or declined deals
+        if (['completed', 'cancelled', 'declined'].includes(deal.status)) {
+            return;
+        }
+        
+        // Create the deal info bar
+        const bar = document.createElement('div');
+        bar.className = `deal-info-bar ${deal.status}`;
+        bar.id = `deal-bar-${deal.id}`;
+        bar.dataset.dealId = deal.id;
+        bar.innerHTML = generateDealInfoBarHTML(deal);
+        
+        // Insert after product-wrapper or after chat-header
+        const productWrapper = document.querySelector('.product-wrapper');
+        const chatHeader = document.querySelector('.chat-header');
+        const messagesContainer = document.getElementById('messagesContainer');
+        
+        if (productWrapper) {
+            productWrapper.after(bar);
+        } else if (messagesContainer) {
+            messagesContainer.before(bar);
+        } else if (chatHeader) {
+            chatHeader.after(bar);
         }
     }
     
-    function generateDealCardHTML(deal) {
-        const isFarmerView = deal.is_farmer;
+    function generateDealInfoBarHTML(deal) {
+        const isOfferRecipient = deal.is_offer_recipient;
         const isBuyerView = deal.is_buyer;
-        const isOfferRecipient = deal.is_offer_recipient;  // Use this for accept/decline logic
-        const isOfferCreator = deal.is_offer_creator;
         
         let icon, title;
         switch(deal.status) {
             case 'pending':
                 icon = '<i class="bi bi-hourglass-split"></i>';
-                title = `Offer from ${deal.created_by.username}`;
+                title = `Offer: ${deal.quantity} ${deal.product.unit} of ${deal.product.name}`;
                 break;
             case 'confirmed':
                 icon = '<i class="bi bi-check-circle"></i>';
-                title = 'Order Confirmed - Ready for Pickup';
+                title = `Confirmed: ${deal.quantity} ${deal.product.unit}`;
                 break;
-            case 'completed':
-                icon = '<i class="bi bi-trophy"></i>';
-                title = 'Transaction Completed';
-                break;
-            case 'cancelled':
+            default:
                 icon = '<i class="bi bi-x-circle"></i>';
-                title = `Cancelled by ${deal.cancelled_by ? deal.cancelled_by.username : 'user'}`;
-                break;
-            case 'declined':
-                icon = '<i class="bi bi-x-circle"></i>';
-                title = 'Declined';
-                break;
+                title = deal.status.charAt(0).toUpperCase() + deal.status.slice(1);
         }
-        
-        const productImage = deal.product.image 
-            ? `<img src="${deal.product.image}" alt="${deal.product.name}" class="deal-product-image">`
-            : `<div class="deal-product-image placeholder"><i class="bi bi-box"></i></div>`;
         
         let actionsHTML = '';
         if (deal.status === 'pending') {
-            // Use is_offer_recipient to determine who sees Accept/Decline buttons
             if (isOfferRecipient) {
                 actionsHTML = `
-                    <div class="deal-card-actions">
-                        <button class="deal-btn-accept" onclick="acceptDeal(${deal.id})">
-                            <i class="bi bi-check-lg"></i> Accept Deal
-                        </button>
-                        <button class="deal-btn-decline" onclick="declineDeal(${deal.id})">
-                            <i class="bi bi-x-lg"></i> Decline
-                        </button>
-                    </div>
+                    <button class="btn-accept" onclick="acceptDeal(${deal.id})">
+                        <i class="bi bi-check-lg"></i> Accept
+                    </button>
+                    <button class="btn-decline" onclick="declineDeal(${deal.id})">
+                        <i class="bi bi-x-lg"></i> Decline
+                    </button>
                 `;
             } else {
-                // Show "Waiting for..." with the other user's name (the recipient)
                 actionsHTML = `
-                    <div class="deal-card-actions">
-                        <span class="deal-waiting-label">
-                            <i class="bi bi-hourglass-split"></i> Waiting for ${deal.other_user.username}...
-                        </span>
-                        <button class="deal-btn-cancel" onclick="cancelDeal(${deal.id})">
-                            Cancel Offer
-                        </button>
-                    </div>
+                    <span class="deal-info-waiting"><i class="bi bi-hourglass-split"></i> Waiting...</span>
+                    <button class="btn-cancel" onclick="cancelDeal(${deal.id})">Cancel</button>
                 `;
             }
         } else if (deal.status === 'confirmed') {
             if (isBuyerView) {
                 actionsHTML = `
-                    <div class="deal-card-actions">
-                        <button class="deal-btn-complete" onclick="completeDeal(${deal.id})">
-                            <i class="bi bi-bag-check"></i> I Received My Order
-                        </button>
-                        <button class="deal-btn-cancel" onclick="cancelDeal(${deal.id})">
-                            Cancel Order
-                        </button>
-                    </div>
+                    <button class="btn-complete" onclick="completeDeal(${deal.id})">
+                        <i class="bi bi-bag-check"></i> Received
+                    </button>
+                    <button class="btn-cancel" onclick="cancelDeal(${deal.id})">Cancel</button>
                 `;
             } else {
                 actionsHTML = `
-                    <div class="deal-card-actions">
-                        <span class="deal-waiting-label">
-                            <i class="bi bi-clock-history"></i> Waiting for Pickup...
-                        </span>
-                        <button class="deal-btn-cancel" onclick="cancelDeal(${deal.id})">
-                            Cancel Order
-                        </button>
-                    </div>
+                    <span class="deal-info-waiting"><i class="bi bi-clock-history"></i> Awaiting pickup...</span>
+                    <button class="btn-cancel" onclick="cancelDeal(${deal.id})">Cancel</button>
                 `;
             }
-        } else if (deal.status === 'completed' && deal.is_reviewed) {
-            actionsHTML = `
-                <div class="deal-review-summary">
-                    <div class="stars">
-                        <i class="bi bi-star-fill"></i> Seller: ${deal.review.seller_rating}/5 | Product: ${deal.review.product_rating}/5
-                    </div>
-                </div>
-            `;
         }
         
         return `
-            <div class="deal-card-header">
-                <div class="deal-icon">${icon}</div>
-                <div class="deal-card-header-text">
-                    <div class="deal-card-title">${title}</div>
-                    <div class="deal-card-subtitle">${deal.created_at_display}</div>
+            <div class="deal-info-left">
+                <div class="deal-info-icon">${icon}</div>
+                <div class="deal-info-text">
+                    <span class="deal-info-title">${title}</span>
+                    <span class="deal-info-subtitle">${deal.created_at_display}</span>
                 </div>
-                <span class="deal-status-badge">${deal.status_display}</span>
+                <span class="deal-info-price">₱${deal.total_price}</span>
             </div>
-            <div class="deal-card-body">
-                <div class="deal-product-info">
-                    ${productImage}
-                    <div class="deal-product-details">
-                        <h4>${deal.product.name}</h4>
-                        <div class="quantity">${deal.quantity} ${deal.product.unit}</div>
-                        <div class="price">₱${deal.total_price}</div>
-                    </div>
-                </div>
+            <div class="deal-info-actions">
+                ${actionsHTML}
             </div>
-            ${actionsHTML}
         `;
     }
     
