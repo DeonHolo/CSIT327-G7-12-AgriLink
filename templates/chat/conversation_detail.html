@@ -89,6 +89,169 @@
         margin: 0;
         padding: 1.25rem;
     }
+
+    /* Minimal Deal Info Bar */
+    .deal-info-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.75rem 1.25rem;
+        flex-shrink: 0;
+    }
+    
+    .deal-info-bar.pending {
+        background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+        border-bottom: 2px solid #ff9800;
+    }
+    
+    .deal-info-bar.confirmed {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        border-bottom: 2px solid #4caf50;
+    }
+    
+    .deal-info-bar.completed {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-bottom: 2px solid #2196f3;
+    }
+    
+    .deal-info-bar.cancelled,
+    .deal-info-bar.declined {
+        background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+        border-bottom: 2px solid #f44336;
+    }
+    
+    .deal-info-left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .deal-info-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .deal-info-bar.pending .deal-info-icon {
+        background: #fff;
+        color: #ef6c00;
+    }
+    
+    .deal-info-bar.confirmed .deal-info-icon {
+        background: #fff;
+        color: #2e7d32;
+    }
+    
+    .deal-info-bar.completed .deal-info-icon {
+        background: #fff;
+        color: #1565c0;
+    }
+    
+    .deal-info-bar.cancelled .deal-info-icon,
+    .deal-info-bar.declined .deal-info-icon {
+        background: #fff;
+        color: #c62828;
+    }
+    
+    .deal-info-text {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+    
+    .deal-info-title {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .deal-info-subtitle {
+        font-size: 0.75rem;
+        color: #666;
+    }
+    
+    .deal-info-price {
+        font-weight: 700;
+        font-size: 1rem;
+        color: #2e7d32;
+        white-space: nowrap;
+    }
+    
+    .deal-info-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-shrink: 0;
+    }
+    
+    .deal-info-actions button {
+        padding: 0.5rem 0.875rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.75rem;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .deal-info-actions .btn-accept {
+        background: #4CAF50;
+        color: white;
+    }
+    
+    .deal-info-actions .btn-accept:hover {
+        background: #43a047;
+    }
+    
+    .deal-info-actions .btn-decline {
+        background: #f5f5f5;
+        color: #666;
+    }
+    
+    .deal-info-actions .btn-decline:hover {
+        background: #e0e0e0;
+    }
+    
+    .deal-info-actions .btn-cancel {
+        background: #ffebee;
+        color: #c62828;
+    }
+    
+    .deal-info-actions .btn-cancel:hover {
+        background: #ffcdd2;
+    }
+    
+    .deal-info-actions .btn-complete {
+        background: #2196F3;
+        color: white;
+    }
+    
+    .deal-info-actions .btn-complete:hover {
+        background: #1e88e5;
+    }
+    
+    .deal-info-waiting {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: #666;
+        font-style: italic;
+        padding: 0.5rem 0;
+    }
     
     .product-info-card > i {
         font-size: 2rem;
@@ -341,219 +504,6 @@
         opacity: 0.7;
     }
 
-    /* Deal Card Styles */
-    .deal-card {
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        overflow: hidden;
-        max-width: 400px;
-        margin: 0.5rem 0;
-        align-self: center;
-    }
-    
-    .deal-card-header {
-        padding: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        border-bottom: 1px solid #e0e0e0;
-    }
-    
-    .deal-card-header .deal-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.25rem;
-    }
-    
-    .deal-card.pending .deal-icon {
-        background: #fff3e0;
-        color: #ef6c00;
-    }
-    
-    .deal-card.confirmed .deal-icon {
-        background: #e8f5e9;
-        color: #2e7d32;
-    }
-    
-    .deal-card.completed .deal-icon {
-        background: #e3f2fd;
-        color: #1565c0;
-    }
-    
-    .deal-card.cancelled .deal-icon,
-    .deal-card.declined .deal-icon {
-        background: #ffebee;
-        color: #c62828;
-    }
-    
-    .deal-card-header-text {
-        flex: 1;
-    }
-    const currentUserAvatar = "{{ user.profile_picture.url|default:''|escapejs }}";
-    .deal-card-title {
-        font-weight: 600;
-        color: #333;
-        font-size: 0.9rem;
-    }
-    
-    .deal-card-subtitle {
-        font-size: 0.75rem;
-        color: #666;
-    }
-    
-    .deal-status-badge {
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-    
-    .deal-card.pending .deal-status-badge {
-        background: #fff3e0;
-        color: #ef6c00;
-    }
-    
-    .deal-card.confirmed .deal-status-badge {
-        background: #e8f5e9;
-        color: #2e7d32;
-    }
-    
-    .deal-card.completed .deal-status-badge {
-        background: #e3f2fd;
-        color: #1565c0;
-    }
-    
-    .deal-card.cancelled .deal-status-badge,
-    .deal-card.declined .deal-status-badge {
-        background: #ffebee;
-        color: #c62828;
-    }
-    
-    .deal-card-body {
-        padding: 1rem;
-    }
-    
-    .deal-product-info {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-    
-    .deal-product-image {
-        width: 80px;
-        height: 80px;
-        border-radius: 12px;
-        object-fit: cover;
-        background: #f5f5f5;
-    }
-    
-    .deal-product-image.placeholder {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #999;
-        font-size: 2rem;
-    }
-    
-    .deal-product-details h4 {
-        margin: 0 0 0.25rem 0;
-        font-size: 1rem;
-        color: #333;
-    }
-    
-    .deal-product-details .quantity {
-        font-size: 0.9rem;
-        color: #666;
-        margin-bottom: 0.5rem;
-    }
-    
-    .deal-product-details .price {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #2e7d32;
-    }
-    
-    .deal-card-actions {
-        display: flex;
-        gap: 0.5rem;
-        padding: 1rem;
-        border-top: 1px solid #e0e0e0;
-        background: #fafafa;
-    }
-    
-    .deal-card-actions button {
-        flex: 1;
-        padding: 0.75rem 1rem;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        font-size: 0.875rem;
-    }
-    
-    .deal-btn-accept {
-        background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-        color: white;
-    }
-    
-    .deal-btn-accept:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
-    }
-    
-    .deal-btn-decline {
-        background: #f5f5f5;
-        color: #666;
-    }
-    
-    .deal-btn-decline:hover {
-        background: #e0e0e0;
-    }
-    
-    .deal-btn-cancel {
-        background: #ffebee;
-        color: #c62828;
-    }
-    
-    .deal-btn-cancel:hover {
-        background: #ffcdd2;
-    }
-    
-    .deal-btn-complete {
-        background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
-        color: white;
-    }
-    
-    .deal-btn-complete:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
-    }
-    
-    .deal-waiting-label {
-        flex: 1;
-        text-align: center;
-        padding: 0.75rem;
-        color: #666;
-        font-style: italic;
-    }
-    
-    .deal-card.completed,
-    .deal-card.cancelled,
-    .deal-card.declined {
-        opacity: 0.8;
-    }
-    
-    .deal-card.confirmed {
-        border: 2px solid #4CAF50;
-    }
-
     /* Modal Styles */
     .modal-overlay {
         position: fixed;
@@ -737,17 +687,69 @@
         min-width: auto !important;
     }
 
-    /* Cancel modal sizing */
-    #cancelDealModal .modal-content {
-        max-width: 420px;
-        padding: 1.5rem;
+    /* Confirmation modal sizing (Cancel, Accept, Decline) */
+    #cancelDealModal .modal-content,
+    #acceptDealModal .modal-content,
+    #declineDealModal .modal-content,
+    #thankYouModal .modal-content {
+        max-width: 380px;
+        text-align: center;
     }
-    #cancelDealModal .modal-header h3 {
+    
+    #cancelDealModal .modal-header,
+    #acceptDealModal .modal-header,
+    #declineDealModal .modal-header {
+        padding: 1rem 1.25rem;
+        justify-content: center;
+    }
+    
+    #cancelDealModal .modal-header h3,
+    #acceptDealModal .modal-header h3,
+    #declineDealModal .modal-header h3 {
         font-size: 1.05rem;
     }
-    #cancelDealModal .modal-body p {
-        font-size: 0.95rem;
-        line-height: 1.45;
+    
+    #cancelDealModal .modal-header .modal-close,
+    #acceptDealModal .modal-header .modal-close,
+    #declineDealModal .modal-header .modal-close {
+        position: absolute;
+        right: 1rem;
+    }
+    
+    #cancelDealModal .modal-body,
+    #acceptDealModal .modal-body,
+    #declineDealModal .modal-body {
+        padding: 1rem 1.25rem;
+    }
+    
+    #cancelDealModal .modal-body p,
+    #acceptDealModal .modal-body p,
+    #declineDealModal .modal-body p {
+        font-size: 0.9rem;
+        line-height: 1.4;
+        margin-bottom: 0.5rem;
+    }
+    
+    #cancelDealModal .modal-body p:last-child,
+    #acceptDealModal .modal-body p:last-child,
+    #declineDealModal .modal-body p:last-child {
+        margin-bottom: 0;
+    }
+    
+    #cancelDealModal .modal-footer,
+    #acceptDealModal .modal-footer,
+    #declineDealModal .modal-footer,
+    #thankYouModal .modal-footer {
+        padding: 0.75rem 1.25rem;
+        justify-content: center;
+    }
+    
+    #cancelDealModal .modal-footer button,
+    #acceptDealModal .modal-footer button,
+    #declineDealModal .modal-footer button,
+    #thankYouModal .modal-footer button {
+        padding: 0.6rem 1.25rem;
+        font-size: 0.9rem;
     }
 
     /* Star Rating Styles */
@@ -759,7 +761,10 @@
     }
     
     .star-rating input {
-        display: none;
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
     }
     
     .star-rating label {
@@ -776,20 +781,73 @@
     }
     
     .review-section {
-        padding: 1.25rem;
+        padding: 1rem;
         background: #f9f9f9;
-        border-radius: 12px;
-        margin-bottom: 1rem;
+        border-radius: 10px;
+        margin-bottom: 0.75rem;
+        text-align: center;
+    }
+    
+    .review-section:last-child {
+        margin-bottom: 0;
     }
     
     .review-section h4 {
-        margin: 0 0 1rem 0;
+        margin: 0 0 0.75rem 0;
         color: #333;
-        font-size: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .review-section .star-rating {
+        justify-content: center;
     }
     
     .review-section textarea {
-        margin-top: 0.75rem;
+        margin-top: 0.5rem;
+        resize: none;
+        font-size: 0.8rem;
+        text-align: left;
+        padding: 0.6rem 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .review-section textarea::placeholder {
+        font-size: 0.75rem;
+        color: #999;
+    }
+    
+    .review-section textarea:focus {
+        outline: none;
+        border-color: #4CAF50;
+    }
+    
+    /* Review Modal specific sizing */
+    #reviewModal .modal-content {
+        max-width: 400px;
+    }
+    
+    #reviewModal .modal-header {
+        padding: 1rem 1.25rem;
+    }
+    
+    #reviewModal .modal-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    #reviewModal .modal-body {
+        padding: 1rem 1.25rem;
+    }
+    
+    #reviewModal .modal-footer {
+        padding: 0.75rem 1.25rem;
+        justify-content: center;
+    }
+    
+    #reviewModal .star-rating label {
+        font-size: 1.5rem;
     }
     
     .btn-primary {
@@ -826,6 +884,27 @@
     
     .btn-secondary:hover {
         background: #e0e0e0;
+    }
+    
+    .btn-danger {
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-danger:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+    }
+    
+    .btn-danger:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 
     /* Stock info */
@@ -906,6 +985,66 @@
     </div>
     {% endif %}
     
+    <!-- Active Deal Info Bar (minimal, fixed at top) - Only show the most recent deal -->
+    {% with deals|first as deal %}
+    {% if deal %}
+    <div class="deal-info-bar {{ deal.status }}" id="deal-bar-{{ deal.id }}" data-deal-id="{{ deal.id }}">
+        <div class="deal-info-left">
+            <div class="deal-info-icon">
+                {% if deal.status == 'pending' %}
+                <i class="bi bi-hourglass-split"></i>
+                {% elif deal.status == 'confirmed' %}
+                <i class="bi bi-check-circle"></i>
+                {% elif deal.status == 'completed' %}
+                <i class="bi bi-trophy"></i>
+                {% else %}
+                <i class="bi bi-x-circle"></i>
+                {% endif %}
+            </div>
+            <div class="deal-info-text">
+                <span class="deal-info-title">
+                    {% if deal.status == 'pending' %}Offer: {{ deal.quantity }} {{ deal.product.unit }} of {{ deal.product.name }}
+                    {% elif deal.status == 'confirmed' %}Confirmed: {{ deal.quantity }} {{ deal.product.unit }}
+                    {% elif deal.status == 'completed' %}Completed: {{ deal.quantity }} {{ deal.product.unit }}
+                    {% elif deal.status == 'cancelled' %}Cancelled
+                    {% else %}Declined
+                    {% endif %}
+                </span>
+                <span class="deal-info-subtitle">{{ deal.created_at|date:"M d, g:i A" }}</span>
+            </div>
+            <span class="deal-info-price">₱{{ deal.total_price }}</span>
+        </div>
+        <div class="deal-info-actions">
+            {% if deal.status == 'pending' %}
+                {% if deal.created_by and user != deal.created_by or not deal.created_by and user != deal.farmer %}
+                <button class="btn-accept" onclick="acceptDeal({{ deal.id }})">
+                    <i class="bi bi-check-lg"></i> Accept
+                </button>
+                <button class="btn-decline" onclick="declineDeal({{ deal.id }})">
+                    <i class="bi bi-x-lg"></i> Decline
+                </button>
+                {% else %}
+                <span class="deal-info-waiting"><i class="bi bi-hourglass-split"></i> Waiting...</span>
+                <button class="btn-cancel" onclick="cancelDeal({{ deal.id }})">Cancel</button>
+                {% endif %}
+            {% elif deal.status == 'confirmed' %}
+                {% if user == deal.buyer %}
+                <button class="btn-complete" onclick="completeDeal({{ deal.id }})">
+                    <i class="bi bi-bag-check"></i> Received
+                </button>
+                <button class="btn-cancel" onclick="cancelDeal({{ deal.id }})">Cancel</button>
+                {% else %}
+                <span class="deal-info-waiting"><i class="bi bi-clock-history"></i> Awaiting pickup...</span>
+                <button class="btn-cancel" onclick="cancelDeal({{ deal.id }})">Cancel</button>
+                {% endif %}
+            {% elif deal.status == 'completed' and deal.is_reviewed %}
+                <span class="deal-info-waiting"><i class="bi bi-star-fill"></i> Reviewed</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+    
     <!-- Messages Container -->
     <div class="messages-container" id="messagesContainer">
         {% if page_obj.object_list or deals %}
@@ -941,104 +1080,6 @@
                 </div>
             </div>
             {% endfor %}
-            
-            <!-- Deal Cards Container -->
-            <div id="dealsContainer">
-                {% for deal in deals %}
-                <div class="deal-card {{ deal.status }}" data-deal-id="{{ deal.id }}" id="deal-{{ deal.id }}">
-                    <div class="deal-card-header">
-                        <div class="deal-icon">
-                            {% if deal.status == 'pending' %}
-                            <i class="bi bi-hourglass-split"></i>
-                            {% elif deal.status == 'confirmed' %}
-                            <i class="bi bi-check-circle"></i>
-                            {% elif deal.status == 'completed' %}
-                            <i class="bi bi-trophy"></i>
-                            {% else %}
-                            <i class="bi bi-x-circle"></i>
-                            {% endif %}
-                        </div>
-                        <div class="deal-card-header-text">
-                            <div class="deal-card-title">
-                                {% if deal.status == 'pending' %}Offer from {% if deal.created_by %}{{ deal.created_by.username }}{% else %}{{ deal.farmer.username }}{% endif %}
-                                {% elif deal.status == 'confirmed' %}Order Confirmed - Ready for Pickup
-                                {% elif deal.status == 'completed' %}Transaction Completed
-                                {% elif deal.status == 'cancelled' %}Cancelled by {{ deal.cancelled_by.username }}
-                                {% else %}Declined
-                                {% endif %}
-                            </div>
-                            <div class="deal-card-subtitle">{{ deal.created_at|date:"M d, Y g:i A" }}</div>
-                        </div>
-                        <span class="deal-status-badge">{{ deal.get_status_display }}</span>
-                    </div>
-                    <div class="deal-card-body">
-                        <div class="deal-product-info">
-                            {% if deal.product.image %}
-                            <img src="{{ deal.product.image.url }}" alt="{{ deal.product.name }}" class="deal-product-image">
-                            {% else %}
-                            <div class="deal-product-image placeholder">
-                                <i class="bi bi-box"></i>
-                            </div>
-                            {% endif %}
-                            <div class="deal-product-details">
-                                <h4>{{ deal.product.name }}</h4>
-                                <div class="quantity">{{ deal.quantity }} {{ deal.product.unit }}</div>
-                                <div class="price">₱{{ deal.total_price }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {% if deal.status == 'pending' %}
-                    <div class="deal-card-actions">
-                        {# Check if current user is the offer recipient (NOT the creator) #}
-                        {% if deal.created_by and user != deal.created_by or not deal.created_by and user != deal.farmer %}
-                        {# User is the recipient - show Accept/Decline buttons #}
-                        <button class="deal-btn-accept" onclick="acceptDeal({{ deal.id }})">
-                            <i class="bi bi-check-lg"></i> Accept Deal
-                        </button>
-                        <button class="deal-btn-decline" onclick="declineDeal({{ deal.id }})">
-                            <i class="bi bi-x-lg"></i> Decline
-                        </button>
-                        {% else %}
-                        {# User is the creator - show Waiting label #}
-                        <span class="deal-waiting-label">
-                            <i class="bi bi-hourglass-split"></i> Waiting for {% if deal.created_by == deal.farmer or not deal.created_by %}{{ deal.buyer.username }}{% else %}{{ deal.farmer.username }}{% endif %}...
-                        </span>
-                        <button class="deal-btn-cancel" onclick="cancelDeal({{ deal.id }})">
-                            Cancel Offer
-                        </button>
-                        {% endif %}
-                    </div>
-                    {% elif deal.status == 'confirmed' %}
-                    <div class="deal-card-actions">
-                        {% if user == deal.buyer %}
-                        <button class="deal-btn-complete" onclick="completeDeal({{ deal.id }})">
-                            <i class="bi bi-bag-check"></i> I Received My Order
-                        </button>
-                        <button class="deal-btn-cancel" onclick="cancelDeal({{ deal.id }})">
-                            Cancel Order
-                        </button>
-                        {% else %}
-                        <span class="deal-waiting-label">
-                            <i class="bi bi-clock-history"></i> Waiting for Pickup...
-                        </span>
-                        <button class="deal-btn-cancel" onclick="cancelDeal({{ deal.id }})">
-                            Cancel Order
-                        </button>
-                        {% endif %}
-                    </div>
-                    {% elif deal.status == 'completed' and deal.is_reviewed %}
-                    <div class="deal-review-summary">
-                        <div class="stars">
-                            {% with deal.review as review %}
-                            <i class="bi bi-star-fill"></i> Seller: {{ review.seller_rating }}/5 | Product: {{ review.product_rating }}/5
-                            {% endwith %}
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
             
             {% if page_obj.has_next %}
             <div class="pagination-info">
@@ -1111,16 +1152,18 @@
                         <div class="label">Total Price</div>
                         <div class="amount" id="totalPriceDisplay">₱0.00</div>
                     </div>
+                    {% if is_product_owner %}
                     <div class="price-override">
                         <label>
                             <input type="checkbox" id="overridePrice" onchange="togglePriceOverride()">
-                            Override price (for discount)
+                            Override price
                         </label>
                         <input type="number" id="customPriceInput" step="0.01" min="0.01" 
                                style="display: none; margin-top: 0.5rem;" 
                                placeholder="Enter custom price"
                                onchange="updateCustomPrice()">
                     </div>
+                    {% endif %}
                 </div>
             </form>
         </div>
@@ -1147,35 +1190,35 @@
                 <div class="review-section">
                     <h4><i class="bi bi-person"></i> How was the service from <span id="reviewFarmerName"></span>?</h4>
                     <div class="star-rating" id="sellerRating">
-                        <input type="radio" name="seller_rating" id="seller5" value="5">
-                        <label for="seller5"><i class="bi bi-star-fill"></i></label>
-                        <input type="radio" name="seller_rating" id="seller4" value="4">
-                        <label for="seller4"><i class="bi bi-star-fill"></i></label>
-                        <input type="radio" name="seller_rating" id="seller3" value="3">
-                        <label for="seller3"><i class="bi bi-star-fill"></i></label>
-                        <input type="radio" name="seller_rating" id="seller2" value="2">
-                        <label for="seller2"><i class="bi bi-star-fill"></i></label>
-                        <input type="radio" name="seller_rating" id="seller1" value="1">
-                        <label for="seller1"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="seller_rating" id="seller5" value="5" onchange="validateReviewForm()">
+                        <label for="seller5" onclick="document.getElementById('seller5').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="seller_rating" id="seller4" value="4" onchange="validateReviewForm()">
+                        <label for="seller4" onclick="document.getElementById('seller4').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="seller_rating" id="seller3" value="3" onchange="validateReviewForm()">
+                        <label for="seller3" onclick="document.getElementById('seller3').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="seller_rating" id="seller2" value="2" onchange="validateReviewForm()">
+                        <label for="seller2" onclick="document.getElementById('seller2').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="seller_rating" id="seller1" value="1" onchange="validateReviewForm()">
+                        <label for="seller1" onclick="document.getElementById('seller1').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
                     </div>
-                    <textarea id="sellerComment" placeholder="Share your experience with the seller (optional)" rows="3"></textarea>
+                    <textarea id="sellerComment" placeholder="Comment (optional)" rows="2"></textarea>
                 </div>
                 
                 <div class="review-section">
                     <h4><i class="bi bi-box"></i> How was the <span id="reviewProductName"></span>?</h4>
                     <div class="star-rating" id="productRating">
-                        <input type="radio" name="product_rating" id="product5" value="5">
-                        <label for="product5"><i class="bi bi-star-fill"></i></label>
-                        <input type="radio" name="product_rating" id="product4" value="4">
-                        <label for="product4"><i class="bi bi-star-fill"></i></label>
-                        <input type="radio" name="product_rating" id="product3" value="3">
-                        <label for="product3"><i class="bi bi-star-fill"></i></label>
-                        <input type="radio" name="product_rating" id="product2" value="2">
-                        <label for="product2"><i class="bi bi-star-fill"></i></label>
-                        <input type="radio" name="product_rating" id="product1" value="1">
-                        <label for="product1"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="product_rating" id="product5" value="5" onchange="validateReviewForm()">
+                        <label for="product5" onclick="document.getElementById('product5').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="product_rating" id="product4" value="4" onchange="validateReviewForm()">
+                        <label for="product4" onclick="document.getElementById('product4').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="product_rating" id="product3" value="3" onchange="validateReviewForm()">
+                        <label for="product3" onclick="document.getElementById('product3').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="product_rating" id="product2" value="2" onchange="validateReviewForm()">
+                        <label for="product2" onclick="document.getElementById('product2').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="product_rating" id="product1" value="1" onchange="validateReviewForm()">
+                        <label for="product1" onclick="document.getElementById('product1').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
                     </div>
-                    <textarea id="productComment" placeholder="Share your thoughts about the product quality (optional)" rows="3"></textarea>
+                    <textarea id="productComment" placeholder="Comment (optional)" rows="2"></textarea>
                 </div>
             </form>
         </div>
@@ -1200,9 +1243,63 @@
             <p style="color:#666;">Stock will be restored and the buyer will see this offer as cancelled.</p>
         </div>
         <div class="modal-footer">
-            <button class="btn-modal-cancel" onclick="closeCancelDealModal()">Keep Offer</button>
-            <button class="btn-modal-save" id="confirmCancelDealBtn" onclick="confirmCancelDeal()">
+            <button class="btn-secondary" onclick="closeCancelDealModal()">Keep Offer</button>
+            <button class="btn-danger" id="confirmCancelDealBtn" onclick="confirmCancelDeal()">
                 <i class="bi bi-x-circle"></i> Cancel Offer
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Accept Deal Modal -->
+<div class="modal-overlay" id="acceptDealModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="bi bi-check-circle" style="color: #4CAF50;"></i> Accept Deal</h3>
+            <button class="modal-close" onclick="closeAcceptDealModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-weight:600; color:#333;">Accept this deal?</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeAcceptDealModal()">Cancel</button>
+            <button class="btn-primary" id="confirmAcceptDealBtn" onclick="confirmAcceptDeal()">
+                <i class="bi bi-check-lg"></i> Accept
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Decline Deal Modal -->
+<div class="modal-overlay" id="declineDealModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="bi bi-x-lg" style="color: #e74c3c;"></i> Decline Offer</h3>
+            <button class="modal-close" onclick="closeDeclineDealModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-weight:600; color:#333;">Decline this offer?</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeDeclineDealModal()">Cancel</button>
+            <button class="btn-danger" id="confirmDeclineDealBtn" onclick="confirmDeclineDeal()">
+                <i class="bi bi-x-lg"></i> Decline
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Thank You Modal -->
+<div class="modal-overlay" id="thankYouModal">
+    <div class="modal-content">
+        <div class="modal-body" style="padding: 2rem; text-align: center;">
+            <i class="bi bi-check-circle-fill" style="font-size: 3rem; color: #4CAF50; margin-bottom: 1rem; display: block;"></i>
+            <h3 style="margin: 0 0 0.5rem 0; color: #333;">Thank You!</h3>
+            <p style="color: #666; margin: 0;">Your review has been submitted.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-primary" onclick="closeThankYouModal()">
+                <i class="bi bi-check-lg"></i> OK
             </button>
         </div>
     </div>
@@ -1316,9 +1413,16 @@
             populateProductsDropdown();
         }
         
-        // Review form rating listeners
+        // Review form rating listeners - listen on both inputs and labels for reliability
         document.querySelectorAll('#sellerRating input, #productRating input').forEach(input => {
             input.addEventListener('change', validateReviewForm);
+            input.addEventListener('click', validateReviewForm);
+        });
+        document.querySelectorAll('#sellerRating label, #productRating label').forEach(label => {
+            label.addEventListener('click', function() {
+                // Small delay to ensure the radio is checked first
+                setTimeout(validateReviewForm, 10);
+            });
         });
     });
     
@@ -1515,15 +1619,18 @@
         const unitPrice = parseFloat(selectedProduct.price) || 0;
         calculatedTotal = unitPrice * quantity;
         
-        if (!document.getElementById('overridePrice').checked) {
+        const overrideCheckbox = document.getElementById('overridePrice');
+        if (!overrideCheckbox || !overrideCheckbox.checked) {
             document.getElementById('totalPriceDisplay').textContent = `₱${calculatedTotal.toFixed(2)}`;
         }
     }
     
     function togglePriceOverride() {
         const customInput = document.getElementById('customPriceInput');
-        const isChecked = document.getElementById('overridePrice').checked;
+        const overrideCheckbox = document.getElementById('overridePrice');
+        if (!customInput || !overrideCheckbox) return;
         
+        const isChecked = overrideCheckbox.checked;
         customInput.style.display = isChecked ? 'block' : 'none';
         
         if (!isChecked) {
@@ -1533,7 +1640,10 @@
     }
     
     function updateCustomPrice() {
-        const customPrice = parseFloat(document.getElementById('customPriceInput').value);
+        const customInput = document.getElementById('customPriceInput');
+        if (!customInput) return;
+        
+        const customPrice = parseFloat(customInput.value);
         if (customPrice > 0) {
             document.getElementById('totalPriceDisplay').textContent = `₱${customPrice.toFixed(2)}`;
         }
@@ -1541,9 +1651,15 @@
     
     function resetOfferForm() {
         document.getElementById('quantityInput').value = 1;
-        document.getElementById('overridePrice').checked = false;
-        document.getElementById('customPriceInput').style.display = 'none';
-        document.getElementById('customPriceInput').value = '';
+        
+        const overrideCheckbox = document.getElementById('overridePrice');
+        const customInput = document.getElementById('customPriceInput');
+        if (overrideCheckbox) overrideCheckbox.checked = false;
+        if (customInput) {
+            customInput.style.display = 'none';
+            customInput.value = '';
+        }
+        
         document.getElementById('totalPriceDisplay').textContent = '₱0.00';
         calculatedTotal = 0;
         setSelectedProductInfo();
@@ -1563,8 +1679,10 @@
         }
         
         let totalPrice = calculatedTotal;
-        if (document.getElementById('overridePrice').checked) {
-            totalPrice = parseFloat(document.getElementById('customPriceInput').value);
+        const overrideCheckbox = document.getElementById('overridePrice');
+        const customInput = document.getElementById('customPriceInput');
+        if (overrideCheckbox && overrideCheckbox.checked && customInput) {
+            totalPrice = parseFloat(customInput.value);
             if (!totalPrice || totalPrice <= 0) {
                 alert('Please enter a valid custom price');
                 return;
@@ -1623,159 +1741,141 @@
         });
     }
     
-    // ==================== DEAL CARD FUNCTIONS ====================
+    // ==================== DEAL INFO BAR FUNCTIONS ====================
     
     function updateOrCreateDealCard(deal) {
-        let card = document.getElementById(`deal-${deal.id}`);
+        // Update the deal info bar (minimal banner) instead of creating deal cards
+        updateDealInfoBar(deal);
+    }
+    
+    function updateDealInfoBar(deal) {
+        // Remove any existing deal info bars first
+        document.querySelectorAll('.deal-info-bar').forEach(bar => bar.remove());
         
-        if (card) {
-            // Update existing card
-            card.className = `deal-card ${deal.status}`;
-            card.innerHTML = generateDealCardHTML(deal);
-        } else {
-            // Create new card
-            displayedDealIds.add(deal.id);
-            card = document.createElement('div');
-            card.className = `deal-card ${deal.status}`;
-            card.id = `deal-${deal.id}`;
-            card.dataset.dealId = deal.id;
-            card.innerHTML = generateDealCardHTML(deal);
-            
-            const dealsContainer = document.getElementById('dealsContainer');
-            if (dealsContainer) {
-                dealsContainer.appendChild(card);
-            } else {
-                const container = document.getElementById('messagesContainer');
-                const newDealsContainer = document.createElement('div');
-                newDealsContainer.id = 'dealsContainer';
-                newDealsContainer.appendChild(card);
-                container.appendChild(newDealsContainer);
-            }
+        // Don't show bar for completed, cancelled, or declined deals
+        if (['completed', 'cancelled', 'declined'].includes(deal.status)) {
+            return;
+        }
+        
+        // Create the deal info bar
+        const bar = document.createElement('div');
+        bar.className = `deal-info-bar ${deal.status}`;
+        bar.id = `deal-bar-${deal.id}`;
+        bar.dataset.dealId = deal.id;
+        bar.innerHTML = generateDealInfoBarHTML(deal);
+        
+        // Insert after product-wrapper or after chat-header
+        const productWrapper = document.querySelector('.product-wrapper');
+        const chatHeader = document.querySelector('.chat-header');
+        const messagesContainer = document.getElementById('messagesContainer');
+        
+        if (productWrapper) {
+            productWrapper.after(bar);
+        } else if (messagesContainer) {
+            messagesContainer.before(bar);
+        } else if (chatHeader) {
+            chatHeader.after(bar);
         }
     }
     
-    function generateDealCardHTML(deal) {
-        const isFarmerView = deal.is_farmer;
+    function generateDealInfoBarHTML(deal) {
+        const isOfferRecipient = deal.is_offer_recipient;
         const isBuyerView = deal.is_buyer;
-        const isOfferRecipient = deal.is_offer_recipient;  // Use this for accept/decline logic
-        const isOfferCreator = deal.is_offer_creator;
         
         let icon, title;
         switch(deal.status) {
             case 'pending':
                 icon = '<i class="bi bi-hourglass-split"></i>';
-                title = `Offer from ${deal.created_by.username}`;
+                title = `Offer: ${deal.quantity} ${deal.product.unit} of ${deal.product.name}`;
                 break;
             case 'confirmed':
                 icon = '<i class="bi bi-check-circle"></i>';
-                title = 'Order Confirmed - Ready for Pickup';
+                title = `Confirmed: ${deal.quantity} ${deal.product.unit}`;
                 break;
-            case 'completed':
-                icon = '<i class="bi bi-trophy"></i>';
-                title = 'Transaction Completed';
-                break;
-            case 'cancelled':
+            default:
                 icon = '<i class="bi bi-x-circle"></i>';
-                title = `Cancelled by ${deal.cancelled_by ? deal.cancelled_by.username : 'user'}`;
-                break;
-            case 'declined':
-                icon = '<i class="bi bi-x-circle"></i>';
-                title = 'Declined';
-                break;
+                title = deal.status.charAt(0).toUpperCase() + deal.status.slice(1);
         }
-        
-        const productImage = deal.product.image 
-            ? `<img src="${deal.product.image}" alt="${deal.product.name}" class="deal-product-image">`
-            : `<div class="deal-product-image placeholder"><i class="bi bi-box"></i></div>`;
         
         let actionsHTML = '';
         if (deal.status === 'pending') {
-            // Use is_offer_recipient to determine who sees Accept/Decline buttons
             if (isOfferRecipient) {
                 actionsHTML = `
-                    <div class="deal-card-actions">
-                        <button class="deal-btn-accept" onclick="acceptDeal(${deal.id})">
-                            <i class="bi bi-check-lg"></i> Accept Deal
-                        </button>
-                        <button class="deal-btn-decline" onclick="declineDeal(${deal.id})">
-                            <i class="bi bi-x-lg"></i> Decline
-                        </button>
-                    </div>
+                    <button class="btn-accept" onclick="acceptDeal(${deal.id})">
+                        <i class="bi bi-check-lg"></i> Accept
+                    </button>
+                    <button class="btn-decline" onclick="declineDeal(${deal.id})">
+                        <i class="bi bi-x-lg"></i> Decline
+                    </button>
                 `;
             } else {
-                // Show "Waiting for..." with the other user's name (the recipient)
                 actionsHTML = `
-                    <div class="deal-card-actions">
-                        <span class="deal-waiting-label">
-                            <i class="bi bi-hourglass-split"></i> Waiting for ${deal.other_user.username}...
-                        </span>
-                        <button class="deal-btn-cancel" onclick="cancelDeal(${deal.id})">
-                            Cancel Offer
-                        </button>
-                    </div>
+                    <span class="deal-info-waiting"><i class="bi bi-hourglass-split"></i> Waiting...</span>
+                    <button class="btn-cancel" onclick="cancelDeal(${deal.id})">Cancel</button>
                 `;
             }
         } else if (deal.status === 'confirmed') {
             if (isBuyerView) {
                 actionsHTML = `
-                    <div class="deal-card-actions">
-                        <button class="deal-btn-complete" onclick="completeDeal(${deal.id})">
-                            <i class="bi bi-bag-check"></i> I Received My Order
-                        </button>
-                        <button class="deal-btn-cancel" onclick="cancelDeal(${deal.id})">
-                            Cancel Order
-                        </button>
-                    </div>
+                    <button class="btn-complete" onclick="completeDeal(${deal.id})">
+                        <i class="bi bi-bag-check"></i> Received
+                    </button>
+                    <button class="btn-cancel" onclick="cancelDeal(${deal.id})">Cancel</button>
                 `;
             } else {
                 actionsHTML = `
-                    <div class="deal-card-actions">
-                        <span class="deal-waiting-label">
-                            <i class="bi bi-clock-history"></i> Waiting for Pickup...
-                        </span>
-                        <button class="deal-btn-cancel" onclick="cancelDeal(${deal.id})">
-                            Cancel Order
-                        </button>
-                    </div>
+                    <span class="deal-info-waiting"><i class="bi bi-clock-history"></i> Awaiting pickup...</span>
+                    <button class="btn-cancel" onclick="cancelDeal(${deal.id})">Cancel</button>
                 `;
             }
-        } else if (deal.status === 'completed' && deal.is_reviewed) {
-            actionsHTML = `
-                <div class="deal-review-summary">
-                    <div class="stars">
-                        <i class="bi bi-star-fill"></i> Seller: ${deal.review.seller_rating}/5 | Product: ${deal.review.product_rating}/5
-                    </div>
-                </div>
-            `;
         }
         
         return `
-            <div class="deal-card-header">
-                <div class="deal-icon">${icon}</div>
-                <div class="deal-card-header-text">
-                    <div class="deal-card-title">${title}</div>
-                    <div class="deal-card-subtitle">${deal.created_at_display}</div>
+            <div class="deal-info-left">
+                <div class="deal-info-icon">${icon}</div>
+                <div class="deal-info-text">
+                    <span class="deal-info-title">${title}</span>
+                    <span class="deal-info-subtitle">${deal.created_at_display}</span>
                 </div>
-                <span class="deal-status-badge">${deal.status_display}</span>
+                <span class="deal-info-price">₱${deal.total_price}</span>
             </div>
-            <div class="deal-card-body">
-                <div class="deal-product-info">
-                    ${productImage}
-                    <div class="deal-product-details">
-                        <h4>${deal.product.name}</h4>
-                        <div class="quantity">${deal.quantity} ${deal.product.unit}</div>
-                        <div class="price">₱${deal.total_price}</div>
-                    </div>
-                </div>
+            <div class="deal-info-actions">
+                ${actionsHTML}
             </div>
-            ${actionsHTML}
         `;
     }
     
+    // ==================== ACCEPT DEAL MODAL FUNCTIONS ====================
+    let pendingAcceptDealId = null;
+    
     function acceptDeal(dealId) {
-        if (!confirm('Accept this deal? The items will be reserved for you.')) return;
+        pendingAcceptDealId = dealId;
+        document.getElementById('acceptDealModal').classList.add('active');
+    }
+    
+    function closeAcceptDealModal() {
+        pendingAcceptDealId = null;
+        document.getElementById('acceptDealModal').classList.remove('active');
+        const btn = document.getElementById('confirmAcceptDealBtn');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-check-lg"></i> Accept Deal';
+        }
+    }
+    
+    function confirmAcceptDeal() {
+        if (!pendingAcceptDealId) {
+            closeAcceptDealModal();
+            return;
+        }
         
-        fetch(`/chat/deal/${dealId}/accept/`, {
+        const btn = document.getElementById('confirmAcceptDealBtn');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Accepting...';
+        }
+        
+        fetch(`/chat/deal/${pendingAcceptDealId}/accept/`, {
             method: 'POST',
             headers: { 'X-CSRFToken': csrfToken }
         })
@@ -1783,20 +1883,56 @@
         .then(data => {
             if (data.success) {
                 updateOrCreateDealCard(data.deal);
+                closeAcceptDealModal();
             } else {
                 alert('Error: ' + (data.error || 'Failed to accept deal'));
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-check-lg"></i> Accept Deal';
+                }
             }
         })
         .catch(error => {
             console.error('Error:', error);
             alert('Failed to accept deal. Please try again.');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check-lg"></i> Accept Deal';
+            }
         });
     }
     
+    // ==================== DECLINE DEAL MODAL FUNCTIONS ====================
+    let pendingDeclineDealId = null;
+    
     function declineDeal(dealId) {
-        if (!confirm('Decline this offer?')) return;
+        pendingDeclineDealId = dealId;
+        document.getElementById('declineDealModal').classList.add('active');
+    }
+    
+    function closeDeclineDealModal() {
+        pendingDeclineDealId = null;
+        document.getElementById('declineDealModal').classList.remove('active');
+        const btn = document.getElementById('confirmDeclineDealBtn');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-x-lg"></i> Decline Offer';
+        }
+    }
+    
+    function confirmDeclineDeal() {
+        if (!pendingDeclineDealId) {
+            closeDeclineDealModal();
+            return;
+        }
         
-        fetch(`/chat/deal/${dealId}/decline/`, {
+        const btn = document.getElementById('confirmDeclineDealBtn');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Declining...';
+        }
+        
+        fetch(`/chat/deal/${pendingDeclineDealId}/decline/`, {
             method: 'POST',
             headers: { 'X-CSRFToken': csrfToken }
         })
@@ -1804,16 +1940,33 @@
         .then(data => {
             if (data.success) {
                 updateOrCreateDealCard(data.deal);
+                closeDeclineDealModal();
                 // Refresh all deals to update Create Offer button state
                 refreshDealsAndButton();
             } else {
                 alert('Error: ' + (data.error || 'Failed to decline deal'));
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-x-lg"></i> Decline Offer';
+                }
             }
         })
         .catch(error => {
             console.error('Error:', error);
             alert('Failed to decline deal. Please try again.');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-x-lg"></i> Decline Offer';
+            }
         });
+    }
+    
+    function showThankYouModal() {
+        document.getElementById('thankYouModal').classList.add('active');
+    }
+    
+    function closeThankYouModal() {
+        document.getElementById('thankYouModal').classList.remove('active');
     }
     
     function cancelDeal(dealId) {
@@ -1959,7 +2112,7 @@
             if (data.success) {
                 closeReviewModal();
                 updateOrCreateDealCard(data.deal);
-                alert('Thank you for your review!');
+                showThankYouModal();
             } else {
                 alert('Error: ' + (data.error || 'Failed to submit review'));
                 btn.disabled = false;

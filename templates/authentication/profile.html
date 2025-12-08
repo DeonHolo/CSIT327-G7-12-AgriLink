@@ -86,6 +86,30 @@
         font-size: 2rem;
         font-weight: 700;
         margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+    
+    .profile-name-rating {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255,255,255,0.2);
+        padding: 0.2rem 0.6rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    .profile-name-rating .star {
+        color: #ffc107;
+    }
+    
+    .profile-name-rating .rating-count {
+        font-size: 0.75rem;
+        opacity: 0.9;
     }
     
     .profile-info {
@@ -811,7 +835,16 @@
                 <div class="avatar-indicator"><i class="bi bi-camera-fill"></i></div>
             </div>
             <div class="profile-info">
-                <h1>{{ profile_user.username }}</h1>
+                <h1>
+                    {{ profile_user.username }}
+                    {% if profile_user.is_farmer and profile_user.farmer_rating_count > 0 %}
+                    <span class="profile-name-rating">
+                        <i class="bi bi-star-fill star"></i>
+                        {{ profile_user.average_farmer_rating|floatformat:1 }}
+                        <span class="rating-count">({{ profile_user.farmer_rating_count }})</span>
+                    </span>
+                    {% endif %}
+                </h1>
                 <span class="role-badge">
                     <i class="bi bi-{{ profile_user.user_type|default:'person' }}"></i>
                     {{ profile_user.get_user_type_display }}
@@ -976,77 +1009,6 @@
                     </div>
                     {% endif %}
                 </div>
-            </div>
-        </div>
-        {% endif %}
-        
-        <!-- Seller Reviews Section (for farmers) -->
-        {% if profile_user.is_farmer %}
-        <div class="profile-section" style="margin-top: 2rem;">
-            <div class="section-header">
-                <i class="bi bi-star"></i>
-                <h3>Seller Reviews</h3>
-            </div>
-            <div class="section-content">
-                {% if profile_user.farmer_rating_count > 0 %}
-                <div class="rating-summary">
-                    <div class="rating-big">
-                        <div class="number">{{ profile_user.average_farmer_rating|floatformat:1 }}</div>
-                        <div class="stars">
-                            {% with avg=profile_user.average_farmer_rating|floatformat:0|add:0 %}
-                            {% for i in "12345" %}
-                                {% if forloop.counter <= avg %}
-                                <i class="bi bi-star-fill"></i>
-                                {% else %}
-                                <i class="bi bi-star-fill empty"></i>
-                                {% endif %}
-                            {% endfor %}
-                            {% endwith %}
-                        </div>
-                        <div class="count">{{ profile_user.farmer_rating_count }} review{{ profile_user.farmer_rating_count|pluralize }}</div>
-                    </div>
-                </div>
-                {% endif %}
-                
-                {% if seller_reviews %}
-                    {% for review in seller_reviews %}
-                    <div class="review-item">
-                        <div class="review-header">
-                            <div class="reviewer-avatar">
-                                {% if review.reviewer.profile_picture %}
-                                <img src="{{ review.reviewer.profile_picture.url }}" alt="{{ review.reviewer.username }}">
-                                {% else %}
-                                <i class="bi bi-person"></i>
-                                {% endif %}
-                            </div>
-                            <div class="reviewer-info">
-                                <div class="reviewer-name">{{ review.reviewer.username }}</div>
-                                <div class="review-date">{{ review.created_at|date:"M d, Y" }}</div>
-                            </div>
-                            <div class="review-stars">
-                                {% for i in "12345" %}
-                                    {% if forloop.counter <= review.seller_rating %}
-                                    <i class="bi bi-star-fill"></i>
-                                    {% else %}
-                                    <i class="bi bi-star-fill empty"></i>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                        </div>
-                        {% if review.seller_comment %}
-                        <div class="review-comment">{{ review.seller_comment }}</div>
-                        {% endif %}
-                        <div class="review-product">
-                            <i class="bi bi-box"></i> {{ review.deal.product.name }} ({{ review.deal.quantity }} {{ review.deal.product.unit }})
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                <div class="empty-state">
-                    <i class="bi bi-star"></i>
-                    <p>No reviews yet. Complete transactions to receive reviews from buyers.</p>
-                </div>
-                {% endif %}
             </div>
         </div>
         {% endif %}
