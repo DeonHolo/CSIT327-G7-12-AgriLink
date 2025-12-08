@@ -143,12 +143,12 @@ def home_view(request):
             highlight_map[p.id]['is_top'] = True
     highlight_products = list(highlight_map.values())
     
-    # Recent conversations for both roles
+    # Recent conversations for both roles (limit 3 for home page)
     recent_conversations = Conversation.objects.filter(
         participants=user
     ).exclude(
         deleted_by=user
-    ).select_related('product').prefetch_related('participants', 'messages')[:5]
+    ).select_related('product').prefetch_related('participants', 'messages')[:3]
     recent_conversation_data = []
     for convo in recent_conversations:
         recent_conversation_data.append({
@@ -180,14 +180,14 @@ def home_view(request):
         context['active_count'] = user_products.filter(is_active=True).count()
         context['inactive_count'] = user_products.filter(is_active=False).count()
         context['low_stock_count'] = user_products.filter(is_active=True, stock_quantity__lt=10).count()
-        context['recent_products'] = user_products.order_by('-created_at')[:5]
+        context['recent_products'] = user_products.order_by('-created_at')[:3]
     else:
         # Buyer-specific stats
         context['total_products'] = all_active_products.count()
         context['total_farmers'] = User.objects.filter(
             user_type__in=['farmer', 'both']
         ).count()
-        context['recent_products'] = all_active_products.order_by('-created_at')[:5]
+        context['recent_products'] = all_active_products.order_by('-created_at')[:3]
     
     return render(request, 'home.html', context)
 
@@ -545,7 +545,7 @@ def get_farmer_profile(request, user_id):
     if not farmer.is_farmer():
         return JsonResponse({'error': 'User is not a farmer'}, status=404)
     
-    # Get recent seller reviews
+    # Get recent seller reviews (max 2)
     from chat.models import Review
     from products.models import Product
     
@@ -553,7 +553,7 @@ def get_farmer_profile(request, user_id):
         deal__farmer=farmer
     ).select_related(
         'deal__product', 'reviewer'
-    ).order_by('-created_at')[:5]
+    ).order_by('-created_at')[:2]
     
     reviews_data = []
     for review in reviews:

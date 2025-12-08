@@ -145,6 +145,29 @@
         left: 0;
     }
     
+    .product-badges {
+        position: absolute;
+        top: 0.5rem;
+        left: 0.5rem;
+        display: flex;
+        gap: 0.35rem;
+        flex-wrap: wrap;
+        align-items: center;
+        z-index: 2;
+    }
+    
+    .product-badge {
+        background: rgba(0,0,0,0.6);
+        color: white;
+        font-size: 0.65rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
     .product-info {
         padding: 1rem;
     }
@@ -206,6 +229,44 @@
     .stock-badge.out-of-stock {
         background: #ffebee;
         color: #c62828;
+    }
+    
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        margin-top: 0.5rem;
+    }
+    
+    .product-rating .stars {
+        display: flex;
+        gap: 1px;
+    }
+    
+    .product-rating .stars i {
+        color: #ffc107;
+        font-size: 0.8rem;
+    }
+    
+    .product-rating .stars i.empty {
+        color: #ddd;
+    }
+    
+    .product-rating .rating-text {
+        font-size: 0.8rem;
+        color: #666;
+        margin-left: 0.25rem;
+    }
+    
+    .product-rating .rating-text .score {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .product-rating .no-reviews {
+        font-size: 0.75rem;
+        color: #999;
+        font-style: italic;
     }
     
     .empty-state {
@@ -567,11 +628,44 @@
                     {% else %}
                     <i class="bi bi-image"></i>
                     {% endif %}
+                    
+                    <!-- Featured/Top Badges -->
+                    {% if product.is_featured or product.id in top_product_ids %}
+                    <div class="product-badges">
+                        {% if product.is_featured %}
+                        <span class="product-badge"><i class="bi bi-star-fill"></i> Featured</span>
+                        {% endif %}
+                        {% if product.id in top_product_ids %}
+                        <span class="product-badge"><i class="bi bi-trophy-fill"></i> Top</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                 </div>
                 <div class="product-info">
                     <div class="product-category">{{ product.category.name }}</div>
                     <div class="product-name">{{ product.name }}</div>
                     <div class="product-price">₱{{ product.price|floatformat:"-2"|intcomma }}<span style="font-size: 0.875rem; font-weight: 400;">/ {{ product.unit }}</span></div>
+                    
+                    <!-- Product Rating -->
+                    <div class="product-rating">
+                        {% if product.rating_count > 0 %}
+                        <div class="stars">
+                            {% with avg=product.average_rating|floatformat:0|add:0 %}
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= avg %}
+                                <i class="bi bi-star-fill"></i>
+                                {% else %}
+                                <i class="bi bi-star-fill empty"></i>
+                                {% endif %}
+                            {% endfor %}
+                            {% endwith %}
+                        </div>
+                        <span class="rating-text"><span class="score">{{ product.average_rating|floatformat:1 }}</span> ({{ product.rating_count }})</span>
+                        {% else %}
+                        <span class="no-reviews"><i class="bi bi-star"></i> No reviews yet</span>
+                        {% endif %}
+                    </div>
+                    
                     <div class="product-meta">
                         <div class="product-farmer farmer-clickable" onclick="openFarmerProfileModal({{ product.farmer.id }}); event.preventDefault(); event.stopPropagation();">
                             <i class="bi bi-person-circle"></i>
