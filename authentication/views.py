@@ -29,14 +29,17 @@ def register_view(request):
             user.user_type = user_type
             user.save()
             
-            # Success message with role
+            # Automatically log in the user after registration
+            login(request, user)
+            
+            # Success message
             messages.success(
                 request, 
-                f'{user.get_user_type_display()} account created successfully for {user.username}! You can now log in.'
+                f'Welcome to AgriLink, {user.username}! Your account has been created successfully.'
             )
             
-            # Redirect to login page
-            return redirect('login')
+            # Redirect to home page since user is now logged in
+            return redirect('home')
         else:
             # Display error messages for each field
             for field, errors in form.errors.items():

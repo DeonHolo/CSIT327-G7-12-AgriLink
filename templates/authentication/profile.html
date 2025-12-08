@@ -177,8 +177,11 @@
     
     .profile-sections {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
         gap: 2rem;
+        align-items: stretch;
+        max-width: 1100px;
+        margin: 0 auto;
     }
     
     .profile-section {
@@ -186,8 +189,8 @@
         border-radius: 16px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         overflow: hidden;
-        max-width: 900px;
-        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
     }
     
     .section-header {
@@ -672,6 +675,10 @@
         color: white;
         cursor: pointer;
         transition: background 0.2s;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .btn-modal-save:hover {
@@ -923,7 +930,7 @@
         
         <!-- Become a Farmer Section (only show for buyers who aren't already farmers) -->
         {% if not profile_user.is_farmer %}
-        <div class="profile-section" style="margin-top: 2rem;">
+        <div class="profile-section">
             <div class="section-header">
                 <i class="bi bi-shop"></i>
                 <h3>Become a Farmer</h3>
@@ -991,7 +998,7 @@
         </div>
         {% elif profile_user.business_permit_status == 'approved' %}
         <!-- Approved farmer status -->
-        <div class="profile-section" style="margin-top: 2rem;">
+        <div class="profile-section">
             <div class="section-header">
                 <i class="bi bi-shop"></i>
                 <h3>Farmer Status</h3>
@@ -1039,7 +1046,6 @@
                     <div class="otp-input-group">
                         <input type="text" class="otp-input" placeholder="Enter verification code" maxlength="6">
                     </div>
-                    <p class="otp-note">* Verification is optional for MVP</p>
                 </div>
             </div>
             <div class="modal-footer">
@@ -1074,7 +1080,6 @@
                     <div class="otp-input-group">
                         <input type="text" class="otp-input" placeholder="Enter OTP code" maxlength="6">
                     </div>
-                    <p class="otp-note">* OTP verification is optional for MVP</p>
                 </div>
             </div>
             <div class="modal-footer">
@@ -1185,7 +1190,7 @@ function sendVerificationCode() {
         alert('Please enter a new email address first.');
         return;
     }
-    alert('Verification code sent to ' + newEmail + '\n\n(This is a demo - verification is optional for MVP)');
+    alert('Verification code sent to ' + newEmail);
 }
 
 // Phone Modal functions
@@ -1204,7 +1209,7 @@ function sendOTP() {
         alert('Please enter a new phone number first.');
         return;
     }
-    alert('OTP sent to ' + newPhone + '\n\n(This is a demo - OTP verification is optional for MVP)');
+    alert('OTP sent to ' + newPhone);
 }
 </script>
 {% endblock %}
