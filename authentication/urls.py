@@ -36,5 +36,9 @@ urlpatterns = [
     path('staff/users/', staff_views.users_list, name='staff_users_list'),
     path('staff/users/<int:user_id>/', staff_views.user_detail, name='staff_user_detail'),
     path('staff/users/<int:user_id>/action/', staff_views.user_action, name='staff_user_action'),
+    # Conversation Management
+    path('staff/conversations/', staff_views.conversations_list, name='staff_conversations_list'),
+    path('staff/conversations/<int:conversation_id>/delete/', staff_views.conversation_delete, name='staff_conversation_delete'),
+    path('staff/conversations/bulk-delete/', staff_views.conversations_bulk_delete, name='staff_conversations_bulk_delete'),
 ]
 

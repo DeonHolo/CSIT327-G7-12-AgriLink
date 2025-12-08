@@ -12,6 +12,10 @@ urlpatterns = [
     path('<int:pk>/mark-read/', views.mark_messages_read, name='mark_messages_read'),
     path('<int:pk>/messages/new/<str:after_timestamp>/', views.get_new_messages, name='get_new_messages'),
     
+    # Typing indicators
+    path('<int:pk>/typing/', views.send_typing, name='send_typing'),
+    path('<int:pk>/typing/status/', views.get_typing_status, name='get_typing_status'),
+    
     # Start conversation from product
     path('start/<int:product_pk>/', views.start_conversation, name='start_conversation'),
     

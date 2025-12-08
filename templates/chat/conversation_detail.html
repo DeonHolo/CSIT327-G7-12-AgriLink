@@ -948,7 +948,7 @@
                         </div>
                         <div class="deal-card-header-text">
                             <div class="deal-card-title">
-                                {% if deal.status == 'pending' %}Offer from {{ deal.farmer.username }}
+                                {% if deal.status == 'pending' %}Offer from {% if deal.created_by %}{{ deal.created_by.username }}{% else %}{{ deal.farmer.username }}{% endif %}
                                 {% elif deal.status == 'confirmed' %}Order Confirmed - Ready for Pickup
                                 {% elif deal.status == 'completed' %}Transaction Completed
                                 {% elif deal.status == 'cancelled' %}Cancelled by {{ deal.cancelled_by.username }}
@@ -978,7 +978,9 @@
                     
                     {% if deal.status == 'pending' %}
                     <div class="deal-card-actions">
-                        {% if user == deal.buyer %}
+                        {# Check if current user is the offer recipient (NOT the creator) #}
+                        {% if deal.created_by and user != deal.created_by or not deal.created_by and user != deal.farmer %}
+                        {# User is the recipient - show Accept/Decline buttons #}
                         <button class="deal-btn-accept" onclick="acceptDeal({{ deal.id }})">
                             <i class="bi bi-check-lg"></i> Accept Deal
                         </button>
@@ -986,8 +988,9 @@
                             <i class="bi bi-x-lg"></i> Decline
                         </button>
                         {% else %}
+                        {# User is the creator - show Waiting label #}
                         <span class="deal-waiting-label">
-                            <i class="bi bi-hourglass-split"></i> Waiting for {{ deal.buyer.username }}...
+                            <i class="bi bi-hourglass-split"></i> Waiting for {% if deal.created_by == deal.farmer or not deal.created_by %}{{ deal.buyer.username }}{% else %}{{ deal.farmer.username }}{% endif %}...
                         </span>
                         <button class="deal-btn-cancel" onclick="cancelDeal({{ deal.id }})">
                             Cancel Offer
@@ -1593,12 +1596,14 @@
     function generateDealCardHTML(deal) {
         const isFarmerView = deal.is_farmer;
         const isBuyerView = deal.is_buyer;
+        const isOfferRecipient = deal.is_offer_recipient;  // Use this for accept/decline logic
+        const isOfferCreator = deal.is_offer_creator;
         
         let icon, title;
         switch(deal.status) {
             case 'pending':
                 icon = '<i class="bi bi-hourglass-split"></i>';
-                title = `Offer from ${deal.farmer.username}`;
+                title = `Offer from ${deal.created_by.username}`;
                 break;
             case 'confirmed':
                 icon = '<i class="bi bi-check-circle"></i>';
@@ -1624,7 +1629,8 @@
         
         let actionsHTML = '';
         if (deal.status === 'pending') {
-            if (isBuyerView) {
+            // Use is_offer_recipient to determine who sees Accept/Decline buttons
+            if (isOfferRecipient) {
                 actionsHTML = `
                     <div class="deal-card-actions">
                         <button class="deal-btn-accept" onclick="acceptDeal(${deal.id})">
@@ -1636,10 +1642,11 @@
                     </div>
                 `;
             } else {
+                // Show "Waiting for..." with the other user's name (the recipient)
                 actionsHTML = `
                     <div class="deal-card-actions">
                         <span class="deal-waiting-label">
-                            <i class="bi bi-hourglass-split"></i> Waiting for ${deal.buyer.username}...
+                            <i class="bi bi-hourglass-split"></i> Waiting for ${deal.other_user.username}...
                         </span>
                         <button class="deal-btn-cancel" onclick="cancelDeal(${deal.id})">
                             Cancel Offer

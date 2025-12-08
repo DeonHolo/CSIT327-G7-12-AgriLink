@@ -1624,6 +1624,14 @@
 
                 </a>
 
+                <a href="{% url 'staff_conversations_list' %}" class="staff-nav-link {% if 'conversations' in request.resolver_match.url_name %}active{% endif %}">
+
+                    <i class="bi bi-chat-dots"></i>
+
+                    <span>Conversations</span>
+
+                </a>
+
                 
 
                 <div class="staff-nav-divider"></div>
@@ -1637,13 +1645,19 @@
                     <span>Back to Site</span>
 
                 </a>
-                <a href="{% url 'logout' %}" class="staff-nav-link logout-trigger">
+                <a href="#" class="staff-nav-link logout-trigger" role="button" tabindex="0">
 
                     <i class="bi bi-box-arrow-right"></i>
 
                     <span>Logout</span>
 
                 </a>
+                <noscript>
+                    <a href="{% url 'logout' %}" class="staff-nav-link">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Logout (No JS)</span>
+                    </a>
+                </noscript>
 
             </nav>
 
