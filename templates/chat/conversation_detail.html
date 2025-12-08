@@ -956,16 +956,14 @@
                 <div class="chat-user-role">{{ other_user.get_user_type_display }}{% if other_user.is_farmer %} <i class="bi bi-chevron-right" style="font-size: 0.75rem;"></i>{% endif %}</div>
             </div>
         </div>
-        {% if is_farmer %}
-            {% if has_active_deal %}
-            <button type="button" class="create-offer-btn" id="createOfferBtn" disabled title="Complete or close the current offer first">
-                <i class="bi bi-tag"></i> Offer Active
-            </button>
-            {% else %}
-            <button type="button" class="create-offer-btn" id="createOfferBtn" onclick="openCreateOfferModal()">
-                <i class="bi bi-tag"></i> Create Offer
-            </button>
-            {% endif %}
+        {% if has_active_deal %}
+        <button type="button" class="create-offer-btn" id="createOfferBtn" disabled title="Complete or close the current offer first">
+            <i class="bi bi-tag"></i> Offer Active
+        </button>
+        {% else %}
+        <button type="button" class="create-offer-btn" id="createOfferBtn" onclick="openCreateOfferModal()">
+            <i class="bi bi-tag"></i> Create Offer
+        </button>
         {% endif %}
     </div>
     
@@ -985,29 +983,22 @@
     </div>
     {% endif %}
     
-    <!-- Active Deal Info Bar (minimal, fixed at top) - Only show the most recent deal -->
+    <!-- Active Deal Info Bar (minimal, fixed at top) - Only show the most recent active deal -->
     {% with deals|first as deal %}
-    {% if deal %}
+    {% if deal and deal.status != 'completed' and deal.status != 'cancelled' and deal.status != 'declined' %}
     <div class="deal-info-bar {{ deal.status }}" id="deal-bar-{{ deal.id }}" data-deal-id="{{ deal.id }}">
         <div class="deal-info-left">
             <div class="deal-info-icon">
                 {% if deal.status == 'pending' %}
                 <i class="bi bi-hourglass-split"></i>
-                {% elif deal.status == 'confirmed' %}
-                <i class="bi bi-check-circle"></i>
-                {% elif deal.status == 'completed' %}
-                <i class="bi bi-trophy"></i>
                 {% else %}
-                <i class="bi bi-x-circle"></i>
+                <i class="bi bi-check-circle"></i>
                 {% endif %}
             </div>
             <div class="deal-info-text">
                 <span class="deal-info-title">
                     {% if deal.status == 'pending' %}Offer: {{ deal.quantity }} {{ deal.product.unit }} of {{ deal.product.name }}
-                    {% elif deal.status == 'confirmed' %}Confirmed: {{ deal.quantity }} {{ deal.product.unit }}
-                    {% elif deal.status == 'completed' %}Completed: {{ deal.quantity }} {{ deal.product.unit }}
-                    {% elif deal.status == 'cancelled' %}Cancelled
-                    {% else %}Declined
+                    {% else %}Confirmed: {{ deal.quantity }} {{ deal.product.unit }}
                     {% endif %}
                 </span>
                 <span class="deal-info-subtitle">{{ deal.created_at|date:"M d, g:i A" }}</span>
@@ -1037,8 +1028,6 @@
                 <span class="deal-info-waiting"><i class="bi bi-clock-history"></i> Awaiting pickup...</span>
                 <button class="btn-cancel" onclick="cancelDeal({{ deal.id }})">Cancel</button>
                 {% endif %}
-            {% elif deal.status == 'completed' and deal.is_reviewed %}
-                <span class="deal-info-waiting"><i class="bi bi-star-fill"></i> Reviewed</span>
             {% endif %}
         </div>
     </div>

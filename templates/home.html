@@ -362,6 +362,42 @@
         color: #666;
     }
     
+    .highlight-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        margin-top: 0.5rem;
+    }
+    
+    .highlight-rating .stars {
+        display: flex;
+        gap: 1px;
+    }
+    
+    .highlight-rating .stars i {
+        color: #ffc107;
+        font-size: 0.75rem;
+    }
+    
+    .highlight-rating .stars i.empty {
+        color: #ddd;
+    }
+    
+    .highlight-rating .rating-text {
+        font-size: 0.75rem;
+        color: #666;
+    }
+    
+    .highlight-rating .no-reviews {
+        font-size: 0.7rem;
+        color: #999;
+        font-style: italic;
+    }
+    
+    .highlight-rating .no-reviews i {
+        color: #ddd;
+    }
+    
     /* Quick Actions */
     .quick-actions {
         background: white;
@@ -628,6 +664,24 @@
                 <div class="highlight-body">
                     <h4>{{ product.name }}</h4>
                     <div class="price">₱{{ product.price|floatformat:"-2"|intcomma }} <span>/ {{ product.unit }}</span></div>
+                    <div class="highlight-rating">
+                        {% if product.rating_count > 0 %}
+                        <div class="stars">
+                            {% with avg=product.average_rating|floatformat:0|add:0 %}
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= avg %}
+                                <i class="bi bi-star-fill"></i>
+                                {% else %}
+                                <i class="bi bi-star-fill empty"></i>
+                                {% endif %}
+                            {% endfor %}
+                            {% endwith %}
+                        </div>
+                        <span class="rating-text">{{ product.average_rating|floatformat:1 }} ({{ product.rating_count }})</span>
+                        {% else %}
+                        <span class="no-reviews"><i class="bi bi-star"></i> No reviews</span>
+                        {% endif %}
+                    </div>
                 </div>
             </a>
             {% endwith %}

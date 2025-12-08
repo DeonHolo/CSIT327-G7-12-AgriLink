@@ -82,6 +82,13 @@ def product_list(request):
 
     # Get all categories for filter sidebar (cached)
     categories = Category.objects.all()
+    
+    # Get top 3 product IDs by sales for badge display
+    top_product_ids = list(
+        Product.objects.filter(is_active=True)
+        .order_by('-total_sales')
+        .values_list('id', flat=True)[:3]
+    )
 
     context = {
         'title': 'Browse Products - AgriLink',
@@ -93,6 +100,7 @@ def product_list(request):
         'max_price': max_price,
         'sort_by': sort_by,
         'total_results': total_results,
+        'top_product_ids': top_product_ids,
     }
     return render(request, 'products/product_list.html', context)
 
@@ -121,18 +129,32 @@ def product_detail(request, pk):
     
     # Get product reviews (reviews on deals for this product)
     from chat.models import Review
-    product_reviews = Review.objects.filter(
+    from django.db.models import Count
+    
+    # Get all reviews for this product
+    all_product_reviews = Review.objects.filter(
         deal__product=product
     ).select_related(
         'deal', 'reviewer'
-    ).order_by('-created_at')[:10]
+    ).order_by('-created_at')
+    
+    # Get featured review (highest rated among recent, or just the latest highest)
+    featured_review = all_product_reviews.order_by('-product_rating', '-created_at').first()
+    
+    # Calculate rating distribution for the bars
+    rating_distribution = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0}
+    for review in all_product_reviews:
+        if review.product_rating in rating_distribution:
+            rating_distribution[review.product_rating] += 1
 
     context = {
         'title': f'{product.name} - AgriLink',
         'product': product,
         'other_products': other_products,
         'farmer_active_products_count': farmer_active_products_count,
-        'product_reviews': product_reviews,
+        'featured_review': featured_review,
+        'all_product_reviews': all_product_reviews,
+        'rating_distribution': rating_distribution,
     }
     return render(request, 'products/product_detail.html', context)
 

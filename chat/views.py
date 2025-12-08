@@ -140,11 +140,22 @@ def conversation_detail(request, pk):
         conversation.product.farmer == request.user
     )
     
-    # Get farmer's active products for the offer form (if user is a farmer)
+    # Get products available for offer (from the product's farmer or farmer participant)
     farmer_products = []
-    if is_farmer:
+    if conversation.product:
+        # Use the conversation's product farmer
+        farmer = conversation.product.farmer
+    else:
+        # Find a farmer participant
+        farmer = None
+        for participant in conversation.participants.all():
+            if participant.is_farmer():
+                farmer = participant
+                break
+    
+    if farmer:
         farmer_products = Product.objects.filter(
-            farmer=request.user,
+            farmer=farmer,
             is_active=True,
             stock_quantity__gt=0
         ).values('id', 'name', 'price', 'unit', 'stock_quantity', 'image')
@@ -393,13 +404,25 @@ def get_farmer_products(request, pk):
     if request.user not in conversation.participants.all():
         return JsonResponse({'error': 'Access denied'}, status=403)
     
-    # Check if user is a farmer
-    if not request.user.is_farmer():
-        return JsonResponse({'error': 'Only farmers can access this'}, status=403)
+    # Get products that can be offered in this conversation
+    # If conversation has a linked product, use that product's farmer
+    # Otherwise, get the farmer participant's products
+    if conversation.product:
+        farmer = conversation.product.farmer
+    else:
+        # Find a farmer participant
+        farmer = None
+        for participant in conversation.participants.all():
+            if participant.is_farmer():
+                farmer = participant
+                break
+    
+    if not farmer:
+        return JsonResponse({'error': 'No farmer found in conversation'}, status=403)
     
     # Get farmer's active products with stock
     products = Product.objects.filter(
-        farmer=request.user,
+        farmer=farmer,
         is_active=True,
         stock_quantity__gt=0
     )
@@ -426,7 +449,7 @@ def get_farmer_products(request, pk):
 @retry_on_db_lock(max_retries=5, delay=0.1)
 def create_offer(request, pk):
     """
-    Any farmer in the conversation can create a deal offer.
+    Any participant in the conversation can create a deal offer.
     The deal's farmer/buyer roles are determined by who owns the product.
     """
     conversation = get_object_or_404(Conversation, pk=pk)
@@ -434,10 +457,6 @@ def create_offer(request, pk):
     # Check if user is a participant
     if request.user not in conversation.participants.all():
         return JsonResponse({'error': 'Access denied'}, status=403)
-    
-    # Check if user is a farmer
-    if not request.user.is_farmer():
-        return JsonResponse({'error': 'Only farmers can create offers'}, status=403)
     
     # Check for existing active deal (pending or confirmed)
     active_deal = conversation.deals.filter(status__in=['pending', 'confirmed']).first()

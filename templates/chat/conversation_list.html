@@ -106,8 +106,12 @@
     }
     
     .conversation-time {
-        font-size: 0.875rem;
-        color: #666;
+        font-size: 0.75rem;
+        color: #888;
+        white-space: nowrap;
+        flex-shrink: 0;
+        margin-left: auto;
+        padding-left: 0.5rem;
     }
     
     .last-message {
@@ -132,7 +136,10 @@
         display: flex;
         flex-direction: column;
         align-items: flex-end;
-        gap: 0.5rem;
+        justify-content: center;
+        gap: 0.35rem;
+        min-width: 80px;
+        margin-right: 0.5rem;
     }
     
     .unread-count {
@@ -272,9 +279,6 @@
                 <div class="conversation-info">
                     <div class="conversation-header">
                         <div class="user-name">{{ data.other_user.username }}</div>
-                        {% if data.last_message %}
-                        <div class="conversation-time">{{ data.last_message.timestamp|timesince }} ago</div>
-                        {% endif %}
                     </div>
                     
                     {% if data.last_message %}
@@ -294,6 +298,9 @@
                 </div>
                 
                 <div class="conversation-meta">
+                    {% if data.last_message %}
+                    <div class="conversation-time">{{ data.last_message.timestamp|timesince }} ago</div>
+                    {% endif %}
                     {% if data.unread_count > 0 %}
                     <div class="unread-count">{{ data.unread_count }}</div>
                     {% endif %}

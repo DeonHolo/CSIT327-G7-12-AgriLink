@@ -191,6 +191,7 @@
         background: white;
         border-radius: 16px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-top: 2rem;
     }
     
     .farmer-header {
@@ -273,80 +274,176 @@
         color: white;
     }
     
-    /* Product Reviews Styles */
+    /* Product Reviews Styles - Professional Revamp */
     .reviews-section {
-        padding: 2rem;
         background: white;
-        border-radius: 16px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-radius: 20px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
         margin-top: 2rem;
+        overflow: hidden;
     }
     
-    .reviews-section h3 {
+    .reviews-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+        padding: 1.75rem 2rem;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .reviews-header h3 {
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        margin-bottom: 1.5rem;
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1a1a1a;
     }
     
-    .rating-summary {
-        background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
-        border-radius: 12px;
+    .reviews-header h3 i {
+        color: #ffc107;
+    }
+    
+    .reviews-count-badge {
+        background: #f0f0f0;
+        color: #666;
+        padding: 0.35rem 0.85rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .reviews-body {
+        padding: 2rem;
+    }
+    
+    .rating-overview {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 2.5rem;
         padding: 1.5rem;
+        background: linear-gradient(135deg, #fffdf7 0%, #fffbeb 100%);
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        border: 1px solid #fef3c7;
+    }
+    
+    .rating-score {
+        text-align: center;
+        padding: 0.5rem 1.5rem;
+    }
+    
+    .rating-score .big-number {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: #1a1a1a;
+        line-height: 1;
+    }
+    
+    .rating-score .stars {
+        color: #ffc107;
+        font-size: 1.1rem;
+        margin: 0.5rem 0;
+        letter-spacing: 2px;
+    }
+    
+    .rating-score .total-reviews {
+        font-size: 0.9rem;
+        color: #666;
+        font-weight: 500;
+    }
+    
+    .rating-bars {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .rating-bar-row {
         display: flex;
         align-items: center;
-        gap: 1.5rem;
-        margin-bottom: 1.5rem;
+        gap: 0.75rem;
     }
     
-    .rating-big {
-        text-align: center;
-    }
-    
-    .rating-big .number {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #333;
-    }
-    
-    .rating-big .stars {
-        color: #ffc107;
-        font-size: 1.25rem;
-    }
-    
-    .rating-big .count {
+    .rating-bar-label {
         font-size: 0.85rem;
         color: #666;
-        margin-top: 0.25rem;
-    }
-    
-    .review-item {
-        padding: 1.25rem 0;
-        border-bottom: 1px solid #f0f0f0;
-    }
-    
-    .review-item:last-child {
-        border-bottom: none;
-    }
-    
-    .review-header {
+        min-width: 50px;
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 0.75rem;
+        gap: 0.25rem;
+    }
+    
+    .rating-bar-label i {
+        color: #ffc107;
+        font-size: 0.75rem;
+    }
+    
+    .rating-bar-track {
+        flex: 1;
+        height: 8px;
+        background: #e5e7eb;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .rating-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ffc107 0%, #ffcd38 100%);
+        border-radius: 4px;
+        transition: width 0.5s ease;
+    }
+    
+    .rating-bar-count {
+        font-size: 0.8rem;
+        color: #999;
+        min-width: 30px;
+        text-align: right;
+    }
+    
+    .reviews-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .review-card {
+        background: #fafafa;
+        border-radius: 14px;
+        padding: 1.5rem;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+    }
+    
+    .review-card:hover {
+        background: #fff;
+        border-color: #e0e0e0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    
+    .review-card-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1rem;
     }
     
     .reviewer-avatar {
-        width: 40px;
-        height: 40px;
+        width: 48px;
+        height: 48px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+        background: linear-gradient(135deg, #4CAF50 0%, #66bb6a 100%);
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
-        font-size: 1rem;
+        font-size: 1.1rem;
+        font-weight: 600;
         overflow: hidden;
+        flex-shrink: 0;
     }
     
     .reviewer-avatar img {
@@ -355,53 +452,275 @@
         object-fit: cover;
     }
     
-    .reviewer-info {
+    .review-meta {
         flex: 1;
     }
     
+    .review-meta-top {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+    
     .reviewer-name {
+        font-weight: 700;
+        color: #1a1a1a;
+        font-size: 1rem;
+    }
+    
+    .verified-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+        color: #166534;
+        padding: 0.2rem 0.6rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
         font-weight: 600;
-        color: #333;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+    
+    .verified-badge i {
+        font-size: 0.7rem;
+    }
+    
+    .review-meta-bottom {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 0.35rem;
+    }
+    
+    .review-stars {
+        display: flex;
+        gap: 2px;
+    }
+    
+    .review-stars i {
+        color: #ffc107;
+        font-size: 0.9rem;
+    }
+    
+    .review-stars i.empty {
+        color: #ddd;
     }
     
     .review-date {
         font-size: 0.8rem;
-        color: #999;
+        color: #888;
     }
     
-    .review-stars {
-        color: #ffc107;
-        font-size: 1rem;
-    }
-    
-    .review-stars .empty {
-        color: #ddd;
+    .review-content {
+        margin-left: 64px;
     }
     
     .review-comment {
-        color: #555;
+        color: #444;
         font-size: 0.95rem;
-        margin-top: 0.5rem;
-        padding-left: 0.5rem;
-        border-left: 3px solid #e0e0e0;
+        line-height: 1.6;
+        margin-bottom: 1rem;
     }
     
-    .review-quantity {
+    .review-purchase-info {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #f3f4f6;
+        color: #6b7280;
+        padding: 0.4rem 0.85rem;
+        border-radius: 8px;
         font-size: 0.8rem;
-        color: #888;
-        margin-top: 0.5rem;
+    }
+    
+    .review-purchase-info i {
+        color: #4CAF50;
     }
     
     .empty-reviews {
         text-align: center;
-        padding: 2rem;
+        padding: 4rem 2rem;
         color: #999;
     }
     
-    .empty-reviews i {
+    .empty-reviews-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .empty-reviews-icon i {
         font-size: 2.5rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
+        color: #9ca3af;
+    }
+    
+    .empty-reviews h4 {
+        font-size: 1.1rem;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-reviews p {
+        font-size: 0.9rem;
+        color: #6b7280;
+        margin: 0;
+    }
+    
+    /* View All Reviews Button & Modal */
+    .view-all-reviews {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .btn-view-all-reviews {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.85rem 1.75rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        color: #495057;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-view-all-reviews:hover {
+        background: linear-gradient(135deg, #4CAF50 0%, #66bb6a 100%);
+        border-color: #4CAF50;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    }
+    
+    .btn-view-all-reviews i {
+        font-size: 1.1rem;
+    }
+    
+    /* All Reviews Modal */
+    .all-reviews-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1050;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+    }
+    
+    .all-reviews-modal.active {
+        display: flex;
+    }
+    
+    .all-reviews-modal-content {
+        background: white;
+        border-radius: 20px;
+        width: 90%;
+        max-width: 700px;
+        max-height: 85vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        animation: modalSlideIn 0.3s ease;
+    }
+    
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+    
+    .all-reviews-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #e5e7eb;
+        background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+    }
+    
+    .all-reviews-modal-header h3 {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1a1a1a;
+    }
+    
+    .all-reviews-modal-header h3 i {
+        color: #ffc107;
+    }
+    
+    .all-reviews-modal-close {
+        background: none;
+        border: none;
+        font-size: 1.75rem;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 0.25rem;
+        line-height: 1;
+        transition: color 0.2s;
+    }
+    
+    .all-reviews-modal-close:hover {
+        color: #1a1a1a;
+    }
+    
+    .all-reviews-modal-body {
+        padding: 1.5rem 2rem;
+        overflow-y: auto;
+        flex: 1;
+    }
+    
+    .all-reviews-modal-body .reviews-list {
+        gap: 1rem;
+    }
+    
+    .all-reviews-modal-body .review-card {
+        background: #fafafa;
+    }
+    
+    @media (max-width: 768px) {
+        .rating-overview {
+            grid-template-columns: 1fr;
+            text-align: center;
+            gap: 1.5rem;
+        }
+        
+        .rating-score {
+            padding: 0;
+        }
+        
+        .review-content {
+            margin-left: 0;
+            margin-top: 1rem;
+        }
+        
+        .review-card-header {
+            flex-wrap: wrap;
+        }
     }
     
     @media (max-width: 768px) {
@@ -532,67 +851,132 @@
     
     <!-- Product Reviews Section -->
     <div class="reviews-section">
-        <h3><i class="bi bi-star"></i> Product Reviews</h3>
-        
-        {% if product.rating_count > 0 %}
-        <div class="rating-summary">
-            <div class="rating-big">
-                <div class="number">{{ product.average_rating|floatformat:1 }}</div>
-                <div class="stars">
-                    {% with avg=product.average_rating|floatformat:0|add:0 %}
-                    {% for i in "12345" %}
-                        {% if forloop.counter <= avg %}
-                        <i class="bi bi-star-fill"></i>
-                        {% else %}
-                        <i class="bi bi-star-fill empty"></i>
-                        {% endif %}
-                    {% endfor %}
-                    {% endwith %}
-                </div>
-                <div class="count">{{ product.rating_count }} review{{ product.rating_count|pluralize }}</div>
-            </div>
+        <div class="reviews-header">
+            <h3><i class="bi bi-star-fill"></i> Customer Reviews</h3>
+            <span class="reviews-count-badge">{{ product.rating_count }} Review{{ product.rating_count|pluralize }}</span>
         </div>
-        {% endif %}
         
-        {% if product_reviews %}
-            {% for review in product_reviews %}
-            <div class="review-item">
-                <div class="review-header">
-                    <div class="reviewer-avatar">
-                        {% if review.reviewer.profile_picture %}
-                        <img src="{{ review.reviewer.profile_picture.url }}" alt="{{ review.reviewer.username }}">
-                        {% else %}
-                        <i class="bi bi-person"></i>
-                        {% endif %}
-                    </div>
-                    <div class="reviewer-info">
-                        <div class="reviewer-name">{{ review.reviewer.username }}</div>
-                        <div class="review-date">{{ review.created_at|date:"M d, Y" }}</div>
-                    </div>
-                    <div class="review-stars">
+        <div class="reviews-body">
+            {% if product.rating_count > 0 %}
+            <div class="rating-overview">
+                <div class="rating-score">
+                    <div class="big-number">{{ product.average_rating|floatformat:1 }}</div>
+                    <div class="stars">
+                        {% with avg=product.average_rating|floatformat:0|add:0 %}
                         {% for i in "12345" %}
-                            {% if forloop.counter <= review.product_rating %}
+                            {% if forloop.counter <= avg %}
                             <i class="bi bi-star-fill"></i>
                             {% else %}
-                            <i class="bi bi-star-fill empty"></i>
+                            <i class="bi bi-star"></i>
                             {% endif %}
                         {% endfor %}
+                        {% endwith %}
                     </div>
+                    <div class="total-reviews">{{ product.rating_count }} rating{{ product.rating_count|pluralize }}</div>
                 </div>
-                {% if review.product_comment %}
-                <div class="review-comment">{{ review.product_comment }}</div>
-                {% endif %}
-                <div class="review-quantity">
-                    <i class="bi bi-bag"></i> Purchased {{ review.deal.quantity }} {{ product.unit }}
+                <div class="rating-bars">
+                    {% with total=product.rating_count %}
+                    <div class="rating-bar-row">
+                        <span class="rating-bar-label">5 <i class="bi bi-star-fill"></i></span>
+                        <div class="rating-bar-track">
+                            <div class="rating-bar-fill" style="width: {% widthratio rating_distribution.5 total 100 %}%;"></div>
+                        </div>
+                        <span class="rating-bar-count">{{ rating_distribution.5 }}</span>
+                    </div>
+                    <div class="rating-bar-row">
+                        <span class="rating-bar-label">4 <i class="bi bi-star-fill"></i></span>
+                        <div class="rating-bar-track">
+                            <div class="rating-bar-fill" style="width: {% widthratio rating_distribution.4 total 100 %}%;"></div>
+                        </div>
+                        <span class="rating-bar-count">{{ rating_distribution.4 }}</span>
+                    </div>
+                    <div class="rating-bar-row">
+                        <span class="rating-bar-label">3 <i class="bi bi-star-fill"></i></span>
+                        <div class="rating-bar-track">
+                            <div class="rating-bar-fill" style="width: {% widthratio rating_distribution.3 total 100 %}%;"></div>
+                        </div>
+                        <span class="rating-bar-count">{{ rating_distribution.3 }}</span>
+                    </div>
+                    <div class="rating-bar-row">
+                        <span class="rating-bar-label">2 <i class="bi bi-star-fill"></i></span>
+                        <div class="rating-bar-track">
+                            <div class="rating-bar-fill" style="width: {% widthratio rating_distribution.2 total 100 %}%;"></div>
+                        </div>
+                        <span class="rating-bar-count">{{ rating_distribution.2 }}</span>
+                    </div>
+                    <div class="rating-bar-row">
+                        <span class="rating-bar-label">1 <i class="bi bi-star-fill"></i></span>
+                        <div class="rating-bar-track">
+                            <div class="rating-bar-fill" style="width: {% widthratio rating_distribution.1 total 100 %}%;"></div>
+                        </div>
+                        <span class="rating-bar-count">{{ rating_distribution.1 }}</span>
+                    </div>
+                    {% endwith %}
                 </div>
             </div>
-            {% endfor %}
-        {% else %}
-        <div class="empty-reviews">
-            <i class="bi bi-star"></i>
-            <p>No reviews yet. Be the first to purchase and review this product!</p>
+            {% endif %}
+            
+            {% if featured_review %}
+            <div class="reviews-list">
+                <!-- Featured Review -->
+                <div class="review-card">
+                    <div class="review-card-header">
+                        <div class="reviewer-avatar">
+                            {% if featured_review.reviewer.profile_picture %}
+                            <img src="{{ featured_review.reviewer.profile_picture.url }}" alt="{{ featured_review.reviewer.username }}">
+                            {% else %}
+                            {{ featured_review.reviewer.username|slice:":1"|upper }}
+                            {% endif %}
+                        </div>
+                        <div class="review-meta">
+                            <div class="review-meta-top">
+                                <span class="reviewer-name">{{ featured_review.reviewer.username }}</span>
+                                <span class="verified-badge"><i class="bi bi-patch-check-fill"></i> Verified Purchase</span>
+                            </div>
+                            <div class="review-meta-bottom">
+                                <div class="review-stars">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= featured_review.product_rating %}
+                                        <i class="bi bi-star-fill"></i>
+                                        {% else %}
+                                        <i class="bi bi-star-fill empty"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <span class="review-date">{{ featured_review.created_at|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        {% if featured_review.product_comment %}
+                        <p class="review-comment">{{ featured_review.product_comment }}</p>
+                        {% endif %}
+                        <div class="review-purchase-info">
+                            <i class="bi bi-bag-check-fill"></i>
+                            Purchased {{ featured_review.deal.quantity }} {{ product.unit }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- View All Reviews Button -->
+                {% if all_product_reviews.count > 1 %}
+                <div class="view-all-reviews">
+                    <button type="button" class="btn-view-all-reviews" onclick="openAllReviewsModal()">
+                        <i class="bi bi-chat-square-text"></i> View All {{ all_product_reviews.count }} Reviews
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="empty-reviews">
+                <div class="empty-reviews-icon">
+                    <i class="bi bi-chat-square-text"></i>
+                </div>
+                <h4>No Reviews Yet</h4>
+                <p>Be the first to purchase and share your experience with this product!</p>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
 
     <!-- Farmer/Seller Section -->
@@ -644,6 +1028,95 @@
     </div>
     {% endif %}
 </div>
+
+<!-- All Reviews Modal -->
+<div class="all-reviews-modal" id="allReviewsModal">
+    <div class="all-reviews-modal-content">
+        <div class="all-reviews-modal-header">
+            <h3><i class="bi bi-star-fill"></i> All Customer Reviews ({{ all_product_reviews.count }})</h3>
+            <button class="all-reviews-modal-close" onclick="closeAllReviewsModal()">&times;</button>
+        </div>
+        <div class="all-reviews-modal-body">
+            <div class="reviews-list">
+                {% for review in all_product_reviews %}
+                <div class="review-card">
+                    <div class="review-card-header">
+                        <div class="reviewer-avatar">
+                            {% if review.reviewer.profile_picture %}
+                            <img src="{{ review.reviewer.profile_picture.url }}" alt="{{ review.reviewer.username }}">
+                            {% else %}
+                            {{ review.reviewer.username|slice:":1"|upper }}
+                            {% endif %}
+                        </div>
+                        <div class="review-meta">
+                            <div class="review-meta-top">
+                                <span class="reviewer-name">{{ review.reviewer.username }}</span>
+                                <span class="verified-badge"><i class="bi bi-patch-check-fill"></i> Verified Purchase</span>
+                            </div>
+                            <div class="review-meta-bottom">
+                                <div class="review-stars">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.product_rating %}
+                                        <i class="bi bi-star-fill"></i>
+                                        {% else %}
+                                        <i class="bi bi-star-fill empty"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <span class="review-date">{{ review.created_at|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-content">
+                        {% if review.product_comment %}
+                        <p class="review-comment">{{ review.product_comment }}</p>
+                        {% endif %}
+                        <div class="review-purchase-info">
+                            <i class="bi bi-bag-check-fill"></i>
+                            Purchased {{ review.deal.quantity }} {{ product.unit }}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-reviews">
+                    <div class="empty-reviews-icon">
+                        <i class="bi bi-chat-square-text"></i>
+                    </div>
+                    <h4>No Reviews Yet</h4>
+                    <p>Be the first to purchase and share your experience!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openAllReviewsModal() {
+    document.getElementById('allReviewsModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAllReviewsModal() {
+    document.getElementById('allReviewsModal').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Close modal on backdrop click
+document.getElementById('allReviewsModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeAllReviewsModal();
+    }
+});
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeAllReviewsModal();
+    }
+});
+</script>
+
 {% if user == product.farmer %}
 <style>
     /* Unlist modal (reuses existing modal styles) */
