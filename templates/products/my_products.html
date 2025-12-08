@@ -372,8 +372,8 @@
                                     class="btn-action btn-delete open-delete-modal"
                                     data-delete-url="{% url 'product_delete' product.pk %}"
                                     data-product-name="{{ product.name }}"
-                                    data-is-active="{{ product.is_active|yesno:'true,false' }}"
-                                    data-detail-url="{% url 'product_detail' product.pk %}">
+                                    aria-label="Delete {{ product.name }}">
+                                    data-is-active="{{ product.is_active|yesno:'true,false' }}">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </div>
@@ -446,10 +446,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const deleteModalCancel = document.getElementById('deleteModalCancel');
     const deleteModalConfirm = document.getElementById('deleteModalConfirm');
     const openButtons = document.querySelectorAll('.open-delete-modal');
-    let deleteActionMode = 'delete';
-    let deleteDetailUrl = null;
 
-    function openModal(url, name, isActive, detailUrl) {
+    function openModal(url, name, isActive) {
         if (!deleteModal || !deleteForm) return;
         deleteForm.action = url;
         deleteModalText.textContent = `Are you sure you want to delete "${name}"? This will permanently remove it from your products.`;
@@ -458,15 +456,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Safeguard: only allow delete if product is already unlisted
         if (isActive === 'true') {
             deleteModalText.textContent = `To delete "${name}", unlist it first (set status to Inactive), then delete.`;
-            deleteActionMode = 'redirect';
-            deleteDetailUrl = detailUrl || '#';
             if (deleteModalConfirm) {
-                deleteModalConfirm.disabled = false;
+                deleteModalConfirm.disabled = true;
                 deleteModalConfirm.textContent = 'Unlist first';
             }
         } else {
-            deleteActionMode = 'delete';
-            deleteDetailUrl = null;
             if (deleteModalConfirm) {
                 deleteModalConfirm.disabled = false;
                 deleteModalConfirm.textContent = 'Yes, Delete';
@@ -483,8 +477,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = btn.getAttribute('data-delete-url');
             const name = btn.getAttribute('data-product-name') || 'this product';
             const isActive = btn.getAttribute('data-is-active') || 'true';
-            const detailUrl = btn.getAttribute('data-detail-url') || '#';
-            openModal(url, name, isActive, detailUrl);
+            openModal(url, name, isActive);
         });
     });
 
@@ -512,15 +505,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Ensure action is present
             if (!deleteForm || !deleteForm.action) {
                 alert('Delete action is missing.');
-                return;
-            }
-            // If we need to redirect to unlist first
-            if (deleteActionMode === 'redirect') {
-                if (deleteDetailUrl && deleteDetailUrl !== '#') {
-                    window.location.href = deleteDetailUrl;
-                } else {
-                    alert('Cannot find the product detail page to unlist.');
-                }
                 return;
             }
             // Block if safeguard disabled the button
