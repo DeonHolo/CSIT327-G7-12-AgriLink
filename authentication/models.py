@@ -186,7 +186,7 @@ class User(AbstractUser):
 
 class AuditLog(models.Model):
     """
-    Audit log for tracking staff actions on users and products.
+    Audit log for tracking staff actions on users, products, and conversations.
     """
     ACTION_CHOICES = (
         # Verification actions
@@ -204,6 +204,8 @@ class AuditLog(models.Model):
         ('user_deactivate', 'Deactivated User'),
         ('user_reactivate', 'Reactivated User'),
         ('user_clear_sessions', 'Cleared User Sessions'),
+        # Conversation actions
+        ('conversation_delete', 'Deleted Conversation'),
     )
     
     actor = models.ForeignKey(
@@ -230,6 +232,11 @@ class AuditLog(models.Model):
         related_name='audit_logs',
         help_text='Product affected by this action'
     )
+    target_conversation_id = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text='Conversation ID affected by this action (stored as ID since conversation may be deleted)'
+    )
     previous_status = models.CharField(max_length=50, blank=True)
     new_status = models.CharField(max_length=50, blank=True)
     notes = models.TextField(blank=True)
@@ -242,5 +249,5 @@ class AuditLog(models.Model):
         ordering = ['-created_at']
     
     def __str__(self):
-        target = self.target_user or self.target_product or 'N/A'
+        target = self.target_user or self.target_product or (f'Conversation #{self.target_conversation_id}' if self.target_conversation_id else 'N/A')
         return f"{self.actor} - {self.get_action_display()} - {target}"

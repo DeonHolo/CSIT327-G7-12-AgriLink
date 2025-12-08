@@ -7,10 +7,18 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from django.utils import timezone
 from django.views.decorators.http import require_POST
+from django.core.cache import cache
 from decimal import Decimal
+from datetime import timedelta
 import json
 from .models import Conversation, Message, Deal, Review
 from products.models import Product
+
+# Typing indicator timeout in seconds
+TYPING_TIMEOUT = 3
+
+# Deal offer expiration time (15 minutes)
+DEAL_EXPIRATION_MINUTES = 15
 
 
 @login_required
@@ -89,11 +97,18 @@ def conversation_detail(request, pk):
     
     # Get deals in this conversation
     deals = conversation.deals.select_related(
-        'product', 'farmer', 'buyer', 'cancelled_by'
+        'product', 'farmer', 'buyer', 'cancelled_by', 'created_by'
     ).prefetch_related('review').order_by('created_at')
     
     # Check if current user is a farmer (can create offers)
     is_farmer = request.user.is_farmer()
+    
+    # Check if current user is the owner of the conversation's product
+    # Only the product owner can create offers
+    is_product_owner = (
+        conversation.product is not None and 
+        conversation.product.farmer == request.user
+    )
     
     # Get farmer's active products for the offer form (if user is a farmer)
     farmer_products = []
@@ -113,6 +128,7 @@ def conversation_detail(request, pk):
         'last_message_timestamp': last_message_timestamp,
         'deals': deals,
         'is_farmer': is_farmer,
+        'is_product_owner': is_product_owner,
         'farmer_products': list(farmer_products),
     }
     return render(request, 'chat/conversation_detail.html', context)
@@ -139,12 +155,17 @@ def message_send(request, pk):
     if not content:
         return JsonResponse({'error': 'Message content cannot be empty'}, status=400)
     
+    # Restore conversation for all participants when a message is sent
+    # This ensures both parties can see the conversation if either deleted it
+    conversation.restore_for_all()
+    
     # Create the message
     message = Message.objects.create(
         conversation=conversation,
         sender=request.user,
         content=content,
-        message_type=message_type
+        message_type=message_type,
+        delivery_status='sent'
     )
     
     # Update conversation's updated_at timestamp
@@ -160,7 +181,8 @@ def message_send(request, pk):
             'timestamp': message.timestamp.isoformat(),
             'timestamp_display': message.timestamp.strftime('%b %d, %Y %I:%M %p'),
             'message_type': message.message_type,
-            'message_type_display': message.get_message_type_display()
+            'message_type_display': message.get_message_type_display(),
+            'delivery_status': message.delivery_status
         }
     })
 
@@ -190,8 +212,16 @@ def get_new_messages(request, pk, after_timestamp):
             timestamp__gt=after_dt
         ).select_related('sender').order_by('timestamp')
         
-        # Mark new messages as read if they're not from current user
-        new_messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
+        # Mark messages from other user as delivered/read
+        # Messages not from current user get marked as 'delivered' when polled
+        for msg in new_messages.exclude(sender=request.user):
+            if msg.delivery_status == 'sent':
+                msg.delivery_status = 'delivered'
+                msg.save(update_fields=['delivery_status'])
+            if not msg.is_read:
+                msg.is_read = True
+                msg.delivery_status = 'read'
+                msg.save(update_fields=['is_read', 'delivery_status'])
         
         # Build message data
         messages_data = []
@@ -204,7 +234,8 @@ def get_new_messages(request, pk, after_timestamp):
                 'timestamp': message.timestamp.isoformat(),
                 'timestamp_display': message.timestamp.strftime('%b %d, %Y %I:%M %p'),
                 'message_type': message.message_type,
-                'message_type_display': message.get_message_type_display()
+                'message_type_display': message.get_message_type_display(),
+                'delivery_status': message.delivery_status
             })
         
         return JsonResponse({
@@ -267,9 +298,9 @@ def start_conversation(request, product_pk):
     ).first()
     
     if existing_conversation:
-        # If user had deleted this conversation, restore it
-        if existing_conversation.is_deleted_by(request.user):
-            existing_conversation.restore_for_user(request.user)
+        # Restore conversation for ALL participants
+        # This handles the case where one or both users deleted the conversation
+        existing_conversation.restore_for_all()
         # Redirect to existing conversation
         return redirect('conversation_detail', pk=existing_conversation.pk)
     
@@ -362,7 +393,8 @@ def get_farmer_products(request, pk):
 @require_POST
 def create_offer(request, pk):
     """
-    Farmer creates a new deal offer in the conversation.
+    Any farmer in the conversation can create a deal offer.
+    The deal's farmer/buyer roles are determined by who owns the product.
     """
     conversation = get_object_or_404(Conversation, pk=pk)
     
@@ -385,8 +417,12 @@ def create_offer(request, pk):
         if not product_id or quantity <= 0:
             return JsonResponse({'error': 'Invalid product or quantity'}, status=400)
         
-        # Get the product
-        product = get_object_or_404(Product, pk=product_id, farmer=request.user)
+        # Get the product (must be the conversation's linked product)
+        product = get_object_or_404(Product, pk=product_id)
+        
+        # Verify this is the conversation's product
+        if conversation.product and conversation.product.id != product.id:
+            return JsonResponse({'error': 'Product does not match conversation'}, status=400)
         
         # Validate stock
         if product.stock_quantity < quantity:
@@ -394,28 +430,40 @@ def create_offer(request, pk):
                 'error': f'Not enough stock. Only {product.stock_quantity} {product.unit} available.'
             }, status=400)
         
-        # Calculate total price (or use override)
+        # Calculate total price (or use override if user is product owner)
         calculated_total = product.price * quantity
-        if total_price:
+        is_product_owner = product.farmer == request.user
+        if total_price and is_product_owner:
+            # Only product owner can override price
             total_price = Decimal(str(total_price))
         else:
             total_price = calculated_total
         
-        # Get the buyer (other participant)
-        buyer = conversation.get_other_participant(request.user)
+        # Determine farmer and buyer based on product ownership
+        # farmer = product owner, buyer = the other participant
+        farmer = product.farmer
+        other_participant = conversation.get_other_participant(request.user)
+        
+        if request.user == farmer:
+            buyer = other_participant
+        else:
+            buyer = request.user
+        
         if not buyer:
             return JsonResponse({'error': 'No buyer found in conversation'}, status=400)
         
-        # Create the deal
+        # Create the deal with expiration time
         deal = Deal.objects.create(
             conversation=conversation,
             product=product,
-            farmer=request.user,
+            farmer=farmer,
             buyer=buyer,
+            created_by=request.user,  # Track who created the offer
             quantity=quantity,
             unit_price=product.price,
             total_price=total_price,
-            status='pending'
+            status='pending',
+            expires_at=timezone.now() + timedelta(minutes=DEAL_EXPIRATION_MINUTES)
         )
         
         # Update conversation timestamp
@@ -436,20 +484,26 @@ def create_offer(request, pk):
 @require_POST
 def accept_deal(request, deal_id):
     """
-    Buyer accepts a deal offer. Reserves stock atomically.
+    Offer recipient accepts a deal offer. Reserves stock atomically.
+    Uses optimistic locking on both Deal and Product rows.
     """
-    deal = get_object_or_404(Deal, pk=deal_id)
-    
-    # Only buyer can accept
-    if request.user != deal.buyer:
-        return JsonResponse({'error': 'Only the buyer can accept this deal'}, status=403)
-    
-    # Check if deal can be accepted
-    if not deal.can_be_accepted():
-        return JsonResponse({'error': 'This deal cannot be accepted'}, status=400)
-    
     try:
         with transaction.atomic():
+            # Lock the deal row for update to prevent race conditions
+            deal = Deal.objects.select_for_update().get(pk=deal_id)
+
+            # Only the offer recipient can accept (the person who didn't create the offer)
+            # For legacy deals without created_by, fall back to farmer as creator
+            offer_creator = deal.created_by if deal.created_by else deal.farmer
+            if request.user == offer_creator:
+                return JsonResponse({'error': 'You cannot accept your own offer'}, status=403)
+            if request.user not in [deal.farmer, deal.buyer]:
+                return JsonResponse({'error': 'Access denied'}, status=403)
+            
+            # Check if deal can be accepted (status check within lock)
+            if not deal.can_be_accepted():
+                return JsonResponse({'error': 'This deal cannot be accepted'}, status=400)
+            
             # Lock the product row for update
             product = Product.objects.select_for_update().get(pk=deal.product_id)
             
@@ -482,13 +536,17 @@ def accept_deal(request, deal_id):
 @require_POST
 def decline_deal(request, deal_id):
     """
-    Buyer declines a deal offer.
+    Offer recipient declines a deal offer.
     """
     deal = get_object_or_404(Deal, pk=deal_id)
-    
-    # Only buyer can decline
-    if request.user != deal.buyer:
-        return JsonResponse({'error': 'Only the buyer can decline this deal'}, status=403)
+
+    # Only the offer recipient can decline (the person who didn't create the offer)
+    # For legacy deals without created_by, fall back to farmer as creator
+    offer_creator = deal.created_by if deal.created_by else deal.farmer
+    if request.user == offer_creator:
+        return JsonResponse({'error': 'You cannot decline your own offer'}, status=403)
+    if request.user not in [deal.farmer, deal.buyer]:
+        return JsonResponse({'error': 'Access denied'}, status=403)
     
     # Check if deal is pending
     if deal.status != 'pending':
@@ -509,15 +567,17 @@ def cancel_deal(request, deal_id):
     """
     Cancel a deal. Farmer can cancel pending offers.
     Either party can cancel confirmed orders (restores stock).
+    Uses optimistic locking on Deal row.
     """
-    deal = get_object_or_404(Deal, pk=deal_id)
-    
-    # Check if user can cancel
-    if not deal.can_be_cancelled(request.user):
-        return JsonResponse({'error': 'You cannot cancel this deal'}, status=403)
-    
     try:
         with transaction.atomic():
+            # Lock the deal row for update to prevent race conditions
+            deal = Deal.objects.select_for_update().get(pk=deal_id)
+            
+            # Check if user can cancel (status check within lock)
+            if not deal.can_be_cancelled(request.user):
+                return JsonResponse({'error': 'You cannot cancel this deal'}, status=403)
+            
             # If deal was confirmed, restore stock
             if deal.status == 'confirmed':
                 product = Product.objects.select_for_update().get(pk=deal.product_id)
@@ -544,32 +604,40 @@ def complete_deal(request, deal_id):
     """
     Buyer marks deal as completed (received the order).
     Returns deal data for showing review modal.
+    Uses optimistic locking on Deal row.
     """
-    deal = get_object_or_404(Deal, pk=deal_id)
-    
-    # Only buyer can complete
-    if not deal.can_be_completed(request.user):
-        return JsonResponse({'error': 'You cannot complete this deal'}, status=403)
-    
-    # Update deal status
-    deal.status = 'completed'
-    deal.completed_at = timezone.now()
-    deal.save(update_fields=['status', 'completed_at'])
-    
-    # Update product's total sales
-    deal.product.total_sales += deal.quantity
-    deal.product.save(update_fields=['total_sales'])
-    
-    return JsonResponse({
-        'success': True,
-        'deal': _serialize_deal(deal, request.user),
-        'show_review_modal': True,
-        'review_data': {
-            'deal_id': deal.id,
-            'product_name': deal.product.name,
-            'farmer_name': deal.farmer.username,
-        }
-    })
+    try:
+        with transaction.atomic():
+            # Lock the deal row for update to prevent race conditions
+            deal = Deal.objects.select_for_update().get(pk=deal_id)
+            
+            # Only buyer can complete (status check within lock)
+            if not deal.can_be_completed(request.user):
+                return JsonResponse({'error': 'You cannot complete this deal'}, status=403)
+            
+            # Update deal status
+            deal.status = 'completed'
+            deal.completed_at = timezone.now()
+            deal.save(update_fields=['status', 'completed_at'])
+            
+            # Lock and update product's total sales
+            product = Product.objects.select_for_update().get(pk=deal.product_id)
+            product.total_sales += deal.quantity
+            product.save(update_fields=['total_sales'])
+        
+        return JsonResponse({
+            'success': True,
+            'deal': _serialize_deal(deal, request.user),
+            'show_review_modal': True,
+            'review_data': {
+                'deal_id': deal.id,
+                'product_name': deal.product.name,
+                'farmer_name': deal.farmer.username,
+            }
+        })
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 @login_required
@@ -661,7 +729,7 @@ def get_conversation_deals(request, pk):
         return JsonResponse({'error': 'Access denied'}, status=403)
     
     deals = conversation.deals.select_related(
-        'product', 'farmer', 'buyer'
+        'product', 'farmer', 'buyer', 'created_by'
     ).prefetch_related('review').order_by('created_at')
     
     deals_data = [_serialize_deal(deal, request.user) for deal in deals]
@@ -679,6 +747,14 @@ def _serialize_deal(deal, user):
     is_farmer = user == deal.farmer
     is_buyer = user == deal.buyer
     
+    # For legacy deals without created_by, fall back to farmer as the creator
+    offer_creator = deal.created_by if deal.created_by else deal.farmer
+    is_offer_creator = user == offer_creator
+    is_offer_recipient = not is_offer_creator and user in [deal.farmer, deal.buyer]
+    
+    # Determine the other user's name for display
+    other_user = deal.buyer if user == deal.farmer else deal.farmer
+
     data = {
         'id': deal.id,
         'product': {
@@ -696,6 +772,14 @@ def _serialize_deal(deal, user):
             'id': deal.buyer.id,
             'username': deal.buyer.username,
         },
+        'created_by': {
+            'id': offer_creator.id,
+            'username': offer_creator.username,
+        },
+        'other_user': {
+            'id': other_user.id,
+            'username': other_user.username,
+        },
         'quantity': deal.quantity,
         'unit_price': str(deal.unit_price),
         'total_price': str(deal.total_price),
@@ -703,11 +787,16 @@ def _serialize_deal(deal, user):
         'status_display': deal.get_status_display(),
         'created_at': deal.created_at.isoformat(),
         'created_at_display': deal.created_at.strftime('%b %d, %Y %I:%M %p'),
+        'expires_at': deal.expires_at.isoformat() if deal.expires_at else None,
+        'is_expired': deal.is_expired,
+        'time_until_expiry': deal.time_until_expiry,
         'confirmed_at': deal.confirmed_at.isoformat() if deal.confirmed_at else None,
         'completed_at': deal.completed_at.isoformat() if deal.completed_at else None,
         'is_farmer': is_farmer,
         'is_buyer': is_buyer,
-        'can_accept': deal.can_be_accepted() and is_buyer,
+        'is_offer_creator': is_offer_creator,
+        'is_offer_recipient': is_offer_recipient,
+        'can_accept': deal.can_be_accepted() and is_offer_recipient,
         'can_cancel': deal.can_be_cancelled(user),
         'can_complete': deal.can_be_completed(user),
         'is_reviewed': deal.is_reviewed,
@@ -730,3 +819,63 @@ def _serialize_deal(deal, user):
         }
     
     return data
+
+
+# ==================== TYPING INDICATORS ====================
+
+def _get_typing_cache_key(conversation_id, user_id):
+    """Generate cache key for typing indicator."""
+    return f'typing:{conversation_id}:{user_id}'
+
+
+@login_required
+@require_POST
+def send_typing(request, pk):
+    """
+    Signal that the user is typing in a conversation.
+    Uses cache with short TTL to auto-expire.
+    """
+    conversation = get_object_or_404(Conversation, pk=pk)
+    
+    # Check if user is a participant
+    if request.user not in conversation.participants.all():
+        return JsonResponse({'error': 'Access denied'}, status=403)
+    
+    # Set typing indicator in cache (expires after TYPING_TIMEOUT seconds)
+    cache_key = _get_typing_cache_key(pk, request.user.id)
+    cache.set(cache_key, {
+        'user_id': request.user.id,
+        'username': request.user.username,
+        'timestamp': timezone.now().isoformat()
+    }, timeout=TYPING_TIMEOUT)
+    
+    return JsonResponse({'success': True})
+
+
+@login_required
+def get_typing_status(request, pk):
+    """
+    Get typing status for a conversation.
+    Returns list of users currently typing (excluding the requester).
+    """
+    conversation = get_object_or_404(Conversation, pk=pk)
+    
+    # Check if user is a participant
+    if request.user not in conversation.participants.all():
+        return JsonResponse({'error': 'Access denied'}, status=403)
+    
+    # Check typing status for all other participants
+    typing_users = []
+    for participant in conversation.participants.exclude(id=request.user.id):
+        cache_key = _get_typing_cache_key(pk, participant.id)
+        typing_data = cache.get(cache_key)
+        if typing_data:
+            typing_users.append({
+                'user_id': typing_data['user_id'],
+                'username': typing_data['username']
+            })
+    
+    return JsonResponse({
+        'success': True,
+        'typing_users': typing_users
+    })

@@ -70,6 +70,10 @@ class Conversation(models.Model):
     def restore_for_user(self, user):
         """Restore conversation for a specific user (undelete)"""
         self.deleted_by.remove(user)
+    
+    def restore_for_all(self):
+        """Restore conversation for all participants (undelete for everyone)"""
+        self.deleted_by.clear()
 
 
 class Message(models.Model):
@@ -92,6 +96,19 @@ class Message(models.Model):
     is_read = models.BooleanField(
         default=False,
         help_text='Whether the message has been read by recipient'
+    )
+    
+    # Delivery status tracking
+    DELIVERY_STATUS_CHOICES = [
+        ('sent', 'Sent'),
+        ('delivered', 'Delivered'),
+        ('read', 'Read'),
+    ]
+    delivery_status = models.CharField(
+        max_length=20,
+        choices=DELIVERY_STATUS_CHOICES,
+        default='sent',
+        help_text='Message delivery status'
     )
     
     # Quick action types (FR-16: Order Now, Request Price)
@@ -120,10 +137,17 @@ class Message(models.Model):
         return f"{self.sender.username}: {self.content[:50]}"
     
     def mark_as_read(self):
-        """Mark this message as read"""
+        """Mark this message as read and update delivery status"""
         if not self.is_read:
             self.is_read = True
-            self.save(update_fields=['is_read'])
+            self.delivery_status = 'read'
+            self.save(update_fields=['is_read', 'delivery_status'])
+    
+    def mark_as_delivered(self):
+        """Mark this message as delivered (recipient received it but hasn't read yet)"""
+        if self.delivery_status == 'sent':
+            self.delivery_status = 'delivered'
+            self.save(update_fields=['delivery_status'])
 
 
 class Deal(models.Model):
@@ -184,6 +208,13 @@ class Deal(models.Model):
         default='pending',
         help_text='Current status of the deal'
     )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='created_deals',
+        null=True,  # Nullable for existing records
+        help_text='User who created this offer'
+    )
     cancelled_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -197,6 +228,11 @@ class Deal(models.Model):
         help_text='Reason for cancellation (optional)'
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='When this deal offer expires (for pending deals)'
+    )
     confirmed_at = models.DateTimeField(
         null=True,
         blank=True,
@@ -224,15 +260,37 @@ class Deal(models.Model):
     def __str__(self):
         return f"Deal #{self.pk}: {self.quantity} {self.product.unit} of {self.product.name} - {self.get_status_display()}"
     
+    @property
+    def is_expired(self):
+        """Check if this pending deal has expired"""
+        if self.status != 'pending' or not self.expires_at:
+            return False
+        return timezone.now() > self.expires_at
+    
+    @property
+    def time_until_expiry(self):
+        """Get time remaining until expiration (in seconds), or None if not applicable"""
+        if self.status != 'pending' or not self.expires_at:
+            return None
+        remaining = (self.expires_at - timezone.now()).total_seconds()
+        return max(0, remaining)
+    
     def can_be_accepted(self):
         """Check if this deal can still be accepted"""
-        return self.status == 'pending'
+        if self.status != 'pending':
+            return False
+        # Also check if not expired
+        if self.is_expired:
+            return False
+        return True
     
     def can_be_cancelled(self, user):
         """Check if this deal can be cancelled by the given user"""
         if self.status == 'pending':
-            # Only farmer can cancel pending offers
-            return user == self.farmer
+            # Only the offer creator can cancel pending offers
+            # For legacy deals without created_by, fall back to farmer
+            offer_creator = self.created_by if self.created_by else self.farmer
+            return user == offer_creator
         elif self.status == 'confirmed':
             # Either party can cancel confirmed orders
             return user in [self.farmer, self.buyer]

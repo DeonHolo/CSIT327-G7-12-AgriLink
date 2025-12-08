@@ -145,11 +145,12 @@
                                 </button>
                                 {% endif %}
                                 
-                                <button type="button" class="btn btn-sm btn-danger open-delete-modal"
-                                        data-delete-url="{% url 'product_delete' product.pk %}"
-                                        data-product-name="{{ product.name }}"
-                                        data-is-active="{{ product.is_active|yesno:'true,false' }}"
-                                        data-detail-url="{% url 'product_detail' product.pk %}"
+                                <button type="button" 
+                                        class="btn btn-sm btn-danger open-delete-modal" 
+                                        data-delete-url="{% url 'product_delete' product.pk %}" 
+                                        data-product-name="{{ product.name }}" 
+                                        data-is-active="{{ product.is_active|yesno:'true,false' }}" 
+                                        data-detail-url="{% url 'product_detail' product.pk %}" 
                                         title="Delete">
                                     <i class="bi bi-trash"></i>
                                 </button>

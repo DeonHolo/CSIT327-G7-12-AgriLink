@@ -779,18 +779,6 @@
             opacity: 0.5;
         }
         
-        .farmer-modal-actions {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e0e0e0;
-        }
-        
-        .farmer-modal-actions .btn {
-            flex: 1;
-        }
-        
         .farmer-clickable {
             cursor: pointer;
             transition: color 0.2s;
@@ -1128,13 +1116,6 @@
                         </div>
                     </div>
                     
-                    <!-- Actions -->
-                    <div class="farmer-modal-actions" id="farmerModalActions">
-                        <button class="btn-modal-cancel" onclick="closeFarmerProfileModal()">Close</button>
-                        <a href="#" class="btn-modal-save" id="farmerContactBtn">
-                            <i class="bi bi-chat-dots"></i> Contact Farmer
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1330,22 +1311,6 @@
                     </div>
                 `;
             }
-            
-            // Contact button - hide if viewing own profile
-            const contactBtn = document.getElementById('farmerContactBtn');
-            {% if user.is_authenticated %}
-            const currentUserId = {{ user.id }};
-            if (farmer.id === currentUserId) {
-                contactBtn.style.display = 'none';
-            } else {
-                contactBtn.style.display = 'inline-flex';
-                // For contact, we need to find a product from this farmer to start conversation
-                // For now, link to products filtered by this farmer (or a search)
-                contactBtn.href = `/products/?search=${encodeURIComponent(farmer.username)}`;
-            }
-            {% else %}
-            contactBtn.href = '/auth/login/';
-            {% endif %}
         }
         
         function generateStarsHtml(rating) {

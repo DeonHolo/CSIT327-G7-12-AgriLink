@@ -31,8 +31,14 @@
             <option value="rejected" {% if permit_status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
         </select>
         
-        <input type="date" name="date_from" class="form-control" value="{{ date_from }}" title="From Date">
-        <input type="date" name="date_to" class="form-control" value="{{ date_to }}" title="To Date">
+        <div class="d-flex align-items-center gap-2">
+            <label class="form-label small text-muted mb-0" for="date_from">From</label>
+            <input type="date" id="date_from" name="date_from" class="form-control" value="{{ date_from }}">
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <label class="form-label small text-muted mb-0" for="date_to">To</label>
+            <input type="date" id="date_to" name="date_to" class="form-control" value="{{ date_to }}">
+        </div>
         
         <button type="submit" class="btn btn-primary">
             <i class="bi bi-search"></i> Filter

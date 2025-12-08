@@ -1,0 +1,281 @@
+{% extends 'staff/base_staff.html' %}
+
+{% block title %}Conversation Management - Staff Panel{% endblock %}
+{% block page_title %}Conversation Management{% endblock %}
+
+{% block content %}
+<div class="staff-card">
+    <!-- Filter Bar -->
+    <form method="GET" class="filter-bar" id="filterForm">
+        <input type="text" name="search" class="form-control search-input" placeholder="Search by username, email, or product..." value="{{ search }}">
+        
+        <select name="has_messages" class="form-select">
+            <option value="">All Conversations</option>
+            <option value="yes" {% if has_messages_filter == 'yes' %}selected{% endif %}>Has Messages</option>
+            <option value="no" {% if has_messages_filter == 'no' %}selected{% endif %}>Empty (No Messages)</option>
+        </select>
+        
+        <div class="d-flex align-items-center gap-2">
+            <label class="form-label small text-muted mb-0" for="date_from">From</label>
+            <input type="date" id="date_from" name="date_from" class="form-control" value="{{ date_from }}">
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <label class="form-label small text-muted mb-0" for="date_to">To</label>
+            <input type="date" id="date_to" name="date_to" class="form-control" value="{{ date_to }}">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-search"></i> Filter
+        </button>
+        
+        {% if search or has_messages_filter or date_from or date_to %}
+        <a href="{% url 'staff_conversations_list' %}" class="btn btn-secondary">Clear</a>
+        {% endif %}
+    </form>
+    
+    <!-- Bulk Actions Bar -->
+    <div style="padding: 0.75rem 1.5rem; background: var(--gray-100); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 1rem;" id="bulkActionsBar">
+        <span class="small text-muted"><span id="selectedCount">0</span> selected</span>
+        <button type="button" class="btn btn-sm btn-danger" onclick="openBulkModal()" id="bulkDeleteBtn" disabled>
+            <i class="bi bi-trash"></i> Delete Selected
+        </button>
+    </div>
+    
+    <!-- Table -->
+    <div class="staff-card-body" style="padding: 0;">
+        {% if conversations %}
+        <form method="POST" action="{% url 'staff_conversations_bulk_delete' %}" id="bulkForm">
+            {% csrf_token %}
+            <input type="hidden" name="notes" id="bulkNotesInput" value="">
+            
+            <table class="staff-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;">
+                            <input type="checkbox" class="form-check-input" id="selectAll">
+                        </th>
+                        <th>ID</th>
+                        <th>Participants</th>
+                        <th>Related Product</th>
+                        <th>Messages</th>
+                        <th>Created</th>
+                        <th>Last Activity</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for conversation in conversations %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="form-check-input conversation-checkbox" name="conversation_ids" value="{{ conversation.pk }}">
+                        </td>
+                        <td>
+                            <span class="fw-semibold">#{{ conversation.pk }}</span>
+                        </td>
+                        <td>
+                            <div class="participants-cell">
+                                {% for participant in conversation.participants.all %}
+                                <a href="{% url 'staff_user_detail' participant.pk %}" class="text-muted" style="text-decoration: none;">
+                                    {{ participant.username }}{% if not forloop.last %}, {% endif %}
+                                </a>
+                                {% empty %}
+                                <span class="text-muted">No participants</span>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            {% if conversation.product %}
+                            <a href="{% url 'product_detail' conversation.product.pk %}" target="_blank" class="text-muted" style="text-decoration: none;">
+                                {{ conversation.product.name|truncatechars:30 }}
+                            </a>
+                            {% else %}
+                            <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge {% if conversation.message_count > 0 %}badge-primary{% else %}badge-secondary{% endif %}">
+                                {{ conversation.message_count }} message{{ conversation.message_count|pluralize }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="small text-muted">{{ conversation.created_at|date:"M d, Y" }}</span>
+                        </td>
+                        <td>
+                            <span class="small text-muted">{{ conversation.updated_at|date:"M d, Y H:i" }}</span>
+                        </td>
+                        <td>
+                            <div class="actions">
+                                <button type="button" class="btn btn-sm btn-danger" onclick="openDeleteModal({{ conversation.pk }}, {{ conversation.message_count }})" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+        
+        <!-- Pagination -->
+        {% if conversations.has_other_pages %}
+        <div class="pagination">
+            {% if conversations.has_previous %}
+            <a href="?page={{ conversations.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if has_messages_filter %}&has_messages={{ has_messages_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            {% endif %}
+            
+            {% for num in conversations.paginator.page_range %}
+                {% if conversations.number == num %}
+                <span class="current">{{ num }}</span>
+                {% elif num > conversations.number|add:'-3' and num < conversations.number|add:'3' %}
+                <a href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if has_messages_filter %}&has_messages={{ has_messages_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if conversations.has_next %}
+            <a href="?page={{ conversations.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if has_messages_filter %}&has_messages={{ has_messages_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-chat-dots"></i>
+            <h4>No Conversations Found</h4>
+            <p>{% if search or has_messages_filter or date_from or date_to %}No conversations match your filters.{% else %}No conversations exist yet.{% endif %}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Single Delete Modal -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="bi bi-exclamation-triangle text-danger"></i> Delete Conversation</h3>
+            <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
+        </div>
+        <form method="POST" id="deleteForm">
+            {% csrf_token %}
+            <div class="modal-body">
+                <p id="deleteModalText">Are you sure you want to delete this conversation?</p>
+                <p class="text-danger small"><strong>Warning:</strong> This action cannot be undone. All messages in this conversation will be permanently deleted.</p>
+                
+                <div class="form-group mt-3">
+                    <label class="form-label">Notes (optional)</label>
+                    <textarea name="notes" class="form-control" rows="3" placeholder="Reason for deletion..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('deleteModal')">Cancel</button>
+                <button type="submit" class="btn btn-danger">Delete Conversation</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Bulk Delete Modal -->
+<div class="modal-overlay" id="bulkModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="bi bi-exclamation-triangle text-danger"></i> Bulk Delete Conversations</h3>
+            <button class="modal-close" onclick="closeModal('bulkModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p id="bulkModalText">Are you sure you want to delete the selected conversations?</p>
+            <p class="text-danger small"><strong>Warning:</strong> This action cannot be undone. All messages in the selected conversations will be permanently deleted.</p>
+            
+            <div class="form-group mt-3">
+                <label class="form-label">Notes (optional)</label>
+                <textarea class="form-control" rows="3" id="bulkNotes" placeholder="Reason for deletion..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('bulkModal')">Cancel</button>
+            <button type="button" class="btn btn-danger" onclick="submitBulkDelete()">Delete Selected</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .participants-cell {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .badge-primary {
+        background-color: var(--primary-color);
+        color: white;
+    }
+</style>
+
+<script>
+    // Select all checkbox functionality
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const conversationCheckboxes = document.querySelectorAll('.conversation-checkbox');
+    const selectedCountSpan = document.getElementById('selectedCount');
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+    
+    function updateSelectedCount() {
+        const count = document.querySelectorAll('.conversation-checkbox:checked').length;
+        selectedCountSpan.textContent = count;
+        bulkDeleteBtn.disabled = count === 0;
+    }
+    
+    selectAllCheckbox.addEventListener('change', function() {
+        conversationCheckboxes.forEach(cb => {
+            cb.checked = this.checked;
+        });
+        updateSelectedCount();
+    });
+    
+    conversationCheckboxes.forEach(cb => {
+        cb.addEventListener('change', updateSelectedCount);
+    });
+    
+    // Modal functions
+    function openDeleteModal(conversationId, messageCount) {
+        const modal = document.getElementById('deleteModal');
+        const form = document.getElementById('deleteForm');
+        const text = document.getElementById('deleteModalText');
+        
+        form.action = "{% url 'staff_conversation_delete' 0 %}".replace('/0/', '/' + conversationId + '/');
+        text.textContent = 'Are you sure you want to delete conversation #' + conversationId + '? This will permanently delete ' + messageCount + ' message(s).';
+        
+        modal.classList.add('active');
+    }
+    
+    function openBulkModal() {
+        const count = document.querySelectorAll('.conversation-checkbox:checked').length;
+        const modal = document.getElementById('bulkModal');
+        const text = document.getElementById('bulkModalText');
+        
+        text.textContent = 'Are you sure you want to delete ' + count + ' selected conversation(s)?';
+        modal.classList.add('active');
+    }
+    
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
+    }
+    
+    function submitBulkDelete() {
+        const notes = document.getElementById('bulkNotes').value;
+        document.getElementById('bulkNotesInput').value = notes;
+        document.getElementById('bulkForm').submit();
+    }
+    
+    // Close modal when clicking outside
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+    });
+</script>
+{% endblock %}

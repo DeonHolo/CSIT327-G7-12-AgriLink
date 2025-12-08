@@ -623,3 +623,128 @@ def user_action(request, user_id):
         messages.error(request, 'Invalid action.')
     
     return redirect('staff_user_detail', user_id=user_id)
+
+
+# ==================== CONVERSATION MANAGEMENT ====================
+
+@login_required
+@staff_required
+def conversations_list(request):
+    """List all conversations with filters for staff moderation."""
+    from chat.models import Conversation
+    
+    queryset = Conversation.objects.prefetch_related(
+        'participants', 'messages'
+    ).select_related('product').annotate(
+        message_count=Count('messages')
+    ).order_by('-updated_at')
+    
+    # Filters
+    search = request.GET.get('search', '')
+    has_messages = request.GET.get('has_messages', '')
+    date_from = request.GET.get('date_from', '')
+    date_to = request.GET.get('date_to', '')
+    
+    if search:
+        queryset = queryset.filter(
+            Q(participants__username__icontains=search) |
+            Q(participants__email__icontains=search) |
+            Q(product__name__icontains=search)
+        ).distinct()
+    
+    if has_messages == 'yes':
+        queryset = queryset.filter(message_count__gt=0)
+    elif has_messages == 'no':
+        queryset = queryset.filter(message_count=0)
+    
+    if date_from:
+        queryset = queryset.filter(created_at__date__gte=date_from)
+    
+    if date_to:
+        queryset = queryset.filter(created_at__date__lte=date_to)
+    
+    # Pagination
+    paginator = Paginator(queryset, 20)
+    page = request.GET.get('page', 1)
+    conversations = paginator.get_page(page)
+    
+    context = {
+        'conversations': conversations,
+        'search': search,
+        'has_messages_filter': has_messages,
+        'date_from': date_from,
+        'date_to': date_to,
+        'pending_verifications_count': get_pending_verifications_count(),
+    }
+    return render(request, 'staff/conversations_list.html', context)
+
+
+@login_required
+@staff_required
+def conversation_delete(request, conversation_id):
+    """Delete a conversation and all its messages."""
+    from chat.models import Conversation
+    
+    if request.method != 'POST':
+        return redirect('staff_conversations_list')
+    
+    conversation = get_object_or_404(Conversation, pk=conversation_id)
+    notes = request.POST.get('notes', '').strip()
+    
+    # Get participant info before deletion for audit log
+    participants = list(conversation.participants.values_list('username', flat=True))
+    message_count = conversation.messages.count()
+    
+    # Log the action before deletion
+    AuditLog.objects.create(
+        actor=request.user,
+        action='conversation_delete',
+        target_conversation_id=conversation_id,
+        previous_status=f'Participants: {", ".join(participants)}; Messages: {message_count}',
+        notes=notes
+    )
+    
+    # Delete the conversation (cascade will delete messages)
+    conversation.delete()
+    
+    messages.success(request, f'Deleted conversation #{conversation_id} with {message_count} message(s).')
+    return redirect('staff_conversations_list')
+
+
+@login_required
+@staff_required
+def conversations_bulk_delete(request):
+    """Bulk delete multiple conversations."""
+    from chat.models import Conversation
+    
+    if request.method != 'POST':
+        return redirect('staff_conversations_list')
+    
+    conversation_ids = request.POST.getlist('conversation_ids')
+    notes = request.POST.get('notes', '').strip()
+    
+    if not conversation_ids:
+        messages.error(request, 'No conversations selected.')
+        return redirect('staff_conversations_list')
+    
+    conversations = Conversation.objects.filter(pk__in=conversation_ids).prefetch_related('participants', 'messages')
+    count = 0
+    
+    for conversation in conversations:
+        participants = list(conversation.participants.values_list('username', flat=True))
+        message_count = conversation.messages.count()
+        
+        AuditLog.objects.create(
+            actor=request.user,
+            action='conversation_delete',
+            target_conversation_id=conversation.pk,
+            previous_status=f'Participants: {", ".join(participants)}; Messages: {message_count}',
+            notes=notes
+        )
+        count += 1
+    
+    # Delete all selected conversations
+    Conversation.objects.filter(pk__in=conversation_ids).delete()
+    
+    messages.success(request, f'Deleted {count} conversation(s).')
+    return redirect('staff_conversations_list')
