@@ -737,17 +737,69 @@
         min-width: auto !important;
     }
 
-    /* Cancel modal sizing */
-    #cancelDealModal .modal-content {
-        max-width: 420px;
-        padding: 1.5rem;
+    /* Confirmation modal sizing (Cancel, Accept, Decline) */
+    #cancelDealModal .modal-content,
+    #acceptDealModal .modal-content,
+    #declineDealModal .modal-content,
+    #thankYouModal .modal-content {
+        max-width: 380px;
+        text-align: center;
     }
-    #cancelDealModal .modal-header h3 {
+    
+    #cancelDealModal .modal-header,
+    #acceptDealModal .modal-header,
+    #declineDealModal .modal-header {
+        padding: 1rem 1.25rem;
+        justify-content: center;
+    }
+    
+    #cancelDealModal .modal-header h3,
+    #acceptDealModal .modal-header h3,
+    #declineDealModal .modal-header h3 {
         font-size: 1.05rem;
     }
-    #cancelDealModal .modal-body p {
-        font-size: 0.95rem;
-        line-height: 1.45;
+    
+    #cancelDealModal .modal-header .modal-close,
+    #acceptDealModal .modal-header .modal-close,
+    #declineDealModal .modal-header .modal-close {
+        position: absolute;
+        right: 1rem;
+    }
+    
+    #cancelDealModal .modal-body,
+    #acceptDealModal .modal-body,
+    #declineDealModal .modal-body {
+        padding: 1rem 1.25rem;
+    }
+    
+    #cancelDealModal .modal-body p,
+    #acceptDealModal .modal-body p,
+    #declineDealModal .modal-body p {
+        font-size: 0.9rem;
+        line-height: 1.4;
+        margin-bottom: 0.5rem;
+    }
+    
+    #cancelDealModal .modal-body p:last-child,
+    #acceptDealModal .modal-body p:last-child,
+    #declineDealModal .modal-body p:last-child {
+        margin-bottom: 0;
+    }
+    
+    #cancelDealModal .modal-footer,
+    #acceptDealModal .modal-footer,
+    #declineDealModal .modal-footer,
+    #thankYouModal .modal-footer {
+        padding: 0.75rem 1.25rem;
+        justify-content: center;
+    }
+    
+    #cancelDealModal .modal-footer button,
+    #acceptDealModal .modal-footer button,
+    #declineDealModal .modal-footer button,
+    #thankYouModal .modal-footer button {
+        padding: 0.6rem 1.25rem;
+        font-size: 0.9rem;
     }
 
     /* Star Rating Styles */
@@ -759,7 +811,10 @@
     }
     
     .star-rating input {
-        display: none;
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
     }
     
     .star-rating label {
@@ -776,20 +831,73 @@
     }
     
     .review-section {
-        padding: 1.25rem;
+        padding: 1rem;
         background: #f9f9f9;
-        border-radius: 12px;
-        margin-bottom: 1rem;
+        border-radius: 10px;
+        margin-bottom: 0.75rem;
+        text-align: center;
+    }
+    
+    .review-section:last-child {
+        margin-bottom: 0;
     }
     
     .review-section h4 {
-        margin: 0 0 1rem 0;
+        margin: 0 0 0.75rem 0;
         color: #333;
-        font-size: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .review-section .star-rating {
+        justify-content: center;
     }
     
     .review-section textarea {
-        margin-top: 0.75rem;
+        margin-top: 0.5rem;
+        resize: none;
+        font-size: 0.8rem;
+        text-align: left;
+        padding: 0.6rem 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .review-section textarea::placeholder {
+        font-size: 0.75rem;
+        color: #999;
+    }
+    
+    .review-section textarea:focus {
+        outline: none;
+        border-color: #4CAF50;
+    }
+    
+    /* Review Modal specific sizing */
+    #reviewModal .modal-content {
+        max-width: 400px;
+    }
+    
+    #reviewModal .modal-header {
+        padding: 1rem 1.25rem;
+    }
+    
+    #reviewModal .modal-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    #reviewModal .modal-body {
+        padding: 1rem 1.25rem;
+    }
+    
+    #reviewModal .modal-footer {
+        padding: 0.75rem 1.25rem;
+        justify-content: center;
+    }
+    
+    #reviewModal .star-rating label {
+        font-size: 1.5rem;
     }
     
     .btn-primary {
@@ -826,6 +934,27 @@
     
     .btn-secondary:hover {
         background: #e0e0e0;
+    }
+    
+    .btn-danger {
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-danger:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+    }
+    
+    .btn-danger:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 
     /* Stock info */
@@ -1111,16 +1240,18 @@
                         <div class="label">Total Price</div>
                         <div class="amount" id="totalPriceDisplay">₱0.00</div>
                     </div>
+                    {% if is_product_owner %}
                     <div class="price-override">
                         <label>
                             <input type="checkbox" id="overridePrice" onchange="togglePriceOverride()">
-                            Override price (for discount)
+                            Override price
                         </label>
                         <input type="number" id="customPriceInput" step="0.01" min="0.01" 
                                style="display: none; margin-top: 0.5rem;" 
                                placeholder="Enter custom price"
                                onchange="updateCustomPrice()">
                     </div>
+                    {% endif %}
                 </div>
             </form>
         </div>
@@ -1147,35 +1278,35 @@
                 <div class="review-section">
                     <h4><i class="bi bi-person"></i> How was the service from <span id="reviewFarmerName"></span>?</h4>
                     <div class="star-rating" id="sellerRating">
-                        <input type="radio" name="seller_rating" id="seller5" value="5">
-                        <label for="seller5"><i class="bi bi-star-fill"></i></label>
-                        <input type="radio" name="seller_rating" id="seller4" value="4">
-                        <label for="seller4"><i class="bi bi-star-fill"></i></label>
-                        <input type="radio" name="seller_rating" id="seller3" value="3">
-                        <label for="seller3"><i class="bi bi-star-fill"></i></label>
-                        <input type="radio" name="seller_rating" id="seller2" value="2">
-                        <label for="seller2"><i class="bi bi-star-fill"></i></label>
-                        <input type="radio" name="seller_rating" id="seller1" value="1">
-                        <label for="seller1"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="seller_rating" id="seller5" value="5" onchange="validateReviewForm()">
+                        <label for="seller5" onclick="document.getElementById('seller5').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="seller_rating" id="seller4" value="4" onchange="validateReviewForm()">
+                        <label for="seller4" onclick="document.getElementById('seller4').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="seller_rating" id="seller3" value="3" onchange="validateReviewForm()">
+                        <label for="seller3" onclick="document.getElementById('seller3').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="seller_rating" id="seller2" value="2" onchange="validateReviewForm()">
+                        <label for="seller2" onclick="document.getElementById('seller2').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="seller_rating" id="seller1" value="1" onchange="validateReviewForm()">
+                        <label for="seller1" onclick="document.getElementById('seller1').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
                     </div>
-                    <textarea id="sellerComment" placeholder="Share your experience with the seller (optional)" rows="3"></textarea>
+                    <textarea id="sellerComment" placeholder="Comment (optional)" rows="2"></textarea>
                 </div>
                 
                 <div class="review-section">
                     <h4><i class="bi bi-box"></i> How was the <span id="reviewProductName"></span>?</h4>
                     <div class="star-rating" id="productRating">
-                        <input type="radio" name="product_rating" id="product5" value="5">
-                        <label for="product5"><i class="bi bi-star-fill"></i></label>
-                        <input type="radio" name="product_rating" id="product4" value="4">
-                        <label for="product4"><i class="bi bi-star-fill"></i></label>
-                        <input type="radio" name="product_rating" id="product3" value="3">
-                        <label for="product3"><i class="bi bi-star-fill"></i></label>
-                        <input type="radio" name="product_rating" id="product2" value="2">
-                        <label for="product2"><i class="bi bi-star-fill"></i></label>
-                        <input type="radio" name="product_rating" id="product1" value="1">
-                        <label for="product1"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="product_rating" id="product5" value="5" onchange="validateReviewForm()">
+                        <label for="product5" onclick="document.getElementById('product5').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="product_rating" id="product4" value="4" onchange="validateReviewForm()">
+                        <label for="product4" onclick="document.getElementById('product4').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="product_rating" id="product3" value="3" onchange="validateReviewForm()">
+                        <label for="product3" onclick="document.getElementById('product3').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="product_rating" id="product2" value="2" onchange="validateReviewForm()">
+                        <label for="product2" onclick="document.getElementById('product2').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
+                        <input type="radio" name="product_rating" id="product1" value="1" onchange="validateReviewForm()">
+                        <label for="product1" onclick="document.getElementById('product1').checked=true; validateReviewForm();"><i class="bi bi-star-fill"></i></label>
                     </div>
-                    <textarea id="productComment" placeholder="Share your thoughts about the product quality (optional)" rows="3"></textarea>
+                    <textarea id="productComment" placeholder="Comment (optional)" rows="2"></textarea>
                 </div>
             </form>
         </div>
@@ -1200,9 +1331,63 @@
             <p style="color:#666;">Stock will be restored and the buyer will see this offer as cancelled.</p>
         </div>
         <div class="modal-footer">
-            <button class="btn-modal-cancel" onclick="closeCancelDealModal()">Keep Offer</button>
-            <button class="btn-modal-save" id="confirmCancelDealBtn" onclick="confirmCancelDeal()">
+            <button class="btn-secondary" onclick="closeCancelDealModal()">Keep Offer</button>
+            <button class="btn-danger" id="confirmCancelDealBtn" onclick="confirmCancelDeal()">
                 <i class="bi bi-x-circle"></i> Cancel Offer
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Accept Deal Modal -->
+<div class="modal-overlay" id="acceptDealModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="bi bi-check-circle" style="color: #4CAF50;"></i> Accept Deal</h3>
+            <button class="modal-close" onclick="closeAcceptDealModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-weight:600; color:#333;">Accept this deal?</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeAcceptDealModal()">Cancel</button>
+            <button class="btn-primary" id="confirmAcceptDealBtn" onclick="confirmAcceptDeal()">
+                <i class="bi bi-check-lg"></i> Accept
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Decline Deal Modal -->
+<div class="modal-overlay" id="declineDealModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="bi bi-x-lg" style="color: #e74c3c;"></i> Decline Offer</h3>
+            <button class="modal-close" onclick="closeDeclineDealModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-weight:600; color:#333;">Decline this offer?</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeDeclineDealModal()">Cancel</button>
+            <button class="btn-danger" id="confirmDeclineDealBtn" onclick="confirmDeclineDeal()">
+                <i class="bi bi-x-lg"></i> Decline
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Thank You Modal -->
+<div class="modal-overlay" id="thankYouModal">
+    <div class="modal-content">
+        <div class="modal-body" style="padding: 2rem; text-align: center;">
+            <i class="bi bi-check-circle-fill" style="font-size: 3rem; color: #4CAF50; margin-bottom: 1rem; display: block;"></i>
+            <h3 style="margin: 0 0 0.5rem 0; color: #333;">Thank You!</h3>
+            <p style="color: #666; margin: 0;">Your review has been submitted.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-primary" onclick="closeThankYouModal()">
+                <i class="bi bi-check-lg"></i> OK
             </button>
         </div>
     </div>
@@ -1316,9 +1501,16 @@
             populateProductsDropdown();
         }
         
-        // Review form rating listeners
+        // Review form rating listeners - listen on both inputs and labels for reliability
         document.querySelectorAll('#sellerRating input, #productRating input').forEach(input => {
             input.addEventListener('change', validateReviewForm);
+            input.addEventListener('click', validateReviewForm);
+        });
+        document.querySelectorAll('#sellerRating label, #productRating label').forEach(label => {
+            label.addEventListener('click', function() {
+                // Small delay to ensure the radio is checked first
+                setTimeout(validateReviewForm, 10);
+            });
         });
     });
     
@@ -1515,15 +1707,18 @@
         const unitPrice = parseFloat(selectedProduct.price) || 0;
         calculatedTotal = unitPrice * quantity;
         
-        if (!document.getElementById('overridePrice').checked) {
+        const overrideCheckbox = document.getElementById('overridePrice');
+        if (!overrideCheckbox || !overrideCheckbox.checked) {
             document.getElementById('totalPriceDisplay').textContent = `₱${calculatedTotal.toFixed(2)}`;
         }
     }
     
     function togglePriceOverride() {
         const customInput = document.getElementById('customPriceInput');
-        const isChecked = document.getElementById('overridePrice').checked;
+        const overrideCheckbox = document.getElementById('overridePrice');
+        if (!customInput || !overrideCheckbox) return;
         
+        const isChecked = overrideCheckbox.checked;
         customInput.style.display = isChecked ? 'block' : 'none';
         
         if (!isChecked) {
@@ -1533,7 +1728,10 @@
     }
     
     function updateCustomPrice() {
-        const customPrice = parseFloat(document.getElementById('customPriceInput').value);
+        const customInput = document.getElementById('customPriceInput');
+        if (!customInput) return;
+        
+        const customPrice = parseFloat(customInput.value);
         if (customPrice > 0) {
             document.getElementById('totalPriceDisplay').textContent = `₱${customPrice.toFixed(2)}`;
         }
@@ -1541,9 +1739,15 @@
     
     function resetOfferForm() {
         document.getElementById('quantityInput').value = 1;
-        document.getElementById('overridePrice').checked = false;
-        document.getElementById('customPriceInput').style.display = 'none';
-        document.getElementById('customPriceInput').value = '';
+        
+        const overrideCheckbox = document.getElementById('overridePrice');
+        const customInput = document.getElementById('customPriceInput');
+        if (overrideCheckbox) overrideCheckbox.checked = false;
+        if (customInput) {
+            customInput.style.display = 'none';
+            customInput.value = '';
+        }
+        
         document.getElementById('totalPriceDisplay').textContent = '₱0.00';
         calculatedTotal = 0;
         setSelectedProductInfo();
@@ -1563,8 +1767,10 @@
         }
         
         let totalPrice = calculatedTotal;
-        if (document.getElementById('overridePrice').checked) {
-            totalPrice = parseFloat(document.getElementById('customPriceInput').value);
+        const overrideCheckbox = document.getElementById('overridePrice');
+        const customInput = document.getElementById('customPriceInput');
+        if (overrideCheckbox && overrideCheckbox.checked && customInput) {
+            totalPrice = parseFloat(customInput.value);
             if (!totalPrice || totalPrice <= 0) {
                 alert('Please enter a valid custom price');
                 return;
@@ -1772,10 +1978,37 @@
         `;
     }
     
+    // ==================== ACCEPT DEAL MODAL FUNCTIONS ====================
+    let pendingAcceptDealId = null;
+    
     function acceptDeal(dealId) {
-        if (!confirm('Accept this deal? The items will be reserved for you.')) return;
+        pendingAcceptDealId = dealId;
+        document.getElementById('acceptDealModal').classList.add('active');
+    }
+    
+    function closeAcceptDealModal() {
+        pendingAcceptDealId = null;
+        document.getElementById('acceptDealModal').classList.remove('active');
+        const btn = document.getElementById('confirmAcceptDealBtn');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-check-lg"></i> Accept Deal';
+        }
+    }
+    
+    function confirmAcceptDeal() {
+        if (!pendingAcceptDealId) {
+            closeAcceptDealModal();
+            return;
+        }
         
-        fetch(`/chat/deal/${dealId}/accept/`, {
+        const btn = document.getElementById('confirmAcceptDealBtn');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Accepting...';
+        }
+        
+        fetch(`/chat/deal/${pendingAcceptDealId}/accept/`, {
             method: 'POST',
             headers: { 'X-CSRFToken': csrfToken }
         })
@@ -1783,20 +2016,56 @@
         .then(data => {
             if (data.success) {
                 updateOrCreateDealCard(data.deal);
+                closeAcceptDealModal();
             } else {
                 alert('Error: ' + (data.error || 'Failed to accept deal'));
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-check-lg"></i> Accept Deal';
+                }
             }
         })
         .catch(error => {
             console.error('Error:', error);
             alert('Failed to accept deal. Please try again.');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check-lg"></i> Accept Deal';
+            }
         });
     }
     
+    // ==================== DECLINE DEAL MODAL FUNCTIONS ====================
+    let pendingDeclineDealId = null;
+    
     function declineDeal(dealId) {
-        if (!confirm('Decline this offer?')) return;
+        pendingDeclineDealId = dealId;
+        document.getElementById('declineDealModal').classList.add('active');
+    }
+    
+    function closeDeclineDealModal() {
+        pendingDeclineDealId = null;
+        document.getElementById('declineDealModal').classList.remove('active');
+        const btn = document.getElementById('confirmDeclineDealBtn');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-x-lg"></i> Decline Offer';
+        }
+    }
+    
+    function confirmDeclineDeal() {
+        if (!pendingDeclineDealId) {
+            closeDeclineDealModal();
+            return;
+        }
         
-        fetch(`/chat/deal/${dealId}/decline/`, {
+        const btn = document.getElementById('confirmDeclineDealBtn');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Declining...';
+        }
+        
+        fetch(`/chat/deal/${pendingDeclineDealId}/decline/`, {
             method: 'POST',
             headers: { 'X-CSRFToken': csrfToken }
         })
@@ -1804,16 +2073,33 @@
         .then(data => {
             if (data.success) {
                 updateOrCreateDealCard(data.deal);
+                closeDeclineDealModal();
                 // Refresh all deals to update Create Offer button state
                 refreshDealsAndButton();
             } else {
                 alert('Error: ' + (data.error || 'Failed to decline deal'));
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-x-lg"></i> Decline Offer';
+                }
             }
         })
         .catch(error => {
             console.error('Error:', error);
             alert('Failed to decline deal. Please try again.');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-x-lg"></i> Decline Offer';
+            }
         });
+    }
+    
+    function showThankYouModal() {
+        document.getElementById('thankYouModal').classList.add('active');
+    }
+    
+    function closeThankYouModal() {
+        document.getElementById('thankYouModal').classList.remove('active');
     }
     
     function cancelDeal(dealId) {
@@ -1959,7 +2245,7 @@
             if (data.success) {
                 closeReviewModal();
                 updateOrCreateDealCard(data.deal);
-                alert('Thank you for your review!');
+                showThankYouModal();
             } else {
                 alert('Error: ' + (data.error || 'Failed to submit review'));
                 btn.disabled = false;
