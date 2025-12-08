@@ -100,6 +100,9 @@ def conversation_detail(request, pk):
         'product', 'farmer', 'buyer', 'cancelled_by', 'created_by'
     ).prefetch_related('review').order_by('created_at')
     
+    # Check if there's an active deal (pending or confirmed)
+    has_active_deal = deals.filter(status__in=['pending', 'confirmed']).exists()
+    
     # Check if current user is a farmer (can create offers)
     is_farmer = request.user.is_farmer()
     
@@ -127,6 +130,7 @@ def conversation_detail(request, pk):
         'product': conversation.product,
         'last_message_timestamp': last_message_timestamp,
         'deals': deals,
+        'has_active_deal': has_active_deal,
         'is_farmer': is_farmer,
         'is_product_owner': is_product_owner,
         'farmer_products': list(farmer_products),
@@ -405,6 +409,13 @@ def create_offer(request, pk):
     # Check if user is a farmer
     if not request.user.is_farmer():
         return JsonResponse({'error': 'Only farmers can create offers'}, status=403)
+    
+    # Check for existing active deal (pending or confirmed)
+    active_deal = conversation.deals.filter(status__in=['pending', 'confirmed']).first()
+    if active_deal:
+        return JsonResponse({
+            'error': 'There is already an active offer in this conversation. Please wait for it to be completed, cancelled, or declined before creating a new one.'
+        }, status=400)
     
     try:
         # Parse request data

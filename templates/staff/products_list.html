@@ -53,6 +53,9 @@
         <button type="button" class="btn btn-sm btn-primary" onclick="openBulkModal('restore')" id="bulkRestoreBtn" disabled>
             <i class="bi bi-eye"></i> Restore Selected
         </button>
+        <button type="button" class="btn btn-sm btn-danger" onclick="openBulkModal('delete')" id="bulkDeleteBtn" disabled>
+            <i class="bi bi-trash"></i> Delete Selected
+        </button>
     </div>
     
     <!-- Table -->
@@ -346,12 +349,14 @@
     const selectedCount = document.getElementById('selectedCount');
     const bulkUnlistBtn = document.getElementById('bulkUnlistBtn');
     const bulkRestoreBtn = document.getElementById('bulkRestoreBtn');
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
     
     function updateSelectedCount() {
         const checked = document.querySelectorAll('.product-checkbox:checked').length;
         selectedCount.textContent = checked;
         bulkUnlistBtn.disabled = checked === 0;
         bulkRestoreBtn.disabled = checked === 0;
+        bulkDeleteBtn.disabled = checked === 0;
     }
     
     if (selectAll) {
@@ -446,6 +451,12 @@
             submitBtn.className = 'btn btn-primary';
             submitBtn.innerHTML = '<i class="bi bi-eye"></i> Restore All';
             notesRequired.style.display = 'none';
+        } else if (action === 'delete') {
+            title.innerHTML = '<i class="bi bi-trash text-danger"></i> Delete Products';
+            text.textContent = `Are you sure you want to permanently delete ${count} product(s)? This action cannot be undone.`;
+            submitBtn.className = 'btn btn-danger';
+            submitBtn.innerHTML = '<i class="bi bi-trash"></i> Delete All';
+            notesRequired.style.display = 'none';
         }
         
         notesInput.value = '';
@@ -465,51 +476,40 @@
         document.getElementById('bulkForm').submit();
     }
 
-    // Delete modal logic (mirrors seller view)
+    // Delete modal logic - Staff can delete directly without unlisting
     const deleteModal = document.getElementById('deleteModal');
     const deleteForm = document.getElementById('deleteForm');
     const deleteModalText = document.getElementById('deleteModalText');
     const deleteModalCancel = document.getElementById('deleteModalCancel');
     const deleteModalConfirm = document.getElementById('deleteModalConfirm');
     const deleteButtons = document.querySelectorAll('.open-delete-modal');
-    let deleteActionMode = 'delete';
-    let deleteDetailUrl = null;
+    let currentDeleteUrl = null;
+    let currentDeleteRow = null;
 
-    function openDeleteModal(url, name, isActive, detailUrl) {
+    function openDeleteModal(url, name, btn) {
         if (!deleteModal || !deleteForm) return;
-        deleteForm.action = url;
-        deleteModalText.textContent = `Are you sure you want to delete "${name}"? This will permanently remove it from your products.`;
+        currentDeleteUrl = url;
+        currentDeleteRow = btn ? btn.closest('tr') : null;
+        deleteModalText.textContent = `Are you sure you want to permanently delete "${name}"? This action cannot be undone.`;
         deleteModal.classList.add('active');
-
-        if (isActive === 'true') {
-            deleteModalText.textContent = `To delete "${name}", unlist it first (set status to Inactive), then delete.`;
-            deleteActionMode = 'redirect';
-            deleteDetailUrl = detailUrl || '#';
-            if (deleteModalConfirm) {
-                deleteModalConfirm.disabled = false;
-                deleteModalConfirm.textContent = 'Unlist first';
-            }
-        } else {
-            deleteActionMode = 'delete';
-            deleteDetailUrl = null;
-            if (deleteModalConfirm) {
-                deleteModalConfirm.disabled = false;
-                deleteModalConfirm.textContent = 'Yes, Delete';
-            }
+        
+        if (deleteModalConfirm) {
+            deleteModalConfirm.disabled = false;
+            deleteModalConfirm.textContent = 'Yes, Delete';
         }
     }
 
     function closeDeleteModal() {
         if (deleteModal) deleteModal.classList.remove('active');
+        currentDeleteUrl = null;
+        currentDeleteRow = null;
     }
 
     deleteButtons.forEach(btn => {
         btn.addEventListener('click', function() {
             const url = btn.getAttribute('data-delete-url');
             const name = btn.getAttribute('data-product-name') || 'this product';
-            const isActive = btn.getAttribute('data-is-active') || 'true';
-            const detailUrl = btn.getAttribute('data-detail-url') || '#';
-            openDeleteModal(url, name, isActive, detailUrl);
+            openDeleteModal(url, name, btn);
         });
     });
 
@@ -530,22 +530,44 @@
     if (deleteModalConfirm) {
         deleteModalConfirm.addEventListener('click', function(e) {
             e.preventDefault();
-            if (!deleteForm || !deleteForm.action) {
+            if (!currentDeleteUrl) {
                 alert('Delete action is missing.');
-                return;
-            }
-            if (deleteActionMode === 'redirect') {
-                if (deleteDetailUrl && deleteDetailUrl !== '#') {
-                    window.location.href = deleteDetailUrl;
-                } else {
-                    alert('Cannot find the product detail page to unlist.');
-                }
                 return;
             }
             if (deleteModalConfirm.disabled) return;
             deleteModalConfirm.disabled = true;
             deleteModalConfirm.textContent = 'Deleting...';
-            deleteForm.submit();
+            
+            // Use AJAX to delete without page redirect
+            fetch(currentDeleteUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the row from the table
+                    if (currentDeleteRow) {
+                        currentDeleteRow.remove();
+                    }
+                    closeDeleteModal();
+                    // Update selected count in case deleted row was selected
+                    updateSelectedCount();
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to delete product'));
+                    deleteModalConfirm.disabled = false;
+                    deleteModalConfirm.textContent = 'Yes, Delete';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to delete product. Please try again.');
+                deleteModalConfirm.disabled = false;
+                deleteModalConfirm.textContent = 'Yes, Delete';
+            });
         });
     }
 </script>
