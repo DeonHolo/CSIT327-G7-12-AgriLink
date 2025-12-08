@@ -220,7 +220,8 @@ def product_edit(request, pk):
 @login_required
 def product_delete(request, pk):
     """
-    Delete product listing (requires product to be inactive/unlisted first).
+    Delete product listing (requires product to be inactive/unlisted first for regular users).
+    Staff can delete products directly without unlisting.
     Also supports unlisting (setting inactive) when action=unlist.
     Only product owner or admin can delete.
     """
@@ -228,19 +229,26 @@ def product_delete(request, pk):
     
     # Check permissions
     if product.farmer != request.user and not request.user.is_staff:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'You do not have permission to delete this product.'}, status=403)
         messages.error(request, 'You do not have permission to delete this product.')
         return redirect('product_detail', pk=pk)
     
     if request.method == 'POST':
         action = request.POST.get('action') or request.POST.get('mode')
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
         # Unlist request
         if action == 'unlist':
             if product.is_active:
                 product.is_active = False
                 product.save(update_fields=['is_active'])
+                if is_ajax:
+                    return JsonResponse({'success': True, 'message': f'Product "{product.name}" has been unlisted.'})
                 messages.success(request, f'Product "{product.name}" has been unlisted.')
             else:
+                if is_ajax:
+                    return JsonResponse({'success': True, 'message': f'Product "{product.name}" is already inactive.'})
                 messages.info(request, f'Product "{product.name}" is already inactive.')
             return redirect('product_detail', pk=pk)
 
@@ -249,18 +257,30 @@ def product_delete(request, pk):
             if not product.is_active:
                 product.is_active = True
                 product.save(update_fields=['is_active'])
+                if is_ajax:
+                    return JsonResponse({'success': True, 'message': f'Product "{product.name}" has been relisted.'})
                 messages.success(request, f'Product "{product.name}" has been relisted and is now visible to buyers.')
             else:
+                if is_ajax:
+                    return JsonResponse({'success': True, 'message': f'Product "{product.name}" is already active.'})
                 messages.info(request, f'Product "{product.name}" is already active.')
             return redirect('product_detail', pk=pk)
 
         # Delete request (default or explicit)
-        if product.is_active:
+        # Staff can delete active products directly; regular users must unlist first
+        if product.is_active and not request.user.is_staff:
+            if is_ajax:
+                return JsonResponse({'success': False, 'error': 'Unlist the product first before deleting.'}, status=400)
             messages.error(request, 'Unlist the product first before deleting.')
             return redirect('product_detail', pk=pk)
 
+        product_name = product.name
         product.delete()
-        messages.success(request, f'Product "{product.name}" has been deleted.')
+        
+        if is_ajax:
+            return JsonResponse({'success': True, 'message': f'Product "{product_name}" has been deleted.'})
+        
+        messages.success(request, f'Product "{product_name}" has been deleted.')
         return redirect('my_products')
     
     context = {

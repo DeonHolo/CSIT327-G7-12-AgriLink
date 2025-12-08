@@ -405,11 +405,27 @@ def products_bulk_action(request):
                 notes=notes
             )
             count += 1
+        
+        elif action == 'delete':
+            product_name = product.name
+            was_active = product.is_active
+            product.delete()
+            AuditLog.objects.create(
+                actor=request.user,
+                action='product_delete',
+                target_product=None,  # Product is deleted
+                previous_status='active' if was_active else 'unlisted',
+                new_status='deleted',
+                notes=f'Deleted product: {product_name}. {notes}'.strip()
+            )
+            count += 1
     
     if action == 'unlist':
         messages.warning(request, f'Unlisted {count} product(s).')
     elif action == 'restore':
         messages.success(request, f'Restored {count} product(s).')
+    elif action == 'delete':
+        messages.success(request, f'Deleted {count} product(s).')
     
     return redirect('staff_products_list')
 
