@@ -14,5 +14,16 @@ urlpatterns = [
     
     # Start conversation from product
     path('start/<int:product_pk>/', views.start_conversation, name='start_conversation'),
+    
+    # Deal management
+    path('<int:pk>/farmer-products/', views.get_farmer_products, name='get_farmer_products'),
+    path('<int:pk>/create-offer/', views.create_offer, name='create_offer'),
+    path('<int:pk>/deals/', views.get_conversation_deals, name='get_conversation_deals'),
+    path('deal/<int:deal_id>/', views.get_deal, name='get_deal'),
+    path('deal/<int:deal_id>/accept/', views.accept_deal, name='accept_deal'),
+    path('deal/<int:deal_id>/decline/', views.decline_deal, name='decline_deal'),
+    path('deal/<int:deal_id>/cancel/', views.cancel_deal, name='cancel_deal'),
+    path('deal/<int:deal_id>/complete/', views.complete_deal, name='complete_deal'),
+    path('deal/<int:deal_id>/review/', views.submit_review, name='submit_review'),
 ]
 

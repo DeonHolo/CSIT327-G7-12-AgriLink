@@ -566,6 +566,240 @@
         .btn-modal-save:hover {
             box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
         }
+
+        /* ===== FARMER PROFILE MODAL ===== */
+        .farmer-modal-content {
+            max-width: 480px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        
+        .farmer-profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 1rem;
+        }
+        
+        .farmer-profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        
+        .farmer-profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .farmer-profile-info {
+            flex: 1;
+        }
+        
+        .farmer-profile-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #333;
+            margin: 0 0 0.25rem 0;
+        }
+        
+        .farmer-profile-type {
+            font-size: 0.875rem;
+            color: #666;
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .farmer-verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .farmer-rating-summary {
+            background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .farmer-rating-big {
+            text-align: center;
+        }
+        
+        .farmer-rating-big .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .farmer-rating-big .stars {
+            color: #ffc107;
+            font-size: 1rem;
+        }
+        
+        .farmer-rating-big .stars .empty {
+            color: #ddd;
+        }
+        
+        .farmer-rating-big .count {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+        
+        .farmer-stats {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .farmer-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #555;
+        }
+        
+        .farmer-stat-item i {
+            color: #4CAF50;
+        }
+        
+        .farmer-reviews-section h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 0.75rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .farmer-review-item {
+            padding: 0.75rem;
+            background: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .farmer-review-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .farmer-review-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.875rem;
+            overflow: hidden;
+        }
+        
+        .farmer-review-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .farmer-review-info {
+            flex: 1;
+        }
+        
+        .farmer-review-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #333;
+        }
+        
+        .farmer-review-date {
+            font-size: 0.75rem;
+            color: #999;
+        }
+        
+        .farmer-review-stars {
+            color: #ffc107;
+            font-size: 0.875rem;
+        }
+        
+        .farmer-review-stars .empty {
+            color: #ddd;
+        }
+        
+        .farmer-review-comment {
+            font-size: 0.875rem;
+            color: #555;
+            margin-top: 0.5rem;
+            padding-left: 0.5rem;
+            border-left: 2px solid #e0e0e0;
+        }
+        
+        .farmer-review-product {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 0.5rem;
+        }
+        
+        .farmer-no-reviews {
+            text-align: center;
+            padding: 1.5rem;
+            color: #999;
+        }
+        
+        .farmer-no-reviews i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.5;
+        }
+        
+        .farmer-modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .farmer-modal-actions .btn {
+            flex: 1;
+        }
+        
+        .farmer-clickable {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .farmer-clickable:hover {
+            color: #4CAF50;
+            text-decoration: underline;
+        }
         
         /* ===== MAIN CONTENT ===== */
         .main-content {
@@ -831,13 +1065,80 @@
         </div>
     </div>
     
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 AgriLink. All rights reserved.</p>
-            <p class="text-white-50">Connecting farmers with buyers for a sustainable future.</p>
+    <!-- Farmer Profile Modal -->
+    <div class="modal-overlay" id="farmerProfileModal">
+        <div class="modal-content farmer-modal-content">
+            <div class="modal-header">
+                <h3><i class="bi bi-person-badge"></i> Farmer Profile</h3>
+                <button class="modal-close" onclick="closeFarmerProfileModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Loading state -->
+                <div id="farmerProfileLoading" style="text-align: center; padding: 2rem;">
+                    <i class="bi bi-hourglass-split" style="font-size: 2rem; color: #4CAF50;"></i>
+                    <p style="margin-top: 0.5rem; color: #666;">Loading farmer profile...</p>
+                </div>
+                
+                <!-- Profile content (hidden until loaded) -->
+                <div id="farmerProfileContent" style="display: none;">
+                    <!-- Profile Header -->
+                    <div class="farmer-profile-header">
+                        <div class="farmer-profile-avatar" id="farmerAvatar">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div class="farmer-profile-info">
+                            <h4 class="farmer-profile-name" id="farmerName">Farmer Name</h4>
+                            <p class="farmer-profile-type" id="farmerType">Farmer</p>
+                            <span class="farmer-verified-badge" id="farmerVerified" style="display: none;">
+                                <i class="bi bi-patch-check-fill"></i> Verified
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Rating Summary -->
+                    <div class="farmer-rating-summary">
+                        <div class="farmer-rating-big">
+                            <div class="number" id="farmerRatingValue">0.0</div>
+                            <div class="stars" id="farmerRatingStars">
+                                <i class="bi bi-star-fill empty"></i>
+                                <i class="bi bi-star-fill empty"></i>
+                                <i class="bi bi-star-fill empty"></i>
+                                <i class="bi bi-star-fill empty"></i>
+                                <i class="bi bi-star-fill empty"></i>
+                            </div>
+                            <div class="count" id="farmerRatingCount">0 reviews</div>
+                        </div>
+                        <div class="farmer-stats">
+                            <div class="farmer-stat-item">
+                                <i class="bi bi-box-seam"></i>
+                                <span id="farmerProductCount">0 active listings</span>
+                            </div>
+                            <div class="farmer-stat-item">
+                                <i class="bi bi-calendar3"></i>
+                                <span id="farmerMemberSince">Member since Jan 2025</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Reviews -->
+                    <div class="farmer-reviews-section">
+                        <h4><i class="bi bi-chat-quote"></i> Recent Reviews</h4>
+                        <div id="farmerReviewsList">
+                            <!-- Reviews will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="farmer-modal-actions" id="farmerModalActions">
+                        <button class="btn-modal-cancel" onclick="closeFarmerProfileModal()">Close</button>
+                        <a href="#" class="btn-modal-save" id="farmerContactBtn">
+                            <i class="bi bi-chat-dots"></i> Contact Farmer
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-    </footer>
+    </div>
     
     <!-- Custom JavaScript -->
     <script>
@@ -919,6 +1220,165 @@
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeLogoutModal();
+        });
+
+        // ===== FARMER PROFILE MODAL =====
+        const farmerProfileModal = document.getElementById('farmerProfileModal');
+        
+        function openFarmerProfileModal(farmerId) {
+            // Show modal and loading state
+            farmerProfileModal.classList.add('active');
+            document.getElementById('farmerProfileLoading').style.display = 'block';
+            document.getElementById('farmerProfileContent').style.display = 'none';
+            
+            // Fetch farmer data
+            fetch(`/auth/api/farmer/${farmerId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        populateFarmerProfile(data);
+                        document.getElementById('farmerProfileLoading').style.display = 'none';
+                        document.getElementById('farmerProfileContent').style.display = 'block';
+                    } else {
+                        alert('Error loading farmer profile: ' + (data.error || 'Unknown error'));
+                        closeFarmerProfileModal();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching farmer profile:', error);
+                    alert('Failed to load farmer profile. Please try again.');
+                    closeFarmerProfileModal();
+                });
+        }
+        
+        function closeFarmerProfileModal() {
+            farmerProfileModal.classList.remove('active');
+        }
+        
+        function populateFarmerProfile(data) {
+            const farmer = data.farmer;
+            const reviews = data.reviews;
+            
+            // Avatar
+            const avatarEl = document.getElementById('farmerAvatar');
+            if (farmer.profile_picture) {
+                avatarEl.innerHTML = `<img src="${farmer.profile_picture}" alt="${farmer.username}">`;
+            } else {
+                avatarEl.innerHTML = '<i class="bi bi-person"></i>';
+            }
+            
+            // Name and type
+            document.getElementById('farmerName').textContent = farmer.full_name || farmer.username;
+            document.getElementById('farmerType').textContent = farmer.user_type;
+            
+            // Verified badge
+            const verifiedBadge = document.getElementById('farmerVerified');
+            verifiedBadge.style.display = farmer.is_verified ? 'inline-flex' : 'none';
+            
+            // Rating
+            document.getElementById('farmerRatingValue').textContent = farmer.average_rating.toFixed(1);
+            document.getElementById('farmerRatingCount').textContent = 
+                `${farmer.rating_count} review${farmer.rating_count !== 1 ? 's' : ''}`;
+            
+            // Stars
+            const starsEl = document.getElementById('farmerRatingStars');
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= Math.round(farmer.average_rating)) {
+                    starsHtml += '<i class="bi bi-star-fill"></i>';
+                } else {
+                    starsHtml += '<i class="bi bi-star-fill empty"></i>';
+                }
+            }
+            starsEl.innerHTML = starsHtml;
+            
+            // Stats
+            document.getElementById('farmerProductCount').textContent = 
+                `${farmer.active_products_count} active listing${farmer.active_products_count !== 1 ? 's' : ''}`;
+            document.getElementById('farmerMemberSince').textContent = `Member since ${farmer.member_since}`;
+            
+            // Reviews
+            const reviewsList = document.getElementById('farmerReviewsList');
+            if (reviews && reviews.length > 0) {
+                reviewsList.innerHTML = reviews.map(review => `
+                    <div class="farmer-review-item">
+                        <div class="farmer-review-header">
+                            <div class="farmer-review-avatar">
+                                ${review.reviewer_avatar 
+                                    ? `<img src="${review.reviewer_avatar}" alt="${review.reviewer_name}">`
+                                    : '<i class="bi bi-person"></i>'}
+                            </div>
+                            <div class="farmer-review-info">
+                                <div class="farmer-review-name">${escapeHtmlGlobal(review.reviewer_name)}</div>
+                                <div class="farmer-review-date">${review.created_at}</div>
+                            </div>
+                            <div class="farmer-review-stars">
+                                ${generateStarsHtml(review.seller_rating)}
+                            </div>
+                        </div>
+                        ${review.seller_comment ? `<div class="farmer-review-comment">${escapeHtmlGlobal(review.seller_comment)}</div>` : ''}
+                        <div class="farmer-review-product">
+                            <i class="bi bi-bag"></i> ${escapeHtmlGlobal(review.product_name)} (${review.quantity} ${escapeHtmlGlobal(review.unit)})
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                reviewsList.innerHTML = `
+                    <div class="farmer-no-reviews">
+                        <i class="bi bi-chat-square-text"></i>
+                        <p>No reviews yet</p>
+                    </div>
+                `;
+            }
+            
+            // Contact button - hide if viewing own profile
+            const contactBtn = document.getElementById('farmerContactBtn');
+            {% if user.is_authenticated %}
+            const currentUserId = {{ user.id }};
+            if (farmer.id === currentUserId) {
+                contactBtn.style.display = 'none';
+            } else {
+                contactBtn.style.display = 'inline-flex';
+                // For contact, we need to find a product from this farmer to start conversation
+                // For now, link to products filtered by this farmer (or a search)
+                contactBtn.href = `/products/?search=${encodeURIComponent(farmer.username)}`;
+            }
+            {% else %}
+            contactBtn.href = '/auth/login/';
+            {% endif %}
+        }
+        
+        function generateStarsHtml(rating) {
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    html += '<i class="bi bi-star-fill"></i>';
+                } else {
+                    html += '<i class="bi bi-star-fill empty"></i>';
+                }
+            }
+            return html;
+        }
+        
+        function escapeHtmlGlobal(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Close modal on overlay click
+        farmerProfileModal.addEventListener('click', function(e) {
+            if (e.target === farmerProfileModal) {
+                closeFarmerProfileModal();
+            }
+        });
+        
+        // Close on Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && farmerProfileModal.classList.contains('active')) {
+                closeFarmerProfileModal();
+            }
         });
     </script>
     

@@ -660,6 +660,122 @@
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 1rem;
     }
+
+    /* Review styles */
+    .review-item {
+        padding: 1.25rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .review-item:last-child {
+        border-bottom: none;
+    }
+    
+    .review-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .reviewer-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1rem;
+        overflow: hidden;
+    }
+    
+    .reviewer-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .reviewer-info {
+        flex: 1;
+    }
+    
+    .reviewer-name {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .review-date {
+        font-size: 0.8rem;
+        color: #999;
+    }
+    
+    .review-stars {
+        color: #ffc107;
+        font-size: 1rem;
+    }
+    
+    .review-stars .empty {
+        color: #ddd;
+    }
+    
+    .review-rating-label {
+        font-size: 0.8rem;
+        color: #666;
+        margin-bottom: 0.25rem;
+    }
+    
+    .review-comment {
+        color: #555;
+        font-size: 0.95rem;
+        margin-top: 0.5rem;
+        padding-left: 0.5rem;
+        border-left: 3px solid #e0e0e0;
+    }
+    
+    .review-product {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #f5f5f5;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+    
+    .rating-summary {
+        background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .rating-big {
+        text-align: center;
+    }
+    
+    .rating-big .number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+    }
+    
+    .rating-big .stars {
+        color: #ffc107;
+        font-size: 1.25rem;
+    }
+    
+    .rating-big .count {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 0.25rem;
+    }
     
     @media (max-width: 768px) {
         .profile-header-content {
@@ -860,6 +976,77 @@
                     </div>
                     {% endif %}
                 </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Seller Reviews Section (for farmers) -->
+        {% if profile_user.is_farmer %}
+        <div class="profile-section" style="margin-top: 2rem;">
+            <div class="section-header">
+                <i class="bi bi-star"></i>
+                <h3>Seller Reviews</h3>
+            </div>
+            <div class="section-content">
+                {% if profile_user.farmer_rating_count > 0 %}
+                <div class="rating-summary">
+                    <div class="rating-big">
+                        <div class="number">{{ profile_user.average_farmer_rating|floatformat:1 }}</div>
+                        <div class="stars">
+                            {% with avg=profile_user.average_farmer_rating|floatformat:0|add:0 %}
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= avg %}
+                                <i class="bi bi-star-fill"></i>
+                                {% else %}
+                                <i class="bi bi-star-fill empty"></i>
+                                {% endif %}
+                            {% endfor %}
+                            {% endwith %}
+                        </div>
+                        <div class="count">{{ profile_user.farmer_rating_count }} review{{ profile_user.farmer_rating_count|pluralize }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if seller_reviews %}
+                    {% for review in seller_reviews %}
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div class="reviewer-avatar">
+                                {% if review.reviewer.profile_picture %}
+                                <img src="{{ review.reviewer.profile_picture.url }}" alt="{{ review.reviewer.username }}">
+                                {% else %}
+                                <i class="bi bi-person"></i>
+                                {% endif %}
+                            </div>
+                            <div class="reviewer-info">
+                                <div class="reviewer-name">{{ review.reviewer.username }}</div>
+                                <div class="review-date">{{ review.created_at|date:"M d, Y" }}</div>
+                            </div>
+                            <div class="review-stars">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.seller_rating %}
+                                    <i class="bi bi-star-fill"></i>
+                                    {% else %}
+                                    <i class="bi bi-star-fill empty"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% if review.seller_comment %}
+                        <div class="review-comment">{{ review.seller_comment }}</div>
+                        {% endif %}
+                        <div class="review-product">
+                            <i class="bi bi-box"></i> {{ review.deal.product.name }} ({{ review.deal.quantity }} {{ review.deal.product.unit }})
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-star"></i>
+                    <p>No reviews yet. Complete transactions to receive reviews from buyers.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
         {% endif %}

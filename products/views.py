@@ -118,12 +118,21 @@ def product_detail(request, pk):
         farmer=product.farmer,
         is_active=True
     ).count()
+    
+    # Get product reviews (reviews on deals for this product)
+    from chat.models import Review
+    product_reviews = Review.objects.filter(
+        deal__product=product
+    ).select_related(
+        'deal', 'reviewer'
+    ).order_by('-created_at')[:10]
 
     context = {
         'title': f'{product.name} - AgriLink',
         'product': product,
         'other_products': other_products,
         'farmer_active_products_count': farmer_active_products_count,
+        'product_reviews': product_reviews,
     }
     return render(request, 'products/product_detail.html', context)
 
@@ -211,9 +220,9 @@ def product_edit(request, pk):
 @login_required
 def product_delete(request, pk):
     """
-    Soft delete product (set is_active=False)
-    Implements FR-7 (delete product listing)
-    Only product owner or admin can delete
+    Delete product listing (requires product to be inactive/unlisted first).
+    Also supports unlisting (setting inactive) when action=unlist.
+    Only product owner or admin can delete.
     """
     product = get_object_or_404(Product, pk=pk)
     
@@ -223,9 +232,35 @@ def product_delete(request, pk):
         return redirect('product_detail', pk=pk)
     
     if request.method == 'POST':
-        product.is_active = False
-        product.save()
-        messages.success(request, f'Product "{product.name}" has been removed.')
+        action = request.POST.get('action') or request.POST.get('mode')
+
+        # Unlist request
+        if action == 'unlist':
+            if product.is_active:
+                product.is_active = False
+                product.save(update_fields=['is_active'])
+                messages.success(request, f'Product "{product.name}" has been unlisted.')
+            else:
+                messages.info(request, f'Product "{product.name}" is already inactive.')
+            return redirect('product_detail', pk=pk)
+
+        # Relist request
+        if action == 'relist':
+            if not product.is_active:
+                product.is_active = True
+                product.save(update_fields=['is_active'])
+                messages.success(request, f'Product "{product.name}" has been relisted and is now visible to buyers.')
+            else:
+                messages.info(request, f'Product "{product.name}" is already active.')
+            return redirect('product_detail', pk=pk)
+
+        # Delete request (default or explicit)
+        if product.is_active:
+            messages.error(request, 'Unlist the product first before deleting.')
+            return redirect('product_detail', pk=pk)
+
+        product.delete()
+        messages.success(request, f'Product "{product.name}" has been deleted.')
         return redirect('my_products')
     
     context = {

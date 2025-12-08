@@ -371,7 +371,9 @@
                             <button type="button"
                                     class="btn-action btn-delete open-delete-modal"
                                     data-delete-url="{% url 'product_delete' product.pk %}"
-                                    data-product-name="{{ product.name }}">
+                                    data-product-name="{{ product.name }}"
+                                    aria-label="Delete {{ product.name }}">
+                                    data-is-active="{{ product.is_active|yesno:'true,false' }}">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </div>
@@ -431,7 +433,7 @@
             {% csrf_token %}
             <div class="modal-actions">
                 <button type="button" class="btn-modal-cancel" id="deleteModalCancel">Cancel</button>
-                <button type="submit" class="btn-modal-confirm">Yes, Delete</button>
+                <button type="submit" class="btn-modal-confirm" id="deleteModalConfirm">Yes, Delete</button>
             </div>
         </form>
     </div>
@@ -442,13 +444,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const deleteForm = document.getElementById('deleteForm');
     const deleteModalText = document.getElementById('deleteModalText');
     const deleteModalCancel = document.getElementById('deleteModalCancel');
+    const deleteModalConfirm = document.getElementById('deleteModalConfirm');
     const openButtons = document.querySelectorAll('.open-delete-modal');
 
-    function openModal(url, name) {
+    function openModal(url, name, isActive) {
         if (!deleteModal || !deleteForm) return;
         deleteForm.action = url;
         deleteModalText.textContent = `Are you sure you want to delete "${name}"? This will permanently remove it from your products.`;
         deleteModal.classList.add('active');
+
+        // Safeguard: only allow delete if product is already unlisted
+        if (isActive === 'true') {
+            deleteModalText.textContent = `To delete "${name}", unlist it first (set status to Inactive), then delete.`;
+            if (deleteModalConfirm) {
+                deleteModalConfirm.disabled = true;
+                deleteModalConfirm.textContent = 'Unlist first';
+            }
+        } else {
+            if (deleteModalConfirm) {
+                deleteModalConfirm.disabled = false;
+                deleteModalConfirm.textContent = 'Yes, Delete';
+            }
+        }
     }
 
     function closeModal() {
@@ -459,7 +476,8 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() {
             const url = btn.getAttribute('data-delete-url');
             const name = btn.getAttribute('data-product-name') || 'this product';
-            openModal(url, name);
+            const isActive = btn.getAttribute('data-is-active') || 'true';
+            openModal(url, name, isActive);
         });
     });
 
@@ -480,6 +498,25 @@ document.addEventListener('DOMContentLoaded', function() {
             closeModal();
         }
     });
+
+    if (deleteModalConfirm) {
+        deleteModalConfirm.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Ensure action is present
+            if (!deleteForm || !deleteForm.action) {
+                alert('Delete action is missing.');
+                return;
+            }
+            // Block if safeguard disabled the button
+            if (deleteModalConfirm.disabled) {
+                return;
+            }
+            // Guard against double submits and submit explicitly
+            deleteModalConfirm.disabled = true;
+            deleteModalConfirm.textContent = 'Deleting...';
+            deleteForm.submit();
+        });
+    }
 });
 </script>
 {% endblock %}

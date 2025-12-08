@@ -313,17 +313,25 @@
         left: 0;
     }
     
-    .highlight-badge {
+    .highlight-badges {
         position: absolute;
         top: 0.5rem;
         left: 0.5rem;
+        display: flex;
+        gap: 0.35rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .highlight-badge {
+        position: relative;
         background: rgba(0,0,0,0.6);
         color: white;
         font-size: 0.65rem;
         padding: 0.2rem 0.5rem;
         border-radius: 4px;
         font-weight: 600;
-        display: flex;
+        display: inline-flex;
         align-items: center;
         gap: 0.25rem;
     }
@@ -593,43 +601,36 @@
     </div>
     
     <!-- Highlights Section -->
-    {% if featured_products or top_products %}
+    {% if highlight_products %}
     <div class="highlights-section">
         <h3 class="section-title">
             <i class="bi bi-star"></i> Highlights
         </h3>
         <div class="highlights-grid">
-            {% for product in featured_products %}
+            {% for item in highlight_products %}
+            {% with product=item.product %}
             <a href="{% url 'product_detail' product.pk %}" class="highlight-card">
-                <div class="highlight-image">
+                <div class="highlight-image {% if item.is_top %}top-seller{% endif %}">
                     {% if product.image %}
                     <img src="{{ product.image.url }}" alt="{{ product.name }}">
                     {% else %}
                     <i class="bi bi-image"></i>
                     {% endif %}
-                    <span class="highlight-badge"><i class="bi bi-star-fill"></i> Featured</span>
+                    <div class="highlight-badges">
+                        {% if item.is_featured %}
+                        <span class="highlight-badge"><i class="bi bi-star-fill"></i> Featured</span>
+                        {% endif %}
+                        {% if item.is_top %}
+                        <span class="highlight-badge"><i class="bi bi-trophy-fill"></i> Top</span>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="highlight-body">
                     <h4>{{ product.name }}</h4>
                     <div class="price">₱{{ product.price|floatformat:"-2"|intcomma }} <span>/ {{ product.unit }}</span></div>
                 </div>
             </a>
-            {% endfor %}
-            {% for product in top_products %}
-            <a href="{% url 'product_detail' product.pk %}" class="highlight-card">
-                <div class="highlight-image top-seller">
-                    {% if product.image %}
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                    {% else %}
-                    <i class="bi bi-image"></i>
-                    {% endif %}
-                    <span class="highlight-badge"><i class="bi bi-trophy-fill"></i> Top</span>
-                </div>
-                <div class="highlight-body">
-                    <h4>{{ product.name }}</h4>
-                    <div class="price">₱{{ product.price|floatformat:"-2"|intcomma }} <span>/ {{ product.unit }}</span></div>
-                </div>
-            </a>
+            {% endwith %}
             {% endfor %}
         </div>
     </div>
